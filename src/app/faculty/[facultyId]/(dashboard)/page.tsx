@@ -114,7 +114,7 @@ export default function Page() {
             {/* <BackButton /> */}
             {!isPending ? (
               <Typography.Title level={3} style={{ marginBottom: 0 }}>
-                {faculty?.name} (Filière)
+               Tableau de bord {/* {faculty?.name} (Filière) */}
               </Typography.Title>
             ) : (
               <Form>
@@ -127,10 +127,12 @@ export default function Page() {
             <Palette />
           </Space>
         </Layout.Header>
-        <Row gutter={[16, 16]}>
-          <Col xs={24} sm={24} md={16}>
+        {/* <Card> */}
+          {/* <Typography.Title level={5}>Tableau de bord</Typography.Title> */}
+        <Row gutter={[24, 24]}>
+          <Col xs={24} sm={24} md={24} lg={16}>
             <Row gutter={[16, 16]}>
-              <Col xs={24} sm={12} md={8}>
+              <Col xs={24} sm={12} md={12} lg={8}>
                 <Card>
                   <Flex justify="space-between">
                     <Statistic
@@ -146,7 +148,7 @@ export default function Page() {
                   </Flex>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} md={8}>
+              <Col  xs={24} sm={12} md={12} lg={8}>
                 <Card>
                   <Flex justify="space-between">
                     <Statistic
@@ -170,7 +172,7 @@ export default function Page() {
                   </Flex>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} md={8}>
+              <Col  xs={24} sm={12} md={12} lg={8}>
                 <Card>
                   <Flex justify="space-between">
                     <Statistic
@@ -195,7 +197,7 @@ export default function Page() {
                   </Flex>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} md={8}>
+              <Col xs={24} sm={12} md={12} lg={8}>
                 <Card>
                   <Flex justify="space-between">
                     <Statistic
@@ -206,7 +208,7 @@ export default function Page() {
                   </Flex>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} md={8}>
+              <Col xs={24} sm={12} md={12} lg={8}>
                 <Card>
                   <Flex justify="space-between">
                     <Statistic
@@ -217,7 +219,7 @@ export default function Page() {
                   </Flex>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} md={8}>
+              <Col  xs={24} sm={12} md={12} lg={8}>
                 <Card>
                   <Flex justify="space-between">
                     <Statistic
@@ -229,8 +231,8 @@ export default function Page() {
                 </Card>
               </Col>
               <Col span={24}>
-                <Card>
-                  <Typography.Title level={5}>Départements</Typography.Title>
+                {/* <Card> */}
+                  <Typography.Title level={5}>Mentions</Typography.Title>
                   <List
                     dataSource={departments}
                     renderItem={(item) => (
@@ -242,7 +244,7 @@ export default function Page() {
                               variant="dashed"
                               style={{ boxShadow: "none" }}
                               onClick={() =>
-                                router.push(`/app/department/${item.id}`)
+                                router.push(`/faculty/${facultyId}/department/${item.id}`)
                               }
                             >
                               Gérer
@@ -265,14 +267,14 @@ export default function Page() {
                       </List.Item>
                     )}
                   />
-                </Card>
+                {/* </Card> */}
               </Col>
             </Row>
           </Col>
-          <Col xs={24} sm={24} md={8}>
+          <Col xs={24} sm={24} md={24} lg={8}>
             <Row gutter={[16, 16]}>
               <Col span={24}>
-                <Card loading={isPending}>
+                {/* <Card loading={isPending}> */}
                   <Descriptions
                     title="Détails"
                     extra={
@@ -304,7 +306,7 @@ export default function Page() {
                     <Typography.Title level={5}>Membres</Typography.Title>
                     <FacultyMembersList faculty={faculty} />
                   </div>
-                </Card>
+                {/* </Card> */}
               </Col>
             </Row>
           </Col>
@@ -316,6 +318,7 @@ export default function Page() {
             setOpen={setOpenEdit}
           />
         </Row>
+        {/* </Card> */}
         <Layout.Footer
           style={{
             display: "flex",

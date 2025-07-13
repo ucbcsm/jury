@@ -153,3 +153,4 @@
 //  https://ciucbc.pythonanywhere.com/api/v01/jury/year-grades
 //  https://ciucbc.pythonanywhere.com/api/v01/jury/announcement
 //  https://ciucbc.pythonanywhere.com/api/v01/jury/retake-course
+// 

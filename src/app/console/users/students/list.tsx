@@ -2,10 +2,7 @@
 
 import {
   DeleteOutlined,
-  DownOutlined,
   EditOutlined,
-  FileExcelOutlined,
-  FilePdfOutlined,
   MoreOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
@@ -14,19 +11,14 @@ import {
   Button,
   Dropdown,
   Input,
-  Segmented,
   Space,
   Table,
   Tag,
 } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import {
-  getGroups,
-  getPermissions,
   getRoleName,
-  getRoles,
   getStudentsUsers,
-  getUsers,
 } from "@/lib/api";
 import { DataFetchPendingSkeleton } from "@/components/loadingSkeleton";
 import { DataFetchErrorResult } from "@/components/errorResult";
@@ -153,28 +145,6 @@ export const ListStudentsUsers: FC<ListStudentsUsersProps> = ({
               Imprimer
             </Button> */}
             <Input.Search placeholder="Rechercher un utilisateur ..." />
-            {/* <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: "pdf",
-                    label: "PDF",
-                    icon: <FilePdfOutlined />,
-                    title: "Exporter en pdf",
-                  },
-                  {
-                    key: "excel",
-                    label: "EXCEL",
-                    icon: <FileExcelOutlined />,
-                    title: "Exporter ver excel",
-                  },
-                ],
-              }}
-            >
-              <Button icon={<DownOutlined />} style={{ boxShadow: "none" }}>
-                Exporter
-              </Button>
-            </Dropdown> */}
           </Space>
         </header>
       )}

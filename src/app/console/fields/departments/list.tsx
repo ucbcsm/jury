@@ -39,7 +39,7 @@ const ActionsBar: FC<ActionsBarProps> = ({ record, faculties, teachers }) => {
         color="primary"
         variant="dashed"
         title="Gérer le département"
-        onClick={() => {router.push(`/app/department/${record.id}`)}}
+        onClick={() => {router.push(`/faculty/${record.faculty.id}/department/${record.id}`)}}
         style={{ boxShadow: "none" }}
       >
         Gérer

@@ -1,32 +1,13 @@
 "use client";
 
-import {
-  DeleteOutlined,
-  EditOutlined,
-  MoreOutlined,
-  PlusCircleOutlined,
-  TeamOutlined,
-} from "@ant-design/icons";
-import {
-  Avatar,
-  Button,
-  Card,
-  Dropdown,
-  Flex,
-  Layout,
-  List,
-  Space,
-  theme,
-  Typography,
-} from "antd";
+import { Card, Flex, Layout, Space, theme, Typography } from "antd";
 
 import { Palette } from "@/components/palette";
-import Link from "next/link";
 import BackButton from "@/components/backButton";
 import { ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { getGroups, getPermissions } from "@/lib/api";
+import { getPermissions } from "@/lib/api";
 import { GroupList } from "./groups/list";
 import { NewGroupForm } from "./groups/new";
 
@@ -40,7 +21,7 @@ export default function UsersLayout({
   const pathname = usePathname();
   const router = useRouter();
 
-   const {
+  const {
     data: permissions,
     isPending: isPendingPermissions,
     isError: isErrorPermissions,
@@ -48,7 +29,6 @@ export default function UsersLayout({
     queryKey: ["permissions"],
     queryFn: getPermissions,
   });
- 
 
   return (
     <Layout>
@@ -81,15 +61,6 @@ export default function UsersLayout({
           </Space>
         </Layout.Header>
         <Card
-          // tabList={[
-          //   {
-          //     key: "/console/users",
-          //     label: "Tous",
-          //   },
-          //   { key: "/console/users/students", label: "Étudiants" },
-          //   { key: "/console/users/teachers", label: "Enseignants" },
-          //   { key: "/console/users/admins", label: "Admins" },
-          // ]}
           activeTabKey={pathname}
           onTabChange={(key) => {
             router.push(key);
@@ -127,7 +98,7 @@ export default function UsersLayout({
           <Typography.Title level={5} className="">
             Groupes
           </Typography.Title>
-          <NewGroupForm permissions={permissions}/>
+          <NewGroupForm permissions={permissions} />
         </Flex>
         <div
           style={{
@@ -137,7 +108,7 @@ export default function UsersLayout({
             overflowY: "auto",
           }}
         >
-          <GroupList permissions={permissions}/>
+          <GroupList permissions={permissions} />
         </div>
       </Layout.Sider>
     </Layout>

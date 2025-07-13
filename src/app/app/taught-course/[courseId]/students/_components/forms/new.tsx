@@ -121,7 +121,7 @@ export const NewCourseEnrollmentForm: FC<NewCourseEnrollmentFormProps> = ({
         width={`100%`}
         title={
           <Space>
-            Formulaire d&apos;inscription au cours :{" "}
+            Inscription au cours :{" "}
             <Typography.Title
               level={5}
               type="success"
@@ -134,6 +134,7 @@ export const NewCourseEnrollmentForm: FC<NewCourseEnrollmentFormProps> = ({
         onClose={onClose}
         open={openNewEnrollments}
         closable={false}
+        destroyOnHidden
         extra={
           <Space>
             <Button
@@ -185,8 +186,8 @@ export const NewCourseEnrollmentForm: FC<NewCourseEnrollmentFormProps> = ({
                   ajoutés.
                 </div>
                 <div style={{ marginTop: 8 }}>
-                  Précisez également le <b>statut de l'inscription</b> pour
-                  l'ensemble de la sélection : <i>En attente</i>, <i>Validé</i>{" "}
+                  Précisez également le <b>statut de l&apos;inscription</b> pour
+                  l&apos;ensemble de la sélection : <i>En attente</i>, <i>Validé</i>{" "}
                   ou <i>Réjeté</i>.
                 </div>
               </>

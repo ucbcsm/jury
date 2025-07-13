@@ -2,10 +2,7 @@
 
 import {
   DeleteOutlined,
-  DownOutlined,
   EditOutlined,
-  FileExcelOutlined,
-  FilePdfOutlined,
   MoreOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
@@ -21,12 +18,8 @@ import {
 } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import {
-  getGroups,
-  getPermissions,
   getRoleName,
-  getRoles,
   getStaffUsers,
-  getUsers,
 } from "@/lib/api";
 import { DataFetchPendingSkeleton } from "@/components/loadingSkeleton";
 import { DataFetchErrorResult } from "@/components/errorResult";
@@ -168,28 +161,6 @@ export const ListStaffUsers: FC<ListStaffUsersProps> = ({
               defaultValue={permanent}
               value={permanent}
             />
-            {/* <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: "pdf",
-                    label: "PDF",
-                    icon: <FilePdfOutlined />,
-                    title: "Exporter en pdf",
-                  },
-                  {
-                    key: "excel",
-                    label: "EXCEL",
-                    icon: <FileExcelOutlined />,
-                    title: "Exporter ver excel",
-                  },
-                ],
-              }}
-            >
-              <Button icon={<DownOutlined />} style={{ boxShadow: "none" }}>
-                Exporter
-              </Button>
-            </Dropdown> */}
           </Space>
         </header>
       )}

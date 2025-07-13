@@ -282,7 +282,7 @@ export default function Page() {
                 open={openEdit}
                 setOpen={setOpenEdit}
                 taughtCourse={course!}
-                faculties={faculties}
+                // faculties={faculties}
                 departments={departments}
                 periods={periods}
                 teachers={teachers}

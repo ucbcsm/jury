@@ -158,6 +158,7 @@ export const NewPeriodEnrollmentForm: FC<NewPeriodEnrollmentFormProps> = ({
         onClose={onClose}
         open={openNewEnrollments}
         closable={false}
+        destroyOnHidden
         extra={
           <Space>
             <Button

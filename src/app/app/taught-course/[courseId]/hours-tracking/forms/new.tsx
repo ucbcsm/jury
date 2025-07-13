@@ -88,7 +88,7 @@ export const NewHourTrackingForm: React.FC = () => {
           style: { boxShadow: "none" },
         }}
         onCancel={() => setOpen(false)}
-        destroyOnClose
+        destroyOnHidden
         maskClosable={!isPending}
         modalRender={(dom) => (
           <Form
@@ -119,10 +119,10 @@ export const NewHourTrackingForm: React.FC = () => {
           <Col span={24}>
             <Form.Item
               name="lesson"
-              label="Matière"
+              label="Leçon du jour"
               rules={[{ required: true }]}
             >
-              <Input placeholder="Libellé de la matière" />
+              <Input placeholder="Libellé de la leçon" />
             </Form.Item>
           </Col>
         </Row>

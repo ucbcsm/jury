@@ -17,9 +17,11 @@ import BackButton from "@/components/backButton";
 import { JurysList } from "../../console/years/[yearId]/jurys/list";
 
 export default function Page() {
+  
   const {
     token: { colorBgContainer, colorBorderSecondary },
   } = theme.useToken();
+
   return (
     <Layout>
       <Layout.Content

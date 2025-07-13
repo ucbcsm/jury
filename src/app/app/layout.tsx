@@ -106,6 +106,11 @@ export default function AppLayout({
               icon: <DashboardOutlined />,
             },
             {
+              key: "/app/enrollments",
+              label: "Inscriptions",
+              icon: <SafetyCertificateOutlined />,
+            },
+            {
               key: "/app/students",
               label: "Étudiants",
               icon: <UsergroupAddOutlined />,
@@ -215,7 +220,7 @@ export default function AppLayout({
           }}
         >
           {children}
-           <div
+          <div
             className=""
             style={{
               display: isLoadingLogout ? "flex" : "none",

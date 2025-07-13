@@ -56,3 +56,12 @@ export async function getStudentDashboard(
     student_infos: Enrollment;
   };
 }
+
+export function getYearEnrollementsAsOptions(data?: Enrollment[]) {
+  const options = data?.map((enrollment) => ({
+    value: enrollment.id,
+    label: `${enrollment.user.first_name} ${enrollment.user.last_name} ${enrollment.user.surname}`,
+  }));
+
+  return options
+}

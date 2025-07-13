@@ -128,7 +128,7 @@ export const EditCourseForm: React.FC<EditCourseFormProps> = ({
         </Row>
         <Form.Item
           name="course_type"
-          label="Type de cours"
+          label="Nature du cours"
           rules={[
             {
               required: true,

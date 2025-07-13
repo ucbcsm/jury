@@ -114,7 +114,9 @@ export function JurysList() {
       title={() => (
         <header className="flex pb-3">
           <Space>
-            <Typography.Title level={5} style={{marginBottom:0}}>Jurys</Typography.Title>
+            <Typography.Title level={5} style={{ marginBottom: 0 }}>
+              Jurys
+            </Typography.Title>
           </Space>
           <div className="flex-1" />
           <Space>
@@ -191,12 +193,17 @@ export function JurysList() {
           ellipsis: true,
         },
         {
-          title: "Autres membres",
-          dataIndex: "membersCount",
-          key: "membersCount",
-          width: 80,
-          render: (_, record) => record.members.length,
-          align: "center",
+          title: "Autre (s) membre (s)",
+          dataIndex: "members",
+          key: "members",
+          render: (_, record) => (
+            <Space wrap>
+              {record.members.map(
+                (m) =>
+                  `${m.user.first_name} ${m.user.last_name} ${m.user.surname}`
+              )}
+            </Space>
+          ),
         },
         {
           dataIndex: "actions",
@@ -213,17 +220,16 @@ export function JurysList() {
       ]}
       dataSource={jurys}
       rowKey="id"
-      rowClassName={`bg-[#f5f5f5] odd:bg-white hover:cursor-pointer`}
-      rowSelection={{
-        type: "checkbox",
-      }}
+      rowClassName={`bg-[#f5f5f5] odd:bg-white`}
+      // rowSelection={{
+      //   type: "checkbox",
+      // }}
       size="small"
       pagination={{
         defaultPageSize: 25,
         pageSizeOptions: [25, 50, 75, 100],
         size: "small",
       }}
-  
     />
   );
 }

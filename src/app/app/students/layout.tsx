@@ -1,24 +1,27 @@
 "use client";
-import { UserAddOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  DownOutlined,
+  FileExcelOutlined,
+  FilePdfOutlined,
+  FilterOutlined,
+  MoreOutlined,
+  PrinterOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Card,
   Dropdown,
   Flex,
+  Input,
   Layout,
   Space,
-  Tabs,
   theme,
   Typography,
 } from "antd";
-import { usePathname, useRouter } from "next/navigation";
-import { parseAsBoolean, useQueryState } from "nuqs";
-import { ListNewApplications } from "./applications/lists/new_applications";
-import { ListReApplications } from "./applications/lists/reapplications";
-import { ReapplyForm } from "./applications/forms/reapply";
-import { NewApplicationForm } from "./applications/forms/new/new";
 import BackButton from "@/components/backButton";
 import { Palette } from "@/components/palette";
+import { ListStudents } from "./list";
 
 export default function StudentsLayout({
   children,
@@ -28,18 +31,6 @@ export default function StudentsLayout({
   const {
     token: { colorBgContainer, colorBorderSecondary },
   } = theme.useToken();
-
-  const [reapply, setReapply] = useQueryState(
-    "reapply",
-    parseAsBoolean.withDefault(false)
-  );
-  const [newApplication, SetNewApplication] = useQueryState(
-    "new",
-    parseAsBoolean.withDefault(false)
-  );
-
-  const pathname = usePathname();
-  const router = useRouter();
 
   return (
     <Layout>
@@ -51,109 +42,68 @@ export default function StudentsLayout({
         <Flex
           justify="space-between"
           align="center"
-          className="px-7 pt-3"
-          style={{ paddingLeft: 28, paddingRight: 28, paddingTop: 12 }}
+          style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 20 }}
         >
-          <Typography.Title level={3} className="">
-            Candidatures
+          <Typography.Title level={3} className="" style={{marginBottom:0}}>
+            Étudiants
           </Typography.Title>
-          <Dropdown
-            menu={{
-              items: [
-                {
-                  key: "reapply",
-                  label: "Réinscrire (Pour les anciens)",
-                  icon: <UserOutlined />,
-                },
-                {
-                  key: "newApplication",
-                  label: "Nouvelle candidature",
-                  icon: <UserAddOutlined />,
-                },
-              ],
-              onClick: ({ key }) => {
-                if (key === "reapply") {
-                  setReapply(true);
-                } else if (key === "newApplication") {
-                  SetNewApplication(true);
-                }
-              },
-            }}
-          >
+          <Space>
             <Button
-              icon={<UserAddOutlined />}
-              type="primary"
+              // icon={<FilterOutlined />}
+              color="primary"
               style={{ boxShadow: "none" }}
               variant="dashed"
             >
-              Créer
+              Filtrer
             </Button>
-          </Dropdown>
+            <Button type="text" icon={<MoreOutlined />} />
+          </Space>
         </Flex>
-        <Tabs
-          tabBarStyle={{ paddingLeft: 28, marginBottom: 0 }}
-          // tabPosition="bottom"
-
-          items={[
-            {
-              key: "waiting",
-              label: "Nouveaux étudiants",
-              children: <ListNewApplications />,
-            },
-            {
-              key: "accepted",
-              label: "Anciens étudiants",
-              children: <ListReApplications />,
-            },
-          ]}
-        />
-        <ReapplyForm open={reapply} setOpen={setReapply} />
-        <NewApplicationForm open={newApplication} setOpen={SetNewApplication} />
+        <div
+          style={{
+            height: "calc(100vh - 116px)",
+            overflowY: "auto",
+            paddingLeft: 16,
+            paddingRight: 16,
+            paddingBottom: 28,
+            paddingTop: 16,
+          }}
+        >
+          <Flex className="" style={{marginBottom:12}}>
+            <Input
+              placeholder="Rechercher ..."
+              allowClear
+              className=""
+              prefix={<SearchOutlined />}
+              variant="borderless"
+            />
+            <Space>
+              <Button
+                type="text"
+                icon={<PrinterOutlined />}
+                style={{ boxShadow: "none" }}
+              />
+              <Button
+                type="text"
+                icon={<FilePdfOutlined />}
+                style={{ boxShadow: "none" }}
+              />
+              <Button
+                type="text"
+                icon={<FileExcelOutlined />}
+                style={{ boxShadow: "none" }}
+              />
+            </Space>
+          </Flex>
+          <ListStudents />
+        </div>
       </Layout.Sider>
       <Layout.Content
         style={{
-          minHeight: 280,
-          padding: "0 32px 0 32px",
           background: colorBgContainer,
-          overflowY: "auto",
-          height: "calc(100vh - 64px)",
         }}
       >
-        <Layout.Header
-          style={{
-            display: "flex",
-            alignItems: "center",
-            background: colorBgContainer,
-            padding: 0,
-          }}
-        >
-          <Space>
-            <BackButton />
-            <Typography.Title level={3} style={{ marginBottom: 0 }}>
-              Etudiants
-            </Typography.Title>
-          </Space>
-          <div className="flex-1" />
-          <Space>
-            <Palette />
-          </Space>
-        </Layout.Header>
-        <Card>{children}</Card>
-        <Layout.Footer
-          style={{
-            display: "flex",
-            background: colorBgContainer,
-            padding: " 24px 0",
-          }}
-        >
-          <Typography.Text type="secondary">
-            © {new Date().getFullYear()} CI-UCBC. Tous droits réservés.
-          </Typography.Text>
-          <div className="flex-1" />
-          <Space>
-            <Palette />
-          </Space>
-        </Layout.Footer>
+        {children}
       </Layout.Content>
     </Layout>
   );

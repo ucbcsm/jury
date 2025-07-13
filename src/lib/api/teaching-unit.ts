@@ -1,6 +1,5 @@
 import { TeachingUnit } from "@/types";
 import api from "../fetcher";
-import { Coda } from "next/font/google";
 
 export async function getTeachingUnits() {
   const res = await api.get(`/faculty/teaching-unit/`);
@@ -13,8 +12,8 @@ export async function getTeachingUnitsByfaculty(facultyId: number) {
 }
 
 export async function createTeachingUnit(
-  data: Omit<TeachingUnit, "id" | "departement" | "cycle"> & {
-    department_id: number;
+  data: Omit<TeachingUnit, "id" | "faculty" | "cycle"> & {
+    faculty_id: number;
     cycle_id: number;
   }
 ) {
@@ -22,7 +21,7 @@ export async function createTeachingUnit(
     name: data.name,
     code: data.code,
     category: data.category,
-    departement: data.department_id,
+    faculty: data.faculty_id,
     cycle: data.cycle_id,
   });
   return res.data;
@@ -30,8 +29,8 @@ export async function createTeachingUnit(
 
 export async function updateTeachingUnit(
   id: number,
-  data: Omit<TeachingUnit, "id" | "departement" | "cycle"> & {
-    department_id: number;
+  data: Omit<TeachingUnit, "id" | "faculty" | "cycle"> & {
+    faculty_id: number;
     cycle_id: number;
   }
 ) {
@@ -39,7 +38,7 @@ export async function updateTeachingUnit(
     name: data.name,
     code: data.code,
     category: data.category,
-    departement: data.department_id,
+    faculty: data.faculty_id,
     cycle: data.cycle_id,
     credit_count: data.credit_count,
   });

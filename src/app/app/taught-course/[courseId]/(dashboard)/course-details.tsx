@@ -53,7 +53,7 @@ export const TaughtCourseDetails: FC<TaughtCourseDetailsProps> = ({
           open={openEdit}
           setOpen={setOpenEdit}
           taughtCourse={data}
-          faculties={faculties}
+          // faculties={faculties}
           departments={departments}
           periods={periods}
           teachers={teachers}
@@ -72,19 +72,19 @@ export const TaughtCourseDetails: FC<TaughtCourseDetailsProps> = ({
           }}
         >
           <Descriptions
-            title="Département"
+            title="Départements"
             column={1}
             items={[
               {
-                key: "name",
-                label: "Nom",
-                children: data?.departement.name || "",
+                key: "departments",
+                label: "Mentions",
+                children: data?.departements.map(dep=><Space size={1} wrap>{dep.name}</Space>) || "",
               },
-              {
-                key: "code",
-                label: "Code",
-                children: data?.departement.acronym || "",
-              },
+              // {
+              //   key: "code",
+              //   label: "Code",
+              //   children: data?.departement.acronym || "",
+              // },
               {
                 key: "year",
                 label: "Année",

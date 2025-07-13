@@ -22,10 +22,9 @@ import axios from "axios";
  * }
  * ```
  */
-export async function checkInstitutionExistence(): Promise<boolean> {
+export async function checkInstitutionExistence() {
   try {
     const res = await api.get("/main_config/institution-exist");
-
     const data = res.data as { institutionExist: boolean };
 
     return data.institutionExist;
@@ -57,17 +56,17 @@ export async function checkInstitutionExistence(): Promise<boolean> {
  * @example
  * ```typescript
  * const institutionData: ConfigFormSchemaType = {
- *   acronym: "ABC",
- *   address: "123 Main St",
+ *   acronym: "UCBC",
+ *   address: "",
  *   category: "university",
- *   city: "Metropolis",
+ *   city: "Beni",
  *   country: "CountryName",
  *   email: "info@institution.com",
- *   email_address: "contact@institution.com",
+ *   email_address: "contact@ucbc.edu.cd",
  *   matricule: "123456",
  *   mission: "To educate and inspire.",
  *   motto: "Knowledge is power.",
- *   name: "Institution Name",
+ *   name: "Université Chrétienne Bilingue du Congo",
  *   parent_organization: null,
  *   password: "securepassword",
  *   phone_number_1: "+1234567890",
@@ -76,7 +75,7 @@ export async function checkInstitutionExistence(): Promise<boolean> {
  *   slogan: "Empowering the future.",
  *   status: "private",
  *   vision: "To be a leader in education.",
- *   web_site: "https://institution.com",
+ *   web_site: "https://ucbc.edu.cd",
  * };
  *
  * const response = await createInstitution(institutionData);

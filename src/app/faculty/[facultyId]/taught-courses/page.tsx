@@ -7,12 +7,9 @@ import {
   getAllTeachers,
   getClassrooms,
   getCoursesByFacultyId,
-  getCycles,
   getDepartmentsByFacultyId,
-  getFaculties,
   getPeriods,
   getTaughtCoursesByFacultyId,
-  getTeachersByFaculty,
   getTeachingUnitsByfaculty,
   getYearStatusColor,
   getYearStatusName,
@@ -22,7 +19,6 @@ import {
   Classroom,
   Course,
   Department,
-  Faculty,
   Period,
   TaughtCourse,
   Teacher,
@@ -68,7 +64,6 @@ type ActionsBarProps = {
   record: TaughtCourse;
   taughtCourse: TaughtCourse | null;
   departments?: Department[];
-  faculties?: Faculty[];
   courses?: Course[];
   teachers?: Teacher[];
   periods?: Period[];
@@ -78,7 +73,6 @@ type ActionsBarProps = {
 
 const ActionsBar: FC<ActionsBarProps> = ({
   record,
-  faculties,
   departments,
   periods,
   teachers,
@@ -94,7 +88,7 @@ const ActionsBar: FC<ActionsBarProps> = ({
     <Space size="middle">
       <EditTaughtCourseForm
         taughtCourse={record}
-        faculties={faculties}
+        // faculties={faculties}
         departments={departments}
         periods={periods}
         teachers={teachers}
@@ -154,13 +148,17 @@ export default function Page() {
   } = theme.useToken();
   const { yid } = useYid();
   const { facultyId } = useParams();
-  const { data:taughtCourses, isPending, isError } = useQuery({
+  const {
+    data: taughtCourses,
+    isPending,
+    isError,
+  } = useQuery({
     queryKey: ["taught_courses", `${yid}`, facultyId],
     queryFn: ({ queryKey }) =>
       getTaughtCoursesByFacultyId(Number(queryKey[1]), Number(queryKey[2])),
     enabled: !!yid && !!facultyId,
   });
-  
+
   const { data: courses } = useQuery({
     queryKey: ["courses", facultyId],
     queryFn: ({ queryKey }) => getCoursesByFacultyId(Number(queryKey[1])),
@@ -184,10 +182,10 @@ export default function Page() {
     queryFn: getPeriods,
   });
 
-  const { data: faculties } = useQuery({
-    queryKey: ["faculties"],
-    queryFn: getFaculties,
-  });
+  // const { data: faculties } = useQuery({
+  //   queryKey: ["faculties"],
+  //   queryFn: getFaculties,
+  // });
 
   const { data: teachingUnits } = useQuery({
     queryKey: ["teaching-units", facultyId],
@@ -198,11 +196,6 @@ export default function Page() {
   const { data: classrooms } = useQuery({
     queryKey: ["classrooms"],
     queryFn: getClassrooms,
-  });
-
-  const { data: cycles } = useQuery({
-    queryKey: ["cycles"],
-    queryFn: getCycles,
   });
 
   if (isPending) {
@@ -249,258 +242,260 @@ export default function Page() {
             <Palette />
           </Space>
         </Layout.Header>
-        <Row gutter={[24, 24]}>
-          <Col span={18}>
-          <Card>
-            <Table
-              title={() => (
-                <header className="flex pb-3">
-                  <Space>
-                     <Input.Search placeholder="Rechercher un cours dans le catalogue ..." />
-                    
-                  </Space>
-                  <div className="flex-1" />
-                  <Space>
-                    {/* <Input.Search placeholder="Rechercher un cours dans le catalogue ..." /> */}
-                    <NewTaughtCourseForm
-                      faculties={faculties}
-                      teachingUnits={teachingUnits}
-                      periods={periods}
-                      courses={courses}
-                      departments={departments}
-                      teachers={teachers}
-                      classrooms={classrooms}
-                    />
-                    {/* <Button
+        {/* <Row gutter={[24, 24]}>
+          <Col span={18}> */}
+            <Card>
+              <Table
+                title={() => (
+                  <header className="flex pb-3">
+                    <Space>
+                      <Input.Search placeholder="Rechercher un cours dans le catalogue ..." />
+                    </Space>
+                    <div className="flex-1" />
+                    <Space>
+                      {/* <Input.Search placeholder="Rechercher un cours dans le catalogue ..." /> */}
+                      <NewTaughtCourseForm
+                        facultyId={Number(facultyId)}
+                        teachingUnits={teachingUnits}
+                        periods={periods}
+                        courses={courses}
+                        departments={departments}
+                        teachers={teachers}
+                        classrooms={classrooms}
+                      />
+                      {/* <Button
               type="primary"
               icon={<PlusOutlined />}
               style={{ boxShadow: "none" }}
             >
               Ajouter
             </Button> */}
-                    <Button
-                      icon={<PrinterOutlined />}
-                      style={{ boxShadow: "none" }}
-                    >
-                      Imprimer
-                    </Button>
-                    <Dropdown
-                      menu={{
-                        items: [
-                          {
-                            key: "pdf",
-                            label: "PDF",
-                            icon: <FilePdfOutlined />,
-                            title: "Exporter en PDF",
-                          },
-                          {
-                            key: "excel",
-                            label: "EXCEL",
-                            icon: <FileExcelOutlined />,
-                            title: "Exporter vers Excel",
-                          },
-                        ],
-                      }}
-                    >
                       <Button
-                        icon={<DownOutlined />}
+                        icon={<PrinterOutlined />}
                         style={{ boxShadow: "none" }}
                       >
-                        Exporter
+                        Imprimer
                       </Button>
-                    </Dropdown>
-                  </Space>
-                </header>
-              )}
-              dataSource={taughtCourses}
-              columns={[
-                {
-                  title: "Titre du cours",
-                  dataIndex: "title",
-                  key: "title",
-                  render: (_, record, __) => record?.available_course?.name,
-                },
-                {
-                  title: "Code",
-                  dataIndex: "code",
-                  key: "code",
-                  render: (_, record, __) => record?.available_course?.code,
-                  width: 100,
-                },
-                // {
-                //   title: "UE",
-                //   dataIndex: "teaching_unit",
-                //   key: "teaching_unit",
-                //   width: 50,
-                //   render: (_, record, __) => record?.teaching_unit?.code,
-                //   ellipsis: true,
-                // },
-                {
-                  title: "Crédits",
-                  dataIndex: "credits",
-                  key: "credits",
-                  align: "center",
-                  width: 68,
-                  render: (_, record, __) => record.credit_count,
-                },
-                {
-                  title: "Heures",
-                  key: "hours",
-                  dataIndex: "hours",
-                  render: (_, record, __) =>
-                    `${
-                      Number(record.theoretical_hours) +
-                      Number(record.practical_hours)
-                    }`,
-                  width: 64,
-                },
-                // {
-                //   title: "Heures théorique",
-                //   dataIndex: "theoretical_hours",
-                //   key: "theoretical_hours",
-                //   //   width: 68,
-                //   render: (_, record, __) => record.theoretical_hours,
-                //   ellipsis: true,
-                // },
-                // {
-                //   title: "Heures pratique",
-                //   dataIndex: "practical_hours",
-                //   key: "practical_hours",
-                //   //   width: 68,
-                //   render: (_, record, __) => record.practical_hours,
-                //   ellipsis: true,
-                // },
-                // {
-                //   title: "Date de début",
-                //   dataIndex: "start_date",
-                //   key: "start_date",
-                //   render: (_, record, __) =>
-                //     record.start_date
-                //       ? new Intl.DateTimeFormat("fr", {
-                //           dateStyle: "long",
-                //         }).format(new Date(`${record.start_date}`))
-                //       : "",
-                //   width: 100,
-                //   ellipsis: true,
-                // },
-                // {
-                //   title: "Date de fin",
-                //   dataIndex: "end_date",
-                //   key: "end_date",
-                //   render: (_, record, __) =>
-                //     record?.end_date
-                //       ? new Intl.DateTimeFormat("fr", {
-                //           dateStyle: "long",
-                //         }).format(new Date(`${record.end_date}`))
-                //       : "",
-                //   width: 100,
-                //   ellipsis: true,
-                // },
-                // {
-                //   title: "Max",
-                //   dataIndex: "max_value",
-                //   key: "max_value",
-                //   render: (_, record, __) => record.max_value,
-                //   width: 44,
-                //   ellipsis: true,
-                //   align: "center",
-                // },
-                {
-                  title: "Période",
-                  dataIndex: "period",
-                  key: "period",
-                  render: (_, record, __) => record.period?.acronym,
-                  width: 64,
-                  ellipsis: true,
-                },
-                {
-                  title: "Enseignant",
-                  dataIndex: "teacher",
-                  key: "teacher",
-                  render: (_, record, __) => (
-                    <Space>
-                      {record.teacher && (
-                        <Avatar
-                          style={{
-                            backgroundColor: getHSLColor(
-                              `${record.teacher?.user.first_name} ${record.teacher?.user.last_name} ${record.teacher?.user.surname}`
-                            ),
-                          }}
+                      <Dropdown
+                        menu={{
+                          items: [
+                            {
+                              key: "pdf",
+                              label: "PDF",
+                              icon: <FilePdfOutlined />,
+                              title: "Exporter en PDF",
+                            },
+                            {
+                              key: "excel",
+                              label: "EXCEL",
+                              icon: <FileExcelOutlined />,
+                              title: "Exporter vers Excel",
+                            },
+                          ],
+                        }}
+                      >
+                        <Button
+                          icon={<DownOutlined />}
+                          style={{ boxShadow: "none" }}
                         >
-                          {record.teacher?.user.first_name
-                            ?.charAt(0)
-                            .toUpperCase()}
-                          {record.teacher?.user.last_name
-                            ?.charAt(0)
-                            .toUpperCase()}
-                        </Avatar>
-                      )}{" "}
-                      {record.teacher?.user.surname}
+                          Exporter
+                        </Button>
+                      </Dropdown>
                     </Space>
-                  ),
-                  ellipsis: true,
-                },
-                {
-                  key: "department",
-                  dataIndex: "departement",
-                  title: "Département",
-                  render: (_, record) => record.departement.name,
-                  ellipsis: true,
-                },
-                {
-                  title: "Inscription",
-                  dataIndex: "status",
-                  key: "status",
-                  render: (_, record, __) => (
-                    <Tag
-                      color={getYearStatusColor(`${record.status}`)}
-                      style={{ border: 0 }}
-                    >
-                      {getYearStatusName(`${record.status}`)}
-                    </Tag>
-                  ),
-                  width: 100,
-                  ellipsis: true,
-                },
-                {
-                  title: "",
-                  key: "actions",
-                  render: (_, record, __) => {
-                    return (
-                      <ActionsBar
-                        record={record}
-                        taughtCourse={record}
-                        faculties={faculties}
-                        departments={departments}
-                        courses={courses}
-                        periods={periods}
-                        teachers={teachers}
-                        teachingUnits={teachingUnits}
-                        classrooms={classrooms}
-                      />
-                    );
+                  </header>
+                )}
+                dataSource={taughtCourses}
+                columns={[
+                  {
+                    title: "Titre du cours",
+                    dataIndex: "title",
+                    key: "title",
+                    render: (_, record, __) => record?.available_course?.name,
                   },
-                  width: 120,
-                },
-              ]}
-              rowKey="id"
-              rowClassName={`bg-[#f5f5f5] odd:bg-white`}
-              rowSelection={{
-                type: "checkbox",
-              }}
-              size="small"
-              pagination={{
-                defaultPageSize: 25,
-                pageSizeOptions: [25, 50, 75, 100],
-                size: "small",
-              }}
-            />
+                  {
+                    title: "Code",
+                    dataIndex: "code",
+                    key: "code",
+                    render: (_, record, __) => record?.available_course?.code,
+                    width: 100,
+                  },
+                  // {
+                  //   title: "UE",
+                  //   dataIndex: "teaching_unit",
+                  //   key: "teaching_unit",
+                  //   width: 50,
+                  //   render: (_, record, __) => record?.teaching_unit?.code,
+                  //   ellipsis: true,
+                  // },
+                  {
+                    title: "Crédits",
+                    dataIndex: "credits",
+                    key: "credits",
+                    align: "center",
+                    width: 68,
+                    render: (_, record, __) => record.credit_count,
+                  },
+                  {
+                    title: "Heures",
+                    key: "hours",
+                    dataIndex: "hours",
+                    render: (_, record, __) =>
+                      `${
+                        Number(record.theoretical_hours) +
+                        Number(record.practical_hours)
+                      }`,
+                    width: 64,
+                  },
+                  // {
+                  //   title: "Heures théorique",
+                  //   dataIndex: "theoretical_hours",
+                  //   key: "theoretical_hours",
+                  //   //   width: 68,
+                  //   render: (_, record, __) => record.theoretical_hours,
+                  //   ellipsis: true,
+                  // },
+                  // {
+                  //   title: "Heures pratique",
+                  //   dataIndex: "practical_hours",
+                  //   key: "practical_hours",
+                  //   //   width: 68,
+                  //   render: (_, record, __) => record.practical_hours,
+                  //   ellipsis: true,
+                  // },
+                  // {
+                  //   title: "Date de début",
+                  //   dataIndex: "start_date",
+                  //   key: "start_date",
+                  //   render: (_, record, __) =>
+                  //     record.start_date
+                  //       ? new Intl.DateTimeFormat("fr", {
+                  //           dateStyle: "long",
+                  //         }).format(new Date(`${record.start_date}`))
+                  //       : "",
+                  //   width: 100,
+                  //   ellipsis: true,
+                  // },
+                  // {
+                  //   title: "Date de fin",
+                  //   dataIndex: "end_date",
+                  //   key: "end_date",
+                  //   render: (_, record, __) =>
+                  //     record?.end_date
+                  //       ? new Intl.DateTimeFormat("fr", {
+                  //           dateStyle: "long",
+                  //         }).format(new Date(`${record.end_date}`))
+                  //       : "",
+                  //   width: 100,
+                  //   ellipsis: true,
+                  // },
+                  // {
+                  //   title: "Max",
+                  //   dataIndex: "max_value",
+                  //   key: "max_value",
+                  //   render: (_, record, __) => record.max_value,
+                  //   width: 44,
+                  //   ellipsis: true,
+                  //   align: "center",
+                  // },
+                  {
+                    title: "Période",
+                    dataIndex: "period",
+                    key: "period",
+                    render: (_, record, __) => record.period?.acronym,
+                    width: 64,
+                    ellipsis: true,
+                  },
+                  {
+                    title: "Enseignant",
+                    dataIndex: "teacher",
+                    key: "teacher",
+                    render: (_, record, __) => (
+                      <Space>
+                        {record.teacher && (
+                          <Avatar
+                            style={{
+                              backgroundColor: getHSLColor(
+                                `${record.teacher?.user.first_name} ${record.teacher?.user.last_name} ${record.teacher?.user.surname}`
+                              ),
+                            }}
+                          >
+                            {record.teacher?.user.first_name
+                              ?.charAt(0)
+                              .toUpperCase()}
+                            {record.teacher?.user.last_name
+                              ?.charAt(0)
+                              .toUpperCase()}
+                          </Avatar>
+                        )}{" "}
+                        {record.teacher?.user.surname}
+                      </Space>
+                    ),
+                    ellipsis: true,
+                  },
+                  {
+                    key: "department",
+                    dataIndex: "departement",
+                    title: "Départements",
+                    render: (_, record) => (
+                      <Space wrap split=",">
+                        {record.departements.map((dep) => dep.acronym)}
+                      </Space>
+                    ),
+                    ellipsis: true,
+                  },
+                  {
+                    title: "Inscription",
+                    dataIndex: "status",
+                    key: "status",
+                    render: (_, record, __) => (
+                      <Tag
+                        color={getYearStatusColor(`${record.status}`)}
+                        style={{ border: 0 }}
+                      >
+                        {getYearStatusName(`${record.status}`)}
+                      </Tag>
+                    ),
+                    width: 100,
+                    ellipsis: true,
+                  },
+                  {
+                    title: "",
+                    key: "actions",
+                    render: (_, record, __) => {
+                      return (
+                        <ActionsBar
+                          record={record}
+                          taughtCourse={record}
+                          departments={departments}
+                          courses={courses}
+                          periods={periods}
+                          teachers={teachers}
+                          teachingUnits={teachingUnits}
+                          classrooms={classrooms}
+                        />
+                      );
+                    },
+                    width: 120,
+                  },
+                ]}
+                rowKey="id"
+                rowClassName={`bg-[#f5f5f5] odd:bg-white`}
+                rowSelection={{
+                  type: "checkbox",
+                }}
+                size="small"
+                pagination={{
+                  defaultPageSize: 25,
+                  pageSizeOptions: [25, 50, 75, 100],
+                  size: "small",
+                }}
+              />
             </Card>
-          </Col>
+          {/* </Col>
           <Col span={6}>
-            <ListTeachingUnits cycles={cycles} departments={departments} />
+            <ListTeachingUnits cycles={cycles} />
           </Col>
-        </Row>
+        </Row> */}
         <Layout.Footer
           style={{
             display: "flex",

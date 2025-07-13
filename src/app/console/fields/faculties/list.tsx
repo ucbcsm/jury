@@ -32,7 +32,7 @@ type ActionsBarProps = {
 const ActionsBar: FC<ActionsBarProps> = ({ record, fields, teachers }) => {
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [openDelete, setOpenDelete] = useState<boolean>(false);
-  const router =useRouter()
+  const router = useRouter();
 
   return (
     <Space size="middle">
@@ -40,7 +40,9 @@ const ActionsBar: FC<ActionsBarProps> = ({ record, fields, teachers }) => {
         color="primary"
         variant="dashed"
         title="Gérer la faculté"
-        onClick={() => {router.push(`/app/faculty/${record.id}`)}}
+        onClick={() => {
+          router.push(`/faculty/${record.id}`);
+        }}
         style={{ boxShadow: "none" }}
       >
         Gérer

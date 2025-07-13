@@ -75,7 +75,9 @@ export const getServerSession = async (): Promise<Session> => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+      
       faculty = resFaculty.data as Faculty | undefined;
+
     } catch (error: any) {
       if (error?.response?.status !== 404 && error?.response?.status !== 400) {
         throw error;
@@ -138,7 +140,7 @@ export const login = async (credentials: {
       access: string;
       refresh: string;
     };
-console.log("Auth,",res.data)
+
     if (!access || !refresh) {
       throw new Error("Invalid login response");
     } else {

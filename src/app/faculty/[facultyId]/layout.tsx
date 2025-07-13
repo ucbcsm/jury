@@ -3,7 +3,7 @@
 import { LanguageSwitcher } from "@/components/languageSwitcher";
 import { YearSelector } from "@/components/yearSelector";
 import { useYid } from "@/hooks/use-yid";
-import { getDepartmentsByFacultyId } from "@/lib/api";
+import { getDepartmentsByFacultyId, getFaculty } from "@/lib/api";
 import { logout } from "@/lib/api/auth";
 import { useSessionStore } from "@/store";
 import {
@@ -17,6 +17,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import {
   Button,
+  Divider,
   Dropdown,
   Image,
   Layout,
@@ -42,8 +43,18 @@ export default function FacultyLayout({
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoadingLogout, setIsLoadingLogout] = useState<boolean>(false);
   const { facultyId } = useParams();
-  const { faculty } = useSessionStore();
+
   const { removeYid } = useYid();
+
+  const {
+      data: faculty,
+      isPending,
+      isError,
+    } = useQuery({
+      queryKey: ["faculty", facultyId],
+      queryFn: ({ queryKey }) => getFaculty(Number(queryKey[1])),
+      enabled: !!facultyId,
+    });
 
   const router = useRouter();
   const pathname = usePathname();
@@ -56,7 +67,7 @@ export default function FacultyLayout({
 
   const getDepartmentsAsMenu = () => {
     const menu = departments?.map((dep) => ({
-      key: `/app/department/${dep.id}`,
+      key: `/faculty/${dep.faculty.id}/department/${dep.id}`,
       label: dep.name,
       icon: <SubnodeOutlined />,
     }));
@@ -76,24 +87,31 @@ export default function FacultyLayout({
           paddingRight: 32,
         }}
       >
-        <Link
-          href={`/faculty/${facultyId}`}
-          style={{ display: "flex", alignItems: "center" }}
-        >
-          <div className="flex items-center pr-3">
-            <Image
-              src="/ucbc-logo.png"
-              alt="Logo ucbc"
-              width={36}
-              height="auto"
-              preview={false}
-            />
-          </div>
-          <Typography.Title level={5} style={{ marginBottom: 0 }}>
-            {faculty?.acronym || "CI-UCBC"}
-          </Typography.Title>
-        </Link>
-        <Menu
+        <Space>
+          <Link
+            href={`/faculty/${facultyId}`}
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <div className="flex items-center pr-3">
+              <Image
+                src="/ucbc-logo.png"
+                alt="Logo ucbc"
+                width={36}
+                height="auto"
+                preview={false}
+              />
+            </div>
+            <Typography.Title level={5} style={{ marginBottom: 0 }}>
+              CI-UCBC
+            </Typography.Title>
+          </Link>
+          <Divider type="vertical" />
+          <Typography.Text type="secondary">
+           {faculty?.acronym}
+          </Typography.Text>
+        </Space>
+
+        {/* <Menu
           mode="horizontal"
           theme="light"
           defaultSelectedKeys={[pathname]}
@@ -124,7 +142,8 @@ export default function FacultyLayout({
           onClick={({ key }) => {
             router.push(key);
           }}
-        />
+        /> */}
+        <div className="flex-1"/>
         <Space>
           <YearSelector />
           <Dropdown
@@ -180,6 +199,92 @@ export default function FacultyLayout({
           <LanguageSwitcher />
         </Space>
       </Layout.Header>
+      <Layout>
+      <Layout.Sider
+          width={260}
+          style={{
+            borderRight: `1px solid ${colorBorderSecondary}`,
+            paddingTop: 20,
+            background: colorBgContainer,
+            height: `calc(100vh - 64px)`,
+            overflow: "auto",
+          }}
+        >
+          <Layout style={{}}>
+            <Menu
+              mode="inline"
+              theme="light"
+              style={{ height: "100%", borderRight: 0 }}
+              defaultSelectedKeys={[pathname]}
+          selectedKeys={[pathname]}
+          overflowedIndicator={<MenuOutlined />}
+          items={[
+              {
+                  key: `/`,
+                  label: "Menu",
+                  type: "group",
+                  children:[
+            {
+              key: `/faculty/${facultyId}`,
+              label: "Aperçu",
+            },
+            { key: `/faculty/${facultyId}/students`, label: "Étudiants" },
+            {
+              key: `/faculty/${facultyId}/taught-courses`,
+              label: "Cours planifiés",
+            },
+            {
+              key: `/faculty/${facultyId}/courses`,
+              label: "Catalogue & UE",
+            },
+            {
+              key: `departments`,
+              label: "Mentions",
+              //  icon: <BranchesOutlined />,
+              children: getDepartmentsAsMenu(),
+            },
+            {
+              key: `/faculty/${facultyId}/class-presidents`,
+              label:"Chefs de promotion"
+            }
+          ]
+          }
+          ]}
+          // style={{ flex: 1, minWidth: 0, borderBottom: 0 }}
+          onClick={({ key }) => {
+            router.push(key);
+          }}
+            />
+
+            {/* {
+                      key: "/console/classrooms",
+                      label: "Salles de classe",
+                      icon: <TagsOutlined />,
+                      className: "normal-case",
+                    },
+                {
+                  key: "/console/users",
+                  label: "Utilisateurs",
+                  icon: <TeamOutlined />,
+                },
+              ]}
+              onClick={({ key }) => {
+                router.push(key);
+              }}
+            /> */}
+            {/* <Layout.Footer
+              style={{
+                padding: "20px 16px",
+                borderTop: `1px solid ${colorBorderSecondary}`,
+                background: colorBgContainer,
+              }}
+            >
+              <Typography.Text type="secondary">
+                © 2025 CI-UCBC. Tous droits réservés.
+              </Typography.Text>
+            </Layout.Footer> */}
+          </Layout>
+        </Layout.Sider>
       <Layout.Content>
         <div
           style={{
@@ -188,6 +293,44 @@ export default function FacultyLayout({
             borderRadius: borderRadiusLG,
           }}
         >
+          {/* <Menu
+          mode="horizontal"
+          theme="light"
+          defaultSelectedKeys={[pathname]}
+          selectedKeys={[pathname]}
+          overflowedIndicator={<MenuOutlined />}
+          items={[
+            {
+                  key: `/`,
+                  label: "Menu",
+                  type: "group",
+                  children:[
+            {
+              key: `/faculty/${facultyId}`,
+              label: "Aperçu",
+            },
+            { key: `/faculty/${facultyId}/students`, label: "Étudiants" },
+            {
+              key: `/faculty/${facultyId}/taught-courses`,
+              label: "Cours",
+            },
+            {
+              key: `/faculty/${facultyId}/courses`,
+              label: "Catalogue",
+            },
+            {
+              key: `departments`,
+              label: "Mentions",
+              //  icon: <BranchesOutlined />,
+              children: getDepartmentsAsMenu(),
+            },]
+          }
+          ]}
+          style={{ flex: 1, minWidth: 0, borderBottom: 0 }}
+          onClick={({ key }) => {
+            router.push(key);
+          }}
+        /> */}
           {children}
           <div
             className=""
@@ -229,6 +372,7 @@ export default function FacultyLayout({
           </div>
         </div>
       </Layout.Content>
+      </Layout>
     </Layout>
   );
 }

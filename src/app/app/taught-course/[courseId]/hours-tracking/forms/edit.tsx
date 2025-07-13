@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import {
-  Button,
   Col,
   DatePicker,
   Form,
@@ -15,7 +14,6 @@ import {
   TimePicker,
   Switch,
 } from "antd";
-import { EditOutlined } from "@ant-design/icons";
 import { HourTracking } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -138,10 +136,10 @@ export const EditHourTrackingForm: React.FC<EditHourTrackingFormProps> = ({
           <Col span={24}>
             <Form.Item
               name="lesson"
-              label="Matière"
+              label="Leçon du jour"
               rules={[{ required: true }]}
             >
-              <Input placeholder="Libellé de la matière" />
+              <Input placeholder="Libellé de la leçon" />
             </Form.Item>
           </Col>
         </Row>

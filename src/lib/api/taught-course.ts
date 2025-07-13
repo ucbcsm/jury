@@ -12,7 +12,7 @@ export async function getTaughtCoursesByFacultyId(
   return res.data.results as TaughtCourse[];
 }
 
-export async function getTaughtCoursesByDepartment(
+export async function getTaughtCoursesByDepartmentId(
   yearId: number,
   departmentId: number
 ) {
@@ -37,7 +37,7 @@ export async function createTaughtCourse(
     | "period"
     | "available_course"
     | "faculty"
-    | "departement"
+    | "departements"
     | "class_room"
     | "assistants"
   > & {
@@ -47,7 +47,7 @@ export async function createTaughtCourse(
     period_id: number;
     available_course_id: number;
     faculty_id: number;
-    department_id: number;
+    departments_ids: number[];
     class_room_id?: number;
     assistants?: number[];
   }
@@ -59,7 +59,7 @@ export async function createTaughtCourse(
     period: data.period_id,
     available_course: data.available_course_id,
     faculty: data.faculty_id,
-    departement: data.department_id,
+    departements: data.departments_ids,
     credit_count: data.credit_count || null,
     theoretical_hours: data.theoretical_hours || null,
     practical_hours: data.practical_hours || null,
@@ -92,7 +92,7 @@ export async function updateTaughtCourse(
     | "period"
     | "available_course"
     | "faculty"
-    | "departement"
+    | "departements"
     | "class_room"
     | "assistants"
   > & {
@@ -102,7 +102,7 @@ export async function updateTaughtCourse(
     period_id: number;
     available_course_id: number;
     faculty_id: number;
-    department_id: number;
+    departments_ids: number[];
     class_room_id?: number;
     assistants?: number[];
   }
@@ -114,7 +114,7 @@ export async function updateTaughtCourse(
     period: data.period_id,
     available_course: data.available_course_id,
     faculty: data.faculty_id,
-    departement: data.department_id,
+    departements: data.departments_ids,
     credit_count: data.credit_count || null,
     theoretical_hours: data.theoretical_hours || null,
     practical_hours: data.practical_hours || null,

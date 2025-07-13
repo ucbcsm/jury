@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   updateTeachingUnit,
   getCurrentCyclesAsOptions,
-  getCurrentDepartmentsAsOptions,
+  // getCurrentDepartmentsAsOptions,
 } from "@/lib/api";
 import { Cycle, Department, TeachingUnit } from "@/types";
 import { filterOption } from "@/lib/utils";
@@ -20,7 +20,7 @@ type EditTeachingUnitFormProps = {
   setOpen: Dispatch<SetStateAction<boolean>>;
   teachingUnit: TeachingUnit | null;
   cycles?: Cycle[];
-  departments?: Department[];
+  // departments?: Department[];
 };
 
 export const EditTeachingUnitForm: React.FC<EditTeachingUnitFormProps> = ({
@@ -28,7 +28,7 @@ export const EditTeachingUnitForm: React.FC<EditTeachingUnitFormProps> = ({
   setOpen,
   teachingUnit,
   cycles,
-  departments,
+  // departments,
 }) => {
   const [form] = Form.useForm<FormDataType>();
   const [messageApi, contextHolder] = message.useMessage();
@@ -36,7 +36,7 @@ export const EditTeachingUnitForm: React.FC<EditTeachingUnitFormProps> = ({
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: ({ id, data }: { id: number; data: FormDataType }) =>
-      updateTeachingUnit(id, data),
+      updateTeachingUnit(id, {...data, faculty_id:teachingUnit?.faculty?.id!}),
   });
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export const EditTeachingUnitForm: React.FC<EditTeachingUnitFormProps> = ({
         code: teachingUnit.code,
         category: teachingUnit.category,
         cycle_id: teachingUnit.cycle?.id,
-        department_id: teachingUnit.departement?.id,
+        // department_id: teachingUnit.departement?.id,
       });
     }
     if (!open) {
@@ -97,7 +97,7 @@ export const EditTeachingUnitForm: React.FC<EditTeachingUnitFormProps> = ({
           disabled: isPending,
         }}
         onCancel={() => setOpen(false)}
-        destroyOnClose
+        destroyOnHidden
         modalRender={(dom) => (
           <Form
             form={form}
@@ -154,7 +154,7 @@ export const EditTeachingUnitForm: React.FC<EditTeachingUnitFormProps> = ({
             filterOption={filterOption}
           />
         </Form.Item>
-        <Form.Item
+        {/* <Form.Item
           name="department_id"
           label="Département"
           rules={[{ required: true }]}
@@ -164,7 +164,7 @@ export const EditTeachingUnitForm: React.FC<EditTeachingUnitFormProps> = ({
             showSearch
             filterOption={filterOption}
           />
-        </Form.Item>
+        </Form.Item> */}
       </Modal>
     </>
   );

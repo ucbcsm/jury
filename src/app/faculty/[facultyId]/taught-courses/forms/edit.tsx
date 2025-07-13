@@ -17,11 +17,10 @@ import {
   Space,
   theme,
 } from "antd";
-import { CloseOutlined } from "@ant-design/icons";
+import { BulbOutlined, CloseOutlined } from "@ant-design/icons";
 import {
   Course,
   Department,
-  Faculty,
   Period,
   Teacher,
   TeachingUnit,
@@ -49,7 +48,6 @@ type EditTaughtCourseFormProps = {
   setOpen: (open: boolean) => void;
   taughtCourse: TaughtCourse | null;
   departments?: Department[];
-  faculties?: Faculty[];
   courses?: Course[];
   teachers?: Teacher[];
   periods?: Period[];
@@ -62,7 +60,6 @@ export const EditTaughtCourseForm: FC<EditTaughtCourseFormProps> = ({
   setOpen,
   taughtCourse,
   departments,
-  faculties,
   courses,
   teachers,
   periods,
@@ -93,7 +90,7 @@ export const EditTaughtCourseForm: FC<EditTaughtCourseFormProps> = ({
         practical_hours: taughtCourse.practical_hours,
         period_id: taughtCourse.period?.id,
         faculty_id: taughtCourse.faculty?.id,
-        department_id: taughtCourse.departement?.id,
+        departments_ids: taughtCourse.departements.map(dep=>dep.id),
         start_date: taughtCourse.start_date
           ? dayjs(taughtCourse.start_date)
           : null,
@@ -115,7 +112,7 @@ export const EditTaughtCourseForm: FC<EditTaughtCourseFormProps> = ({
   const onFinish = (values: any) => {
     if (!taughtCourse) return;
     mutateAsync(
-      { id: taughtCourse.id, data: { ...values, academic_year_id: yid } },
+      { id: taughtCourse.id, data: { ...values, academic_year_id: yid, faculty_id:taughtCourse.faculty.id } },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["taught_courses"] });
@@ -155,9 +152,17 @@ export const EditTaughtCourseForm: FC<EditTaughtCourseFormProps> = ({
         <Flex vertical gap={16} style={{ maxWidth: 520, margin: "auto" }}>
           <Alert
             type="info"
-            message="Vous pouvez modifier les informations du cours programmé."
-            description="Mettez à jour les champs nécessaires puis cliquez sur « Enregistrer » pour valider les modifications."
+            message="Instructions"
+            description={
+              <ul>
+                <li>
+                  ▪ Mettez à jour les champs si nécessaires .
+                </li>
+                <li>▪ Puis cliquez sur «Sauvegarder» pour valider les modifications</li>
+              </ul>
+            }
             showIcon
+            icon={<BulbOutlined />}
             closable
           />
           <Card
@@ -192,12 +197,14 @@ export const EditTaughtCourseForm: FC<EditTaughtCourseFormProps> = ({
               <Form.Item
                 name="teaching_unit_id"
                 label="Unité d'enseignement"
-                rules={[
-                  // {
-                  //   required: true,
-                  //   message: "Veuillez sélectionner une unité d'enseignement.",
-                  // },
-                ]}
+                rules={
+                  [
+                    // {
+                    //   required: true,
+                    //   message: "Veuillez sélectionner une unité d'enseignement.",
+                    // },
+                  ]
+                }
               >
                 <Select
                   options={getTeachingUnitsAsOptions(teachingUnits)}
@@ -253,37 +260,38 @@ export const EditTaughtCourseForm: FC<EditTaughtCourseFormProps> = ({
                   filterOption={filterOption}
                 />
               </Form.Item>
-
+              {/* 
               <Row gutter={[16, 16]}>
-                <Col span={12}>
-                  <Form.Item
-                    name="department_id"
-                    label="Département"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Veuillez sélectionner un département.",
-                      },
-                    ]}
-                  >
-                    <Select
-                      options={getCurrentDepartmentsAsOptions(departments)}
-                      allowClear
-                      showSearch
-                      filterOption={filterOption}
-                      onChange={(value) => {
-                        const selectedDepartment = departments?.find(
-                          (department) => department.id === value
-                        );
-                        form.setFieldValue(
-                          "faculty_id",
-                          selectedDepartment?.faculty.id
-                        );
-                      }}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
+                <Col span={12}> */}
+              <Form.Item
+                name="departments_ids"
+                label="Départements"
+                rules={[
+                  {
+                    required: true,
+                    message: "Veuillez sélectionner les départements.",
+                  },
+                ]}
+              >
+                <Select
+                  options={getCurrentDepartmentsAsOptions(departments)}
+                  allowClear
+                  showSearch
+                  mode="multiple"
+                  filterOption={filterOption}
+                  // onChange={(value) => {
+                  //   const selectedDepartment = departments?.find(
+                  //     (department) => department.id === value
+                  //   );
+                  //   form.setFieldValue(
+                  //     "faculty_id",
+                  //     selectedDepartment?.faculty.id
+                  //   );
+                  // }}
+                />
+              </Form.Item>
+              {/* </Col> */}
+              {/* <Col span={12}>
                   <Form.Item
                     name="faculty_id"
                     label="Faculté"
@@ -302,8 +310,8 @@ export const EditTaughtCourseForm: FC<EditTaughtCourseFormProps> = ({
                       disabled
                     />
                   </Form.Item>
-                </Col>
-              </Row>
+                </Col> */}
+              {/* </Row> */}
               <Row gutter={[16, 16]}>
                 <Col span={12}>
                   <Form.Item name="start_date" label="Date de début">
@@ -344,7 +352,7 @@ export const EditTaughtCourseForm: FC<EditTaughtCourseFormProps> = ({
                   allowClear
                 />
               </Form.Item>
-              <Form.Item name="status" label="Statut du cours">
+              <Form.Item name="status" label="Statut des inscriptions">
                 <Select
                   options={[
                     { value: "pending", label: "En attente" },
@@ -370,7 +378,7 @@ export const EditTaughtCourseForm: FC<EditTaughtCourseFormProps> = ({
                       loading={isPending}
                       style={{ boxShadow: "none" }}
                     >
-                      Enregistrer
+                      Sauvegarder
                     </Button>
                   </Space>
                 </Form.Item>

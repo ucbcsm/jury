@@ -70,3 +70,8 @@ export async function deleteJury(id: number) {
   const res = await api.delete(`/jury/jury/${id}/`);
   return res.data;
 }
+
+export async function getJury(juryId: number) {
+  const res = await api.get(`/jury/jury/${juryId}/`);
+  return res.data as Jury;
+}

@@ -14,6 +14,11 @@ export async function getApplications() {
   return res.data.results as Application[];
 }
 
+export async function getApplication(id: number) {
+  const res = await api.get(`/apparitorat/application/${id}/`);
+  return res.data as Application;
+}
+
 export async function getPendingApplications(searchParams?: {
   year?: string;
   page?: string | number;
@@ -161,6 +166,34 @@ export async function updateApplication({
   });
   return res.data;
 }
+
+
+
+export async function markApplicationAsPending(params: Application) {
+  const res = await api.put(`/apparitorat/application/${params.id}/`, {
+    ...params,
+    academic_year: params.academic_year.id,
+    cycle: params.cycle.id,
+    faculty: params.faculty.id,
+    field: params.field.id,
+    departement: params.departement.id,
+    class_year: params.class_year.id,
+    avatar: params.avatar || null,
+    application_documents: formatApplicationDocumentsForEdition(
+      params.application_documents
+    ),
+    enrollment_question_response: formatEnrollmentQuestionResponseForEdition(
+      params.enrollment_question_response
+    ),
+    admission_test_result: formatAdmissionTestResultsForEdition(
+      params.admission_test_result
+    ),
+    status: "pending",
+  });
+  return res.data;
+}
+
+
 
 export async function rejectApplication(params: Application) {
   const res = await api.put(`/apparitorat/application/${params.id}/`, {
@@ -324,6 +357,21 @@ export function getApplicationStatusAlertType(
   status: "pending" | "validated" | "rejected" | "reoriented" | string
 ) {
   switch (status) {
+    case "pending":
+      return "warning";
+    case "validated":
+      return "success";
+    case "rejected":
+      return "error";
+    case "reoriented":
+      return "info";
+    default:
+      break;
+  }
+}
+
+export function getApplicationTagColor( status: "pending" | "validated" | "rejected" | "reoriented" | string){
+switch (status) {
     case "pending":
       return "warning";
     case "validated":

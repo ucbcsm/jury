@@ -7,6 +7,7 @@ import { DataFetchPendingSkeleton } from "@/components/loadingSkeleton";
 import {
   getCoursesByFacultyId,
   getCourseTypeName,
+  getCycles,
   getFaculties,
 } from "@/lib/api";
 import { Course, Faculty } from "@/types";
@@ -23,10 +24,12 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Button,
   Card,
+  Col,
   Dropdown,
   Form,
   Input,
   Layout,
+  Row,
   Skeleton,
   Space,
   Table,
@@ -37,6 +40,8 @@ import { useParams } from "next/navigation";
 import { FC, useState } from "react";
 import { NewCourseForm } from "@/app/faculty/[facultyId]/courses/forms/new";
 import { Palette } from "@/components/palette";
+import { ListTeachingUnits } from "./teaching-units/list";
+import Sider from "antd/es/layout/Sider";
 
 type ActionsBarProps = {
   record: Course;
@@ -92,7 +97,7 @@ const ActionsBar: FC<ActionsBarProps> = ({ record, faculties }) => {
 
 export default function Page() {
   const {
-    token: { colorBgContainer },
+    token: { colorBgContainer, colorBorderSecondary },
   } = theme.useToken();
   const { facultyId } = useParams();
   const { data, isPending, isError } = useQuery({
@@ -104,6 +109,11 @@ export default function Page() {
   const { data: faculties } = useQuery({
     queryKey: ["faculties"],
     queryFn: getFaculties,
+  });
+
+  const { data: cycles } = useQuery({
+    queryKey: ["cycles"],
+    queryFn: getCycles,
   });
 
   if (isPending) {
@@ -149,106 +159,113 @@ export default function Page() {
             <Palette />
           </Space>
         </Layout.Header>
-        <Card>
-          <Table
-            title={() => (
-              <header className="flex pb-3">
-                <Space>
-                  <Input.Search placeholder="Rechercher un cours dans le catalogue ..." />
-                </Space>
-                <div className="flex-1" />
-                <Space>
-                  <NewCourseForm
-                    faculties={faculties?.filter(
-                      (fac) => fac.id === Number(facultyId)
-                    )}
-                  />
-                  <Button
-                    icon={<PrinterOutlined />}
-                    style={{ boxShadow: "none" }}
-                  >
-                    Imprimer
-                  </Button>
-                  <Dropdown
-                    menu={{
-                      items: [
-                        {
-                          key: "pdf",
-                          label: "PDF",
-                          icon: <FilePdfOutlined />,
-                          title: "Exporter en PDF",
-                        },
-                        {
-                          key: "excel",
-                          label: "EXCEL",
-                          icon: <FileExcelOutlined />,
-                          title: "Exporter vers Excel",
-                        },
-                      ],
-                    }}
-                  >
-                    <Button
-                      icon={<DownOutlined />}
-                      style={{ boxShadow: "none" }}
-                    >
-                      Exporter
-                    </Button>
-                  </Dropdown>
-                </Space>
-              </header>
-            )}
-            dataSource={data}
-            columns={[
-              {
-                title: "Titre du cours",
-                dataIndex: "title",
-                key: "title",
-                render: (_, record, __) => record.name,
-              },
-              {
-                title: "Code",
-                dataIndex: "code",
-                key: "code",
-                width: 100,
-              },
-              {
-                title: "Nature",
-                dataIndex: "course_type",
-                key: "type",
-                render: (_, record, __) =>
-                  getCourseTypeName(record.course_type),
-                // width:100,
-                ellipsis: true,
-              },
-              {
-                title: "",
-                key: "actions",
-                render: (_, record, __) => {
-                  return (
-                    <ActionsBar
-                      record={record}
-                      faculties={faculties?.filter(
-                        (fac) => fac.id === Number(facultyId)
-                      )}
-                    />
-                  );
-                },
-                width: 50,
-              },
-            ]}
-            rowKey="id"
-            rowClassName={`bg-[#f5f5f5] odd:bg-white`}
-            rowSelection={{
-              type: "checkbox",
-            }}
-            size="small"
-            pagination={{
-              defaultPageSize: 25,
-              pageSizeOptions: [25, 50, 75, 100],
-              size: "small",
-            }}
-          />
-        </Card>
+        {/* <Row> */}
+          {/* <Col span={16}> */}
+            <Card>
+              <Table
+                title={() => (
+                  <header className="flex pb-3">
+                    <Space>
+                      <Input.Search placeholder="Rechercher un cours dans le catalogue ..." />
+                    </Space>
+                    <div className="flex-1" />
+                    <Space>
+                      <NewCourseForm
+                        faculties={faculties?.filter(
+                          (fac) => fac.id === Number(facultyId)
+                        )}
+                      />
+                      <Button
+                        icon={<PrinterOutlined />}
+                        style={{ boxShadow: "none" }}
+                      >
+                        Imprimer
+                      </Button>
+                      <Dropdown
+                        menu={{
+                          items: [
+                            {
+                              key: "pdf",
+                              label: "PDF",
+                              icon: <FilePdfOutlined />,
+                              title: "Exporter en PDF",
+                            },
+                            {
+                              key: "excel",
+                              label: "EXCEL",
+                              icon: <FileExcelOutlined />,
+                              title: "Exporter vers Excel",
+                            },
+                          ],
+                        }}
+                      >
+                        <Button
+                          icon={<DownOutlined />}
+                          style={{ boxShadow: "none" }}
+                        >
+                          Exporter
+                        </Button>
+                      </Dropdown>
+                    </Space>
+                  </header>
+                )}
+                dataSource={data}
+                columns={[
+                  {
+                    title: "Titre du cours",
+                    dataIndex: "title",
+                    key: "title",
+                    render: (_, record, __) => record.name,
+                  },
+                  {
+                    title: "Code",
+                    dataIndex: "code",
+                    key: "code",
+                    width: 100,
+                  },
+                  {
+                    title: "Nature",
+                    dataIndex: "course_type",
+                    key: "type",
+                    render: (_, record, __) =>
+                      getCourseTypeName(record.course_type),
+                    // width:100,
+                    ellipsis: true,
+                  },
+                  {
+                    title: "",
+                    key: "actions",
+                    render: (_, record, __) => {
+                      return (
+                        <ActionsBar
+                          record={record}
+                          faculties={faculties?.filter(
+                            (fac) => fac.id === Number(facultyId)
+                          )}
+                        />
+                      );
+                    },
+                    width: 50,
+                  },
+                ]}
+                rowKey="id"
+                rowClassName={`bg-[#f5f5f5] odd:bg-white`}
+                rowSelection={{
+                  type: "checkbox",
+                }}
+                size="small"
+                pagination={{
+                  defaultPageSize: 25,
+                  pageSizeOptions: [25, 50, 75, 100],
+                  size: "small",
+                }}
+              />
+            </Card>
+          {/* </Col> */}
+          {/* <Col span={8}>
+            <ListTeachingUnits cycles={cycles} />
+          </Col> */}
+        {/* </Row> */}
         <Layout.Footer
           style={{
             display: "flex",
@@ -265,6 +282,18 @@ export default function Page() {
           </Space>
         </Layout.Footer>
       </Layout.Content>
+      <Layout.Sider
+        width={300}
+        style={{
+          borderLeft: `1px solid ${colorBorderSecondary}`,
+          // paddingTop: 20,
+          background: colorBgContainer,
+          height: `calc(100vh - 64px)`,
+          overflow: "auto",
+        }}
+      >
+        <ListTeachingUnits cycles={cycles} />
+      </Layout.Sider>
     </Layout>
   );
 }

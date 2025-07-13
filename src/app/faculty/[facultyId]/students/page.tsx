@@ -6,31 +6,21 @@ import { useYid } from "@/hooks/use-yid";
 import { getYearEnrollmentsByFacultyId } from "@/lib/api";
 import { getHSLColor } from "@/lib/utils";
 import {
-  AppstoreOutlined,
-  ClockCircleOutlined,
   DownOutlined,
   FileExcelOutlined,
   FilePdfOutlined,
   MoreOutlined,
   PrinterOutlined,
-  UnorderedListOutlined,
-  UserAddOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
   Avatar,
   Button,
-  Card,
-  Col,
   Dropdown,
   Input,
-  Radio,
-  Row,
   Space,
   Table,
-  Tabs,
   Tag,
-  Typography,
 } from "antd";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";

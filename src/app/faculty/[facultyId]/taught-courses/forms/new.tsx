@@ -20,7 +20,7 @@ import {
 } from "antd";
 import { parseAsBoolean, useQueryState } from "nuqs";
 
-import { CloseOutlined, UserAddOutlined } from "@ant-design/icons";
+import { BulbOutlined, CloseOutlined, UserAddOutlined } from "@ant-design/icons";
 import {
   Classroom,
   Course,
@@ -47,7 +47,7 @@ import { filterOption } from "@/lib/utils";
 
 type NewTaughtCourseFormProps = {
   departments?: Department[];
-  faculties?: Faculty[];
+  facultyId: number;
   courses?: Course[];
   teachers?: Teacher[];
   periods?: Period[];
@@ -57,7 +57,7 @@ type NewTaughtCourseFormProps = {
 
 export const NewTaughtCourseForm: FC<NewTaughtCourseFormProps> = ({
   departments,
-  faculties,
+  facultyId,
   courses,
   teachers,
   periods,
@@ -87,7 +87,7 @@ export const NewTaughtCourseForm: FC<NewTaughtCourseFormProps> = ({
 
   const onFinish = (values: any) => {
     mutateAsync(
-      { ...values, academic_year_id: yid },
+      { ...values, academic_year_id: yid, faculty_id: facultyId },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["taught_courses"] });
@@ -163,9 +163,32 @@ export const NewTaughtCourseForm: FC<NewTaughtCourseFormProps> = ({
         <Flex vertical gap={16} style={{ maxWidth: 520, margin: "auto" }}>
           <Alert
             type="info"
-            message="Veuillez fournir toutes les informations nécessaires pour programmer un nouveau cours."
-            description="Assurez-vous que les détails du cours (intitulé, horaires, enseignants, et étudiants concernés) sont complets et exacts avant de valider la planification."
+            message="Instructions"
+            description={
+              <ul style={{ margin: 0 }}>
+                <li>
+                  ▪ Remplissez tous les champs obligatoires du formulaire.
+                </li>
+                <li>
+                  ▪ Vérifiez que les informations du cours (intitulé, horaires,
+                  enseignants, etc.) sont exactes.
+                </li>
+                <li>
+                  ▪ Ajoutez les départements et la période concernés par ce
+                  cours.
+                </li>
+                <li>
+                  ▪ Indiquez les dates de début et de fin, ainsi que la salle
+                  de classe si nécessaire.
+                </li>
+                <li>
+                  ▪ Validez la planification en cliquant sur "Programmer le
+                  cours".
+                </li>
+              </ul>
+            }
             showIcon
+            icon={<BulbOutlined />}
             closable
           />
           <Card
@@ -267,15 +290,14 @@ export const NewTaughtCourseForm: FC<NewTaughtCourseFormProps> = ({
                 />
               </Form.Item>
 
-              <Row gutter={[16, 16]}>
-                <Col span={12}>
+              
                   <Form.Item
-                    name="department_id"
-                    label="Département"
+                    name="departments_ids"
+                    label="Départements"
                     rules={[
                       {
                         required: true,
-                        message: "Veuillez sélectionner un département.",
+                        message: "Veuillez sélectionner les départements.",
                       },
                     ]}
                   >
@@ -283,40 +305,11 @@ export const NewTaughtCourseForm: FC<NewTaughtCourseFormProps> = ({
                       options={getCurrentDepartmentsAsOptions(departments)}
                       allowClear
                       showSearch
+                      mode="multiple"
                       filterOption={filterOption}
-                      onChange={(value) => {
-                        const selectedDepartment = departments?.find(
-                          (department) => department.id === value
-                        );
-                        form.setFieldValue(
-                          "faculty_id",
-                          selectedDepartment?.faculty.id
-                        );
-                      }}
                     />
                   </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    name="faculty_id"
-                    label="Faculté"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Veuillez sélectionner une faculté.",
-                      },
-                    ]}
-                  >
-                    <Select
-                      options={getCurrentFacultiesAsOptions(faculties)}
-                      allowClear
-                      showSearch
-                      filterOption={filterOption}
-                      disabled
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
+              
               <Row gutter={[16, 16]}>
                 <Col span={12}>
                   <Form.Item name="start_date" label="Date de début">
@@ -357,26 +350,31 @@ export const NewTaughtCourseForm: FC<NewTaughtCourseFormProps> = ({
                   allowClear
                 />
               </Form.Item>
-              <Alert message="Statut des inscriptions au cours" description={<Form.Item name="status" >
-                <Select
-                  options={[
-                    { value: "pending", label: "En attente" },
-                    {
-                      value: "progress",
-                      label: "En cours",
-                    },
-                    {
-                      value: "finished",
-                      label: "Terminé",
-                    },
-                    {
-                      value: "suspended",
-                      label: "Suspendu",
-                    },
-                  ]}
-                />
-              </Form.Item>}/>
-              
+              <Alert
+                message="Statut des inscriptions"
+                description={
+                  <Form.Item name="status">
+                    <Select
+                      options={[
+                        { value: "pending", label: "En attente" },
+                        {
+                          value: "progress",
+                          label: "En cours",
+                        },
+                        {
+                          value: "finished",
+                          label: "Terminé",
+                        },
+                        {
+                          value: "suspended",
+                          label: "Suspendu",
+                        },
+                      ]}
+                    />
+                  </Form.Item>
+                }
+              />
+
               <Flex justify="space-between" align="center">
                 <Palette />
                 <Form.Item

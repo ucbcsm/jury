@@ -149,9 +149,9 @@ export const EditDepartmentForm: React.FC<EditDepartmentFormProps> = ({
         </Form.Item>
         <Card>
           <Typography.Title level={5}>Membres du département </Typography.Title>
-          <Form.Item name="director_id" label="Directeur" rules={[]}>
+          <Form.Item name="director_id" label="Chef de département" rules={[]}>
             <Select
-              placeholder="Séléctionnez le directeur"
+              placeholder="Séléctionnez le chef"
               prefix={<UserOutlined />}
               options={getTeachersAsOptions(teachers)}
               filterOption={filterOption}

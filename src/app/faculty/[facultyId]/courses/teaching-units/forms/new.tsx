@@ -10,6 +10,7 @@ import {
 } from "@/lib/api";
 import { Cycle, Department, TeachingUnit } from "@/types";
 import { filterOption } from "@/lib/utils";
+import { useParams } from "next/navigation";
 
 type FormDataType = Omit<TeachingUnit, "id" | "departement" | "cycle"> & {
   department_id: number;
@@ -25,6 +26,7 @@ export const NewTeachingUnitForm: React.FC<NewTeachingUnitFormProps> = ({
   cycles,
   departments,
 }) => {
+  const {facultyId}=useParams()
   const [form] = Form.useForm<FormDataType>();
   const [open, setOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -34,7 +36,7 @@ export const NewTeachingUnitForm: React.FC<NewTeachingUnitFormProps> = ({
   });
 
   const onFinish = (values: FormDataType) => {
-    mutateAsync(values, {
+    mutateAsync({...values, faculty_id:Number(facultyId)}, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["teaching-units"] });
         messageApi.success("Unité d'enseignement créée avec succès !");
@@ -77,7 +79,7 @@ export const NewTeachingUnitForm: React.FC<NewTeachingUnitFormProps> = ({
           disabled: isPending,
         }}
         onCancel={() => setOpen(false)}
-        destroyOnClose
+        destroyOnHidden
         modalRender={(dom) => (
           <Form
             form={form}
@@ -134,7 +136,7 @@ export const NewTeachingUnitForm: React.FC<NewTeachingUnitFormProps> = ({
             filterOption={filterOption}
           />
         </Form.Item>
-        <Form.Item
+        {/* <Form.Item
           name="department_id"
           label="Département"
           rules={[{ required: true }]}
@@ -144,7 +146,7 @@ export const NewTeachingUnitForm: React.FC<NewTeachingUnitFormProps> = ({
             showSearch
             filterOption={filterOption}
           />
-        </Form.Item>
+        </Form.Item> */}
       </Modal>
     </>
   );

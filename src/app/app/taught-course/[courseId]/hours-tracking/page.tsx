@@ -26,6 +26,7 @@ type ActionsBarProps = {
 };
 
 const ActionsBar: FC<ActionsBarProps> = ({ record }) => {
+  
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [openDelete, setOpenDelete] = useState<boolean>(false);
 
@@ -139,7 +140,7 @@ export default function Page() {
               : "",
         },
         {
-          title: "Matière",
+          title: "Leçon",
           dataIndex: "lesson",
           key: "lesson",
           render: (_, record, __) => record?.lesson,

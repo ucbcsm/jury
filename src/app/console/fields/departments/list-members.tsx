@@ -2,7 +2,7 @@
 import React, { FC, useState } from "react";
 import { Alert, Button, Modal } from "antd";
 import { Department } from "@/types";
-import { DepartmentMembersList } from "@/app/app/department/[departmentId]/(dashboard)/_components/members/list";
+import { DepartmentMembersList } from "@/app/faculty/[facultyId]/department/[departmentId]/(dashboard)/_components/members/list";
 
 type ListDepartmentMembersProps = {
     department: Department;

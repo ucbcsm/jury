@@ -150,6 +150,15 @@ export const Class = z.object({
 
 export type Class = z.infer<typeof Class>;
 
+export const ClassPresident = z.object({
+  id: z.number(),
+  departement: Department,
+  class_year: Class,
+  student: Enrollment,
+});
+
+export type ClassPresident = z.infer<typeof ClassPresident>;
+
 export const Period = z.object({
   id: z.number(),
   cycle: Cycle.nullable(),
@@ -304,7 +313,7 @@ export const TeachingUnit = z.object({
   name: z.string(),
   code: z.string(),
   category: z.enum(["required", "optional", "free", "transversal"]),
-  departement: Department.nullable(),
+  faculty: Faculty.nullable(),
   cycle: Cycle.nullable(),
   credit_count: z.number().nullable(),
 });
@@ -321,7 +330,7 @@ export const TaughtCourse = z.object({
   period: Period.nullable(),
   available_course: Course,
   faculty: Faculty,
-  departement: Department,
+  departements: z.array(Department),
   credit_count: z.number().nullable(),
   theoretical_hours: z.number().nullable(),
   practical_hours: z.number().nullable(),
@@ -833,3 +842,4 @@ export const LetterGrading = z.object({
 });
 
 export type LetterGrading = z.infer<typeof LetterGrading>;
+

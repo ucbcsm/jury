@@ -103,13 +103,13 @@ export default function Page() {
           </Space>
         </Layout.Footer>
       </Layout.Content>
-      <Layout.Sider
+      {/* <Layout.Sider
         width={280}
         theme="light"
         style={{ borderLeft: `1px solid ${colorBorderSecondary}` }}
       >
         <DepartmentsStatistics />
-      </Layout.Sider>
+      </Layout.Sider> */}
     </Layout>
   );
 }
