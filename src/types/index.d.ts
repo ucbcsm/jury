@@ -29,25 +29,25 @@ export type Year = z.infer<typeof Year>;
 /**
  * Represents an Institute with various properties describing its details.
  *
- * @property id - A unique identifier for the institute.
- * @property name - The full name of the institute.
- * @property acronym - The acronym or short form of the institute's name.
- * @property category - The category of the institute, either "university" or "institut".
- * @property address - The physical address of the institute.
- * @property web_site - The official website URL of the institute.
- * @property phone_number_1 - The primary contact phone number of the institute.
- * @property phone_number_2 - An optional secondary contact phone number of the institute.
- * @property email_address - The official email address of the institute.
- * @property logo - An optional URL to the logo of the institute.
- * @property parent_organization - An optional name of the parent organization, if applicable.
- * @property status - The status of the institute, either "private" or "public".
- * @property motto - An optional motto of the institute.
- * @property slogan - The slogan of the institute.
- * @property vision - The vision statement of the institute.
- * @property mission - The mission statement of the institute.
- * @property country - The country where the institute is located.
- * @property city - The city where the institute is located.
- * @property province - The province or state where the institute is located.
+ * @property {number} id - A unique identifier for the institute.
+ * @property {string} name - The full name of the institute.
+ * @property {string} acronym - The acronym or short form of the institute's name.
+ * @property {"university" | "institut"} category - The category of the institute, either "university" or "institut".
+ * @property {string} address - The physical address of the institute.
+ * @property {string} web_site - The official website URL of the institute.
+ * @property {string} phone_number_1 - The primary contact phone number of the institute.
+ * @property {string | null} phone_number_2 - An optional secondary contact phone number of the institute.
+ * @property {string} email_address - The official email address of the institute.
+ * @property {string | null} logo - An optional URL to the logo of the institute.
+ * @property {string | null} parent_organization - An optional name of the parent organization, if applicable.
+ * @property {"private" | "public"} status - The status of the institute, either "private" or "public".
+ * @property {string | null} motto - An optional motto of the institute.
+ * @property {string} slogan - The slogan of the institute.
+ * @property {string} vision - The vision statement of the institute.
+ * @property {string} mission - The mission statement of the institute.
+ * @property {string} country - The country where the institute is located.
+ * @property {string} city - The city where the institute is located.
+ * @property {string} province - The province or state where the institute is located.
  */
 export const Institute = z.object({
   id: z.number(),
@@ -114,6 +114,21 @@ export const Field = z.object({
 
 export type Field = z.infer<typeof Field>;
 
+/**
+ * Represents a faculty entity within the system.
+ *
+ * @remarks
+ * The `Faculty` object contains information about a faculty, including its coordinator,
+ * secretary, other members, associated field, name, and acronym.
+ *
+ * @property {number} id - Unique identifier for the faculty.
+ * @property {Teacher | null} coordinator - The teacher who coordinates the faculty. Can be null.
+ * @property {Teacher | null} secretary - The teacher who acts as secretary for the faculty. Can be null.
+ * @property {Teacher[]} other_members - An array of teachers who are other members of the faculty.
+ * @property {Field} field - The field or area of expertise associated with the faculty.
+ * @property {string} name - The full name of the faculty.
+ * @property {string} acronym - The acronym representing the faculty.
+ */
 export const Faculty = z.object({
   id: z.number(),
   coordinator: Teacher.nullable(),
@@ -126,6 +141,22 @@ export const Faculty = z.object({
 
 export type Faculty = z.infer<typeof Faculty>;
 
+/**
+ * Represents a department within an educational institution.
+ *
+ * @remarks
+ * This type defines the structure for a department, including its unique identifier,
+ * associated class years, faculty, director, other members, name, and acronym.
+ *
+ * @property {number} id - Unique identifier for the department.
+ * @property {Class} start_class_year - The starting class year associated with the department.
+ * @property {Class} end_class_year - The ending class year associated with the department.
+ * @property {Faculty} faculty - The faculty to which the department belongs.
+ * @property {Teacher | null} director - The director of the department, which may be null.
+ * @property {Teacher[]} other_members - An array of other teachers who are members of the department.
+ * @property {string} name - The full name of the department.
+ * @property {string} acronym - The acronym representing the department.
+ */
 export const Department = z.object({
   id: z.number(),
   start_class_year: Class,
@@ -139,6 +170,20 @@ export const Department = z.object({
 
 export type Department = z.infer<typeof Department>;
 
+/**
+ * Represents a school class entity.
+ *
+ * @remarks
+ * This schema defines the structure for a class, including its unique identifier,
+ * associated cycle, name, acronym, order number, and an optional description.
+ *
+ * @property {number} id - Unique identifier for the class.
+ * @property {Cycle | null} cycle - The cycle to which the class belongs. Can be null.
+ * @property {string} name - The name of the class.
+ * @property {string} acronym - The acronym representing the class.
+ * @property {number} order_number - The order number of the class.
+ * @property {string} description - Optional description of the class. Can be null.
+ */
 export const Class = z.object({
   id: z.number(),
   cycle: Cycle.nullable(),
@@ -150,6 +195,14 @@ export const Class = z.object({
 
 export type Class = z.infer<typeof Class>;
 
+/**
+ * Represents a class president.
+ *
+ * @property {number} id - Unique identifier for the class president.
+ * @property {Department} departement - The department to which the class president belongs.
+ * @property {Class} class_year - The class year of the president.
+ * @property {Enrollment} student - Enrollment information of the student president.
+ */
 export const ClassPresident = z.object({
   id: z.number(),
   departement: Department,
@@ -159,6 +212,22 @@ export const ClassPresident = z.object({
 
 export type ClassPresident = z.infer<typeof ClassPresident>;
 
+/**
+ * Represents an academic period with its properties and status.
+ *
+ * @decorator z.object
+ * @property {number} id - Unique identifier for the period.
+ * @property {Cycle | null} cycle - The academic cycle associated with the period, or null if not applicable.
+ * @property {Year} academic_year - The academic year for the period.
+ * @property {string} name - The full name of the period.
+ * @property {string} acronym - The acronym or short name of the period.
+ * @property {"semester" | "block_semester" | "quarter" | "term"} type_of_period - The type of academic period.
+ * @property {number} order_number - The order of the period within the academic year.
+ * @property {string} start_date - The start date of the period (ISO string).
+ * @property {string} end_date - The end date of the period (ISO string).
+ * @property {number} max_value - The maximum value associated with the period (e.g., credits, points).
+ * @property {"pending" | "progress" | "finished" | "suspended"} status - The current status of the period.
+ */
 export const Period = z.object({
   id: z.number(),
   cycle: Cycle.nullable(),
@@ -175,6 +244,17 @@ export const Period = z.object({
 
 export type Period = z.infer<typeof Period>;
 
+/**
+ * Represents a currency used in the application.
+ *
+ * @decorator @model
+ * @decorator @currency
+ * @property {number} id - Unique identifier for the currency.
+ * @property {string} name - Name of the currency.
+ * @property {('')} iso_code - ISO code of the currency (currently no values defined).
+ * @property {string} symbol - Symbol of the currency (e.g., €, $, £).
+ * @property {boolean} enabled - Indicates whether the currency is enabled.
+ */
 export const Currency = z.object({
   id: z.number(),
   name: z.string(),
@@ -185,6 +265,15 @@ export const Currency = z.object({
 
 export type Currency = z.infer<typeof Currency>;
 
+/**
+ * @typedef PaymentMethod
+ * Represents a payment method available in the system.
+ *
+ * @property {number} id - Unique identifier for the payment method.
+ * @property {string} name - Display name of the payment method.
+ * @property {string} description - Detailed description of the payment method.
+ * @property {boolean} enabled - Indicates whether the payment method is currently enabled.
+ */
 export const PaymentMethod = z.object({
   id: z.number(),
   name: z.string(),
@@ -194,6 +283,16 @@ export const PaymentMethod = z.object({
 
 export type PaymentMethod = z.infer<typeof PaymentMethod>;
 
+/**
+ * Represents a permission object.
+ *
+ * @decorator Permission
+ * @property {number} id - Unique identifier for the permission.
+ * @property {string} name - Human-readable name of the permission.
+ * @property {number} content_type_id - Identifier for the related content type.
+ * @property {string} codename - Code name used for permission checks.
+ * @property {number} content_type - Content type associated with the permission.
+ */
 export const Permission = z.object({
   id: z.number(),
   name: z.string(),
@@ -204,6 +303,14 @@ export const Permission = z.object({
 
 export type Permission = z.infer<typeof Permission>;
 
+/**
+ * Represents a group entity with a unique identifier, name, and associated permissions.
+ *
+ * @decorator Group
+ * @property {number} id - The unique identifier for the group.
+ * @property {string} name - The name of the group.
+ * @property {Permission[]} permissions - An array of permissions assigned to the group.
+ */
 export const Group = z.object({
   id: z.number(),
   name: z.string(),
@@ -212,6 +319,13 @@ export const Group = z.object({
 
 export type Group = z.infer<typeof Group>;
 
+/**
+ * @decorator
+ * Represents a user role within the system.
+ *
+ * @property id - Unique identifier for the role.
+ * @property name - Human-readable name of the role.
+ */
 export const Role = z.object({
   id: z.number(),
   name: z.string(),
@@ -249,6 +363,35 @@ export type RolesType =
   | "is_sgr_secretary"
   | "is_sgr_personal";
 
+/**
+ * @typedef User
+ * Represents a user entity in the system.
+ *
+ * @property {number} id - Unique identifier for the user.
+ * @property {Permission[]} user_permissions - List of permissions assigned to the user.
+ * @property {Group[]} groups - Groups to which the user belongs.
+ * @property {string} last_login - ISO string representing the user's last login datetime.
+ * @property {boolean} is_superuser - Indicates if the user has superuser privileges.
+ * @property {string | null} first_name - User's first name, nullable.
+ * @property {string | null} last_name - User's last name, nullable.
+ * @property {boolean} is_staff - Indicates if the user is a staff member.
+ * @property {boolean} is_student - Indicates if the user is a student.
+ * @property {boolean} is_active - Indicates if the user account is active.
+ * @property {boolean} is_permanent_teacher - Indicates if the user is a permanent teacher.
+ * @property {string} date_joined - ISO string representing the date the user joined.
+ * @property {string | null} surname - User's surname, nullable.
+ * @property {string} username - User's username.
+ * @property {string} email - User's email address.
+ * @property {string} matricule - User's matricule (registration number).
+ * @property {string | null} avatar - URL or path to the user's avatar image, nullable.
+ * @property {string | null} pending_avatar - URL or path to the user's pending avatar image, nullable.
+ * @property {Role[]} roles - List of roles assigned to the user.
+ *
+ * @decorator
+ * @see Permission
+ * @see Group
+ * @see Role
+ */
 export const User = z.object({
   id: z.number(),
   user_permissions: z.array(Permission),
@@ -273,6 +416,20 @@ export const User = z.object({
 
 export type User = z.infer<typeof User>;
 
+/**
+ * @class Classroom
+ * Represents a classroom entity with its properties and status.
+ *
+ * @property {number} id - Unique identifier for the classroom.
+ * @property {string} name - Name of the classroom.
+ * @property {"amphitheater" | "classroom" | "laboratory" | "computer-room" | "meeting-room" | "chapel" | "office" | null} room_type
+ *   - Type of the room. Can be null if not specified.
+ * @property {number | null} capacity - Maximum number of people the classroom can accommodate. Can be null.
+ * @property {string} code - Internal code or reference for the classroom.
+ * @property {"occupied" | "unoccupied" | null} status - Current occupancy status of the classroom. Can be null.
+ *
+ * @decorator z.object
+ */
 export const Classroom = z.object({
   id: z.number(),
   name: z.string(),
@@ -294,6 +451,17 @@ export const Classroom = z.object({
 
 export type Classroom = z.infer<typeof Classroom>;
 
+/**
+ * @module Course
+ * @description
+ * Represents a course entity with its unique identifier, associated faculties, name, code, and type.
+ *
+ * @property {number} id - Unique identifier for the course.
+ * @property {Faculty[]} faculties - Array of faculties associated with the course.
+ * @property {string} name - Name of the course.
+ * @property {string} code - Code representing the course.
+ * @property {"theoretical" | "practical" | "theoretical_and_practical"} course_type - Type of the course, indicating whether it is theoretical, practical, or both.
+ */
 export const Course = z.object({
   id: z.number(),
   faculties: z.array(Faculty),
@@ -308,6 +476,21 @@ export const Course = z.object({
 
 export type Course = z.infer<typeof Course>;
 
+/**
+ * Represents a teaching unit within the academic system.
+ *
+ * @remarks
+ * This type defines the structure for a teaching unit, including its identification,
+ * categorization, and academic associations.
+ *
+ * @property {number} id - Unique identifier for the teaching unit.
+ * @property {string} name - Name of the teaching unit.
+ * @property {string} code - Code representing the teaching unit.
+ * @property {"required" | "optional" | "free" | "transversal"} category - Category of the teaching unit.
+ * @property {Faculty | null} faculty - Associated faculty. Can be null if not assigned.
+ * @property {Cycle | null} cycle - Academic cycle. Can be null if not assigned.
+ * @property {number | null} credit_count - Number of credits for the teaching unit. Can be null if not applicable.
+ */
 export const TeachingUnit = z.object({
   id: z.number(),
   name: z.string(),
@@ -320,6 +503,28 @@ export const TeachingUnit = z.object({
 
 export type TeachingUnit = z.infer<typeof TeachingUnit>;
 
+
+/**
+ * Represents a course taught during an academic period.
+ *
+ * @property {number} id - Unique identifier for the taught course.
+ * @property {Teacher | null} teacher - The main teacher assigned to the course, or null if not assigned.
+ * @property {Teacher[] | null} assistants - Array of assistant teachers, or null if none.
+ * @property {Classroom | null} class_room - The classroom where the course is held, or null if not assigned.
+ * @property {Year | null} academic_year - The academic year of the course, or null if not specified.
+ * @property {TeachingUnit | null} teaching_unit - The teaching unit associated with the course, or null if not specified.
+ * @property {Period | null} period - The period during which the course is taught, or null if not specified.
+ * @property {Course} available_course - The available course reference.
+ * @property {Faculty} faculty - The faculty to which the course belongs.
+ * @property {Department[]} departements - Array of departments associated with the course.
+ * @property {number | null} credit_count - Number of credits for the course, or null if not specified.
+ * @property {number | null} theoretical_hours - Number of theoretical hours, or null if not specified.
+ * @property {number | null} practical_hours - Number of practical hours, or null if not specified.
+ * @property {number | null} max_value - Maximum value (e.g., capacity or score), or null if not specified.
+ * @property {Date | null} start_date - Start date of the course, or null if not specified.
+ * @property {Date | null} end_date - End date of the course, or null if not specified.
+ * @property {"pending" | "progress" | "finished" | "suspended" | null} status - Current status of the course, or null if not specified.
+ */
 export const TaughtCourse = z.object({
   id: z.number(),
   teacher: Teacher.nullable(),
@@ -342,6 +547,21 @@ export const TaughtCourse = z.object({
 
 export type TaughtCourse = z.infer<typeof TaughtCourse>;
 
+/**
+ * Represents a record of teaching hours tracked for a specific course and activity type.
+ * Used for validation and reporting of teaching activities.
+ * @typedef {object} HourTracking
+ * @property {number} id - Unique identifier for the hour tracking entry.
+ * @property {TaughtCourse} course - The course associated with the tracked hours.
+ * @property {Date} date - The date when the hours were tracked.
+ * @property {string} start_time - The start time of the tracked session (HH:mm format).
+ * @property {string} end_time - The end time of the tracked session (HH:mm format).
+ * @property {number} hours_completed - The total number of hours completed in this session.
+ * @property {"lecture" | "tutorial" | "practical" | "practical_tutorial"} activity_type - The type of activity performed (CM, TD, TP, or TPD).
+ * @property {string | null} lesson - The lesson associated with the tracked hours, or null if not applicable.
+ * @property {boolean} cp_validation - Indicates whether the pedagogical coordinator has validated the entry.
+ * @property {boolean} teacher_validation - Indicates whether the teacher has validated the entry.
+ */
 export const HourTracking = z.object({
   id: z.number(),
   course: TaughtCourse,
@@ -362,6 +582,19 @@ export const HourTracking = z.object({
 
 export type HourTracking = z.infer<typeof HourTracking>;
 
+/**
+ * Represents an attendance list for a specific course session.
+ *
+ * @decorator
+ * @typedef AttendanceList
+ *
+ * @property {number} id - Unique identifier for the attendance list.
+ * @property {TaughtCourse} course - The course associated with this attendance list.
+ * @property {User} verified_by - The user who verified the attendance.
+ * @property {AttendanceListItem[]} student_attendance_status - Array of attendance status items for each student.
+ * @property {Date} date - The date of the attendance session.
+ * @property {string} time - The time of the attendance session in string format.
+ */
 export const AttendanceList = z.object({
   id: z.number(),
   course: TaughtCourse,
@@ -373,6 +606,18 @@ export const AttendanceList = z.object({
 
 export type AttendanceList = z.infer<typeof AttendanceList>;
 
+/**
+ * Represents an item in the attendance list for a student.
+ *
+ * @remarks
+ * This type is used to track the attendance status of a student for a specific period.
+ *
+ * @property {number} id - Unique identifier for the attendance record.
+ * @property {PeriodEnrollment} student - The enrolled student for the period.
+ * @property {"present" | "absent" | "justified"} status - The attendance status, which can be "present", "absent", or "justified".
+ * @property {string | null} note - An optional note associated with the attendance record; can be null.
+ * @decorator z.object
+ */
 export const AttendanceListItem = z.object({
   id: z.number(),
   student: PeriodEnrollment,
@@ -382,6 +627,16 @@ export const AttendanceListItem = z.object({
 
 export type AttendanceListItem = z.infer<typeof AttendanceListItem>;
 
+/**
+ * Represents the enrollment of a student in a specific course during a given period.
+ *
+ * @decorator z.object
+ * @property {number} id - Unique identifier for the course enrollment.
+ * @property {PeriodEnrollment} student - The student's enrollment information for the period.
+ * @property {Date} date - The date when the enrollment was created.
+ * @property {TaughtCourse} course - The course in which the student is enrolled.
+ * @property {"pending" | "validated" | "rejected" | null} status - The current status of the enrollment; can be pending, validated, rejected, or null.
+ */
 export const CourseEnrollment = z.object({
   id: z.number(),
   student: PeriodEnrollment,
@@ -843,3 +1098,116 @@ export const LetterGrading = z.object({
 
 export type LetterGrading = z.infer<typeof LetterGrading>;
 
+export const GradeClass = z.object({
+  id: z.number(),
+  student: PeriodEnrollment,
+  jury: Jury,
+  course: TaughtCourse,
+  continuous_assessment: z.number().nullable(),
+  exam: z.number().nullable(),
+  total: z.number(),
+  grade_letter: LetterGrading,
+  earned_credits: z.number(),
+  validation: z.enum(["validated", "no_validated"]),
+  moment: z.enum(["before_appeal", "after_appeal"]),
+  session: z.enum(["main_session", "retake_session"]),
+  status: z.enum(["validated", "pending"]),
+  is_retaken: z.boolean(),
+});
+
+export type GradeClass = z.infer<typeof GradeClass>;
+
+export const TeachingUnitGrades = z.object({
+  id: z.number(),
+  jury: Jury,
+  student: PeriodEnrollment,
+  teaching_unit: TeachingUnit,
+  course_grades_list: z.array(GradeClass),
+  credit_sum: z.number(),
+  validated_credit_sum: z.number(),
+  unvalidated_credit_sum: z.number(),
+  weighted_average: z.number(),
+  percentage: z.number(),
+  grade_letter: LetterGrading,
+  moment: z.enum(["before_appeal", "after_appeal"]),
+  session: z.enum(["main_session", "retake_session"]),
+  validated_courses_sum: z.number(),
+  unvalidated_courses_sum: z.number(),
+  validation_status: z.enum(["validated", "no_validated"]),
+});
+
+export type TeachingUnitGrades = z.infer<typeof TeachingUnitGrades>;
+
+export const PeriodGrades = z.object({
+  id: z.number(),
+  jury: Jury,
+  student: PeriodEnrollment,
+  period: Period,
+  teaching_unit_grades_list:z.array(TeachingUnitGrades),
+  credit_sum: z.number(),
+  validated_credit_sum: z.number(),
+  unvalidated_credit_sum: z.number(),
+  weighted_average: z.number(),
+  percentage: z.number(),
+  grade_letter: LetterGrading,
+  moment: z.enum(["before_appeal", "after_appeal"]),
+  session: z.enum(["main_session", "retake_session"]),
+  validated_TU_sum: z.number(),
+  unvalidated_TU_sum: z.number(),
+  period_decision: z.enum(["passed","postponed"]),
+});
+
+export type PeriodGrades = z.infer<typeof PeriodGrades>;
+
+export const YearGrades = z.object({
+  id: z.number(),
+  student: Enrollment,
+  jury: Jury,
+  period_grade_list: z.array(PeriodGrades),
+  credit_sum: z.number(),
+  validated_credit_sum: z.number(),
+  unvalidated_credit_sum: z.number(),
+  weighted_average: z.number(),
+  percentage: z.number(),
+  grade_letter: LetterGrading,
+  moment: z.enum(["before_appeal", "after_appeal"]),
+  session: z.enum(["main_session", "retake_session"]),
+  validated_TU_sum: z.number(),
+  unvalidated_TU_sum: z.number(),
+  final_decision: z.enum(["passed", "postponed"]),
+});
+
+export type YearGrades = z.infer<typeof YearGrades>;
+
+export const Announcement = z.object({
+  id: z.number(),
+  academic_year: Year,
+  field: Field,
+  period: Period,
+  faculty: Faculty,
+  departement: Department,
+  class_year: Class,
+  total_students: z.number(),
+  graduated_students: z.number(),
+  non_graduated_students: z.number(),
+  moment: z.enum(["before_appeal", "after_appeal"]),
+  session: z.enum(["main_session", "retake_session"]),
+  date_created: z.string(),
+  date_updated: z.string(),
+  status: z.enum(["locked", "unlocked"]),
+});
+
+export type Announcement = z.infer<typeof Announcement>
+
+export const RetakeCourse = z.object({
+  id: z.number(),
+  user: User,
+  retake_course_list: z.array(Course),
+  retake_course_done_list: z.array(Course),
+  faculty: Faculty,
+  departement: Department,
+  class_year: Class,
+  academic_year: Year,
+});
+
+export type RetakeCourse = z.infer<typeof RetakeCourse>;
