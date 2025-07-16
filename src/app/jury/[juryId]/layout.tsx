@@ -62,7 +62,7 @@ export default function FacultyLayout({
           display: "flex",
           alignItems: "center",
           background: colorBgContainer,
-          borderBottom: `1px solid ${colorBorderSecondary}`,
+          // borderBottom: `1px solid ${colorBorderSecondary}`,
           paddingLeft: 32,
           paddingRight: 32,
         }}
@@ -99,7 +99,7 @@ export default function FacultyLayout({
           )}
 
           {facultyId && (
-            <Select
+            !isPending?<Select
               value={Number(facultyId)}
               showSearch
               variant="filled"
@@ -110,7 +110,9 @@ export default function FacultyLayout({
               onSelect={(value) => {
                 router.push(`/jury/${juryId}/${value}`);
               }}
-            />
+            />: <Form>
+              <Skeleton.Input size="small" active />
+            </Form>
           )}
         </Space>
 

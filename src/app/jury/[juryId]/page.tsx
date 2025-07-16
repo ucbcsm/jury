@@ -225,7 +225,7 @@ export default function Page() {
                 className=" hover:cursor-pointer hover:bg-gray-50"
                 style={{ paddingLeft: 16, paddingRight: 16 }}
                 onClick={() => {
-                  router.push(`/jury/${juryId}/${item.id}`);
+                  router.push(`/jury/${juryId}/${item.id}/grade-entry`);
                 }}
                 extra={<RightOutlined />}
               >
