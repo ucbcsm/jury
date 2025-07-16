@@ -2,7 +2,7 @@
 
 import { getHSLColor } from "@/lib/utils";
 import { Faculty } from "@/types";
-import { Avatar, Button, Divider, Dropdown, List, Tag, Typography } from "antd";
+import { Avatar, Button, Divider, List, Tag, Typography } from "antd";
 import { FC } from "react";
 
 type FacultyMembersListProps = {

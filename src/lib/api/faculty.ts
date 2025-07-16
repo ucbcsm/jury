@@ -70,6 +70,12 @@ export function getCurrentFacultiesAsOptions(faculties?: Faculty[]) {
   });
 }
 
+export function getFacultiesAAsOptionsWithAcronym(faculties?: Faculty[]) {
+  return faculties?.map((faculty) => {
+    return { value: faculty.id, label: `${faculty.acronym} - ${faculty.name}` };
+  });
+}
+
 export async function getFacultyDashboard(yearId: number, facultyId: number) {
   const res = await api.get(
     `/faculty/faculty-dashboard/?academic_year__id=${yearId}&faculty__id=${facultyId}`

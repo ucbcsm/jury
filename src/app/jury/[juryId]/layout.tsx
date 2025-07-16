@@ -1,17 +1,13 @@
 "use client";
 
-import { LanguageSwitcher } from "@/components/languageSwitcher";
-import { YearSelector } from "@/components/yearSelector";
 import { useYid } from "@/hooks/use-yid";
-import { getDepartmentsByFacultyId, getFaculty, getJury } from "@/lib/api";
+import { getFacultiesAAsOptionsWithAcronym, getJury } from "@/lib/api";
 import { logout } from "@/lib/api/auth";
-import { useSessionStore } from "@/store";
+import { filterOption } from "@/lib/utils";
 import {
+  CloseOutlined,
   LoadingOutlined,
   LogoutOutlined,
-  MenuOutlined,
-  QuestionOutlined,
-  SubnodeOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
@@ -19,17 +15,19 @@ import {
   Button,
   Divider,
   Dropdown,
+  Form,
   Image,
   Layout,
-  Menu,
   message,
+  Select,
+  Skeleton,
   Space,
   Spin,
   theme,
   Typography,
 } from "antd";
 import Link from "next/link";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function FacultyLayout({
@@ -42,38 +40,20 @@ export default function FacultyLayout({
   } = theme.useToken();
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoadingLogout, setIsLoadingLogout] = useState<boolean>(false);
-  const { juryId } = useParams();
+  const { juryId, facultyId } = useParams();
+  const router = useRouter();
 
   const { removeYid } = useYid();
 
   const {
-      data: jury,
-      isPending,
-      isError,
-    } = useQuery({
-      queryKey: ["jury", juryId],
-      queryFn: ({ queryKey }) => getJury(Number(queryKey[1])),
-      enabled: !!juryId,
-    });
-
-  const router = useRouter();
-  const pathname = usePathname();
-
-  // const { data: departments } = useQuery({
-  //   queryKey: ["departments", facultyId],
-  //   queryFn: ({ queryKey }) => getDepartmentsByFacultyId(Number(queryKey[1])),
-  //   enabled: !!facultyId,
-  // });
-
-  // const getDepartmentsAsMenu = () => {
-  //   const menu = departments?.map((dep) => ({
-  //     key: `/faculty/${dep.faculty.id}/department/${dep.id}`,
-  //     label: dep.name,
-  //     icon: <SubnodeOutlined />,
-  //   }));
-  //   return menu;
-  // };
-
+    data: jury,
+    isPending,
+    isError,
+  } = useQuery({
+    queryKey: ["jury", juryId],
+    queryFn: ({ queryKey }) => getJury(Number(queryKey[1])),
+    enabled: !!juryId,
+  });
   return (
     <Layout>
       {contextHolder}
@@ -106,44 +86,44 @@ export default function FacultyLayout({
             </Typography.Title>
           </Link>
           <Divider type="vertical" />
-          <Typography.Text type="secondary">Jury {jury?.name}</Typography.Text>
+          {!isPending ? (
+            <Typography.Text type="secondary">{jury?.name}</Typography.Text>
+          ) : (
+            <Form>
+              <Skeleton.Input size="small" active />
+            </Form>
+          )}
+          {facultyId && <Divider type="vertical" />}
+          {facultyId && (
+            <Typography.Text type="secondary">Filière:</Typography.Text>
+          )}
+
+          {facultyId && (
+            <Select
+              value={Number(facultyId)}
+              showSearch
+              variant="filled"
+              filterOption={filterOption}
+              options={getFacultiesAAsOptionsWithAcronym(jury?.faculties)}
+              style={{ width: 108 }}
+              loading={isPending}
+              onSelect={(value) => {
+                router.push(`/jury/${juryId}/${value}`);
+              }}
+            />
+          )}
         </Space>
 
-        {/* <Menu
-          mode="horizontal"
-          theme="light"
-          defaultSelectedKeys={[pathname]}
-          selectedKeys={[pathname]}
-          overflowedIndicator={<MenuOutlined />}
-          items={[
-            {
-              key: `/faculty/${facultyId}`,
-              label: "Aperçu",
-            },
-            { key: `/faculty/${facultyId}/students`, label: "Étudiants" },
-            {
-              key: `/faculty/${facultyId}/taught-courses`,
-              label: "Cours",
-            },
-            {
-              key: `/faculty/${facultyId}/courses`,
-              label: "Catalogue",
-            },
-            {
-              key: `departments`,
-              label: "Mentions",
-              //  icon: <BranchesOutlined />,
-              children: getDepartmentsAsMenu(),
-            },
-          ]}
-          style={{ flex: 1, minWidth: 0, borderBottom: 0 }}
-          onClick={({ key }) => {
-            router.push(key);
-          }}
-        /> */}
         <div className="flex-1" />
         <Space>
-          <YearSelector />
+          <Typography.Title
+            level={5}
+            type="secondary"
+            style={{ marginBottom: 0 }}
+          >
+            {jury?.academic_year.name}
+          </Typography.Title>
+          {/* <YearSelector /> */}
           <Dropdown
             menu={{
               items: [
@@ -191,50 +171,18 @@ export default function FacultyLayout({
               icon={<UserOutlined />}
             />
           </Dropdown>
-          <LanguageSwitcher />
+          <Button
+            type="text"
+            icon={<CloseOutlined />}
+            title="Fermer"
+            onClick={() => {
+              router.push("/jury");
+            }}
+          />
+          {/* <LanguageSwitcher /> */}
         </Space>
       </Layout.Header>
       <Layout>
-        <Layout.Sider
-          width={260}
-          style={{
-            borderRight: `1px solid ${colorBorderSecondary}`,
-            paddingTop: 20,
-            background: colorBgContainer,
-            height: `calc(100vh - 64px)`,
-            overflow: "auto",
-          }}
-        >
-          <Layout style={{}}>
-            <Menu
-              mode="inline"
-              theme="light"
-              style={{ height: "100%", borderRight: 0 }}
-              defaultSelectedKeys={[pathname]}
-              selectedKeys={[pathname]}
-              overflowedIndicator={<MenuOutlined />}
-              items={[
-                {
-                  key: `/`,
-                  label: "Menu",
-                  type: "group",
-                  children: [
-                    {
-                      key: `/jury/${juryId}`,
-                      label: "Aperçu",
-                    },
-                   
-                  ],
-                },
-              ]}
-              onClick={({ key }) => {
-                router.push(key);
-              }}
-            />
-
-           
-          </Layout>
-        </Layout.Sider>
         <Layout.Content>
           <div
             style={{
@@ -243,7 +191,6 @@ export default function FacultyLayout({
               borderRadius: borderRadiusLG,
             }}
           >
-          
             {children}
             <div
               className=""

@@ -3,17 +3,20 @@ import { LoginForm } from "./form";
 import { redirect } from "next/navigation";
 import { getServerSession } from "@/lib/api/auth";
 import { Suspense } from "react";
+import { DataFetchErrorResult } from "@/components/errorResult";
 
 export default async function Page() {
   const exists = await checkInstitutionExistence();
   const auth = await getServerSession();
 
   if (!exists) {
-    redirect("/config");
+    <Suspense>
+      <DataFetchErrorResult />
+    </Suspense>;
   }
 
   if (auth?.user) {
-    redirect(auth.faculty ? `/faculty/${auth.faculty.id}` : "/app");
+    redirect("/jury");
   }
 
   return (

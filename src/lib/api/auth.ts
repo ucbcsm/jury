@@ -68,33 +68,14 @@ export const getServerSession = async (): Promise<Session> => {
       throw error;
     }
 
-    let faculty: Faculty | undefined = undefined;
-    try {
-      const resFaculty = await api.get(`/account/faculty-from-user/`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      
-      faculty = resFaculty.data as Faculty | undefined;
+    
 
-    } catch (error: any) {
-      if (error?.response?.status !== 404 && error?.response?.status !== 400) {
-        throw error;
-      }
-      // If 404 or 400, faculty remains undefined
-    }
-
-    // if (!user) {
-    //   return null;
-    // }
 
     return {
       accessToken,
       refreshToken,
       user,
       error: null,
-      faculty,
     };
   } catch (error: any) {
     return null;
@@ -151,7 +132,7 @@ export const login = async (credentials: {
         },
       });
       const user = userResponse.data;
-      console.log("User,",user)
+      
       if ((user.is_superuser || user.is_staff) && user.is_active) {
         Cookies.set("accessToken", access);
         Cookies.set("refreshToken", refresh);
