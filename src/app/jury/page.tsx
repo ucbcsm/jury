@@ -2,19 +2,35 @@
 
 import { DataFetchErrorResult } from "@/components/errorResult";
 import { Palette } from "@/components/palette";
+import { useYid } from "@/hooks/use-yid";
 import { getUserIsJury, getYears } from "@/lib/api";
+import { logout } from "@/lib/api/auth";
 import {
   CalendarOutlined,
   LoadingOutlined,
   RightOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Card, Flex, Layout, List, Typography } from "antd";
+import {
+  Alert,
+  Button,
+  Card,
+  Flex,
+  Layout,
+  List,
+  message,
+  Spin,
+  Typography,
+} from "antd";
 import { redirect } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const [yearId, setYearId] = useState<number>();
+  const [messageApi, contextHolder] = message.useMessage();
+  const [isLoadingLogout, setIsLoadingLogout] = useState<boolean>(false);
+  const { removeYid } = useYid();
+
   const {
     data: years,
     isPending,
@@ -27,6 +43,8 @@ export default function Page() {
   const {
     data: jury,
     isLoading,
+    isError: isErrorJury,
+    error,
     refetch,
   } = useQuery({
     queryKey: ["get", `${yearId}`],
@@ -58,8 +76,17 @@ export default function Page() {
     );
   }
 
+  useEffect(() => {
+    if (isErrorJury && error?.status === 404) {
+      messageApi.error("Vous n'êtes associé(e) à aucun jury dans le système.");
+    } else if (isErrorJury) {
+      messageApi.error("Erreur inconnue. Merci de réessayer.");
+    }
+  }, [error]);
+
   return (
     <Layout>
+      {contextHolder}
       <Layout.Content
         style={{
           display: "flex",
@@ -72,8 +99,44 @@ export default function Page() {
         }}
       >
         <div style={{ width: 400, margin: "auto" }}>
+          {isErrorJury && error?.status === 404 && (
+            <Alert
+              type="error"
+              message="Accès non autorisé"
+              description="Vous n'êtes associé(e) à aucun jury dans le système. Merci de contacter l'administrateur afin qu'il vous associe à un jury."
+              // closable
+              style={{ marginBottom: 20 }}
+              action={
+                <Button
+                  type="primary"
+                  style={{ boxShadow: "none" }}
+                  onClick={() => {
+                    setIsLoadingLogout(true);
+                    logout()
+                      .then(() => {
+                        removeYid();
+                        window.location.href = "/auth/login";
+                      })
+                      .catch((error) => {
+                        console.log(
+                          "Error",
+                          error.response?.status,
+                          error.message
+                        );
+                        messageApi.error(
+                          "Ouf, une erreur est survenue, Veuillez réessayer!"
+                        );
+                        setIsLoadingLogout(false);
+                      });
+                  }}
+                >
+                  OK
+                </Button>
+              }
+            />
+          )}
           <Card loading={isPending}>
-            <Typography.Title level={4}> Année</Typography.Title>
+            <Typography.Title level={4}>Année</Typography.Title>
             <List
               dataSource={years}
               renderItem={(item) => (
@@ -111,6 +174,44 @@ export default function Page() {
             </Typography.Text>
             <Palette />
           </Flex>
+        </div>
+        <div
+          className=""
+          style={{
+            display: isLoadingLogout ? "flex" : "none",
+            flexDirection: "column",
+            background: "#fff",
+            position: "fixed",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 99,
+            height: "100vh",
+            width: "100%",
+          }}
+        >
+          <div
+            style={{
+              width: 440,
+              margin: "auto",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Spin
+              indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />}
+            />
+            <Typography.Title
+              type="secondary"
+              level={3}
+              style={{ marginTop: 10 }}
+            >
+              Déconnexion en cours ...
+            </Typography.Title>
+          </div>
         </div>
       </Layout.Content>
     </Layout>

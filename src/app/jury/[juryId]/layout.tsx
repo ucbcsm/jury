@@ -125,7 +125,6 @@ export default function FacultyLayout({
           >
             {jury?.academic_year.name}
           </Typography.Title>
-          {/* <YearSelector /> */}
           <Dropdown
             menu={{
               items: [
