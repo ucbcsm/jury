@@ -63,8 +63,8 @@ export default function FacultyLayout({
           alignItems: "center",
           background: colorBgContainer,
           // borderBottom: `1px solid ${colorBorderSecondary}`,
-          paddingLeft: 32,
-          paddingRight: 32,
+          paddingLeft: 12,
+          paddingRight: 12,
         }}
       >
         <Space>
@@ -108,7 +108,7 @@ export default function FacultyLayout({
               style={{ width: 108 }}
               loading={isPending}
               onSelect={(value) => {
-                router.push(`/jury/${juryId}/${value}`);
+                router.push(`/jury/${juryId}/${value}/grade-entry`);
               }}
             />: <Form>
               <Skeleton.Input size="small" active />

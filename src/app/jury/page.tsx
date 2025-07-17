@@ -104,7 +104,6 @@ export default function Page() {
               type="error"
               message="Accès non autorisé"
               description="Vous n'êtes associé(e) à aucun jury dans le système. Merci de contacter l'administrateur afin qu'il vous associe à un jury."
-              // closable
               style={{ marginBottom: 20 }}
               action={
                 <Button
