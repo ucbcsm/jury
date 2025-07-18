@@ -1,26 +1,19 @@
 "use client";
 
 import { getJury, getPeriodsByYear } from "@/lib/api";
-import { SearchOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Collapse,
-  type CollapseProps,
-  Flex,
-  Input,
-  List,
-  Splitter,
-  Tag,
-  Typography,
-} from "antd";
+import { Collapse, type CollapseProps, Flex, Splitter, Typography } from "antd";
 import { useParams } from "next/navigation";
+import { ListCourse } from "./_components/list-course";
+import { DataFetchPendingSkeleton } from "@/components/loadingSkeleton";
+import { DataFetchErrorResult } from "@/components/errorResult";
 
 export default function GradeEntryLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { juryId, facultyId } = useParams();
+  const { juryId } = useParams();
 
   const {
     data: jury,
@@ -34,9 +27,8 @@ export default function GradeEntryLayout({
 
   const {
     data: periods,
-    // isPending,
-    isLoading: isLoadingPeriods,
-    // isError,
+    isPending: isPendingPeriods,
+    isError: isErrorPeriods,
   } = useQuery({
     queryKey: ["periods", `${jury?.academic_year.id}`],
     queryFn: ({ queryKey }) => getPeriodsByYear(Number(queryKey[1])),
@@ -47,45 +39,7 @@ export default function GradeEntryLayout({
     const items = periods?.map((period) => ({
       key: `${period.id}`,
       label: `${period.acronym} (${period.name})`,
-      children: (
-        <div>
-          <Input
-            style={{ borderRadius: 20 }}
-            variant="filled"
-            placeholder="Rechercher ..."
-            prefix={<SearchOutlined />}
-          />
-          <Flex gap={4} wrap align="center" style={{ paddingTop: 12 }}>
-            <Tag.CheckableTag
-              key="new"
-              checked={true}
-              // onChange={(checked) => setSelectedTag("new")}
-              style={{ borderRadius: 12 }}
-            >
-              Tous
-            </Tag.CheckableTag>
-            <Tag.CheckableTag
-              key="new"
-              checked={false}
-              // onChange={(checked) => setSelectedTag("new")}
-              style={{ borderRadius: 12 }}
-            >
-              GI
-            </Tag.CheckableTag>
-
-            <Tag.CheckableTag
-              key="old"
-              checked={false}
-              // onChange={(checked) => setSelectedTag("old")}
-              style={{ borderRadius: 12 }}
-            >
-              EM
-            </Tag.CheckableTag>
-          </Flex>
-          <List />
-        </div>
-      ),
-      //   extra: <Button type="text" icon={<MoreOutlined />} />,
+      children: <ListCourse period={period} />,
       styles: {
         header: {
           background: "#fff",
@@ -101,19 +55,33 @@ export default function GradeEntryLayout({
   return (
     <Splitter style={{ height: `calc(100vh - 110px)` }}>
       <Splitter.Panel defaultSize="20%" min="20%" max="25%">
-        <Flex style={{ padding: `12px 16px 0 16px` }}>
-          <Typography.Title level={3} style={{ marginBottom: 0 }}>
+        <Flex style={{ padding: `12px 16px 0 16px`, height:64 }}>
+          <Typography.Title
+            type="secondary"
+            level={3}
+            style={{ marginBottom: 0 }}
+          >
             Cours & Périodes
           </Typography.Title>
         </Flex>
-        <Collapse
-          accordion
-          items={getPeriodsAsCollapseItems()}
-          bordered={false}
-          style={{ borderRadius: 0 }}
-
-          //   ghost
-        />
+        {isPendingPeriods && (
+          <div className="p-4">
+            <DataFetchPendingSkeleton />
+          </div>
+        )}
+        {isErrorPeriods && (
+          <div className="p-4">
+            <DataFetchErrorResult />
+          </div>
+        )}
+        {periods && (
+          <Collapse
+            accordion
+            items={getPeriodsAsCollapseItems()}
+            bordered={false}
+            style={{ borderRadius: 0 }}
+          />
+        )}
       </Splitter.Panel>
       <Splitter.Panel>{children}</Splitter.Panel>
     </Splitter>

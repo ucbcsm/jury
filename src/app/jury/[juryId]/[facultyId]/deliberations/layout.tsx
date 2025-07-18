@@ -81,7 +81,7 @@ export default function DeliberationsLayout({
     <Splitter style={{ height: `calc(100vh - 110px)` }}>
       <Splitter.Panel defaultSize="20%" min="20%" max="25%">
         <Flex style={{ padding: `12px 16px 0 16px` }}>
-          <Typography.Title level={3} style={{ marginBottom: 0 }}>
+          <Typography.Title level={3} type="secondary" style={{ marginBottom: 0 }}>
             Mentions & Promotions
           </Typography.Title>
         </Flex>
