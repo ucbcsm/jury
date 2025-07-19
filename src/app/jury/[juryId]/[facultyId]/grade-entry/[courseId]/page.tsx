@@ -8,11 +8,23 @@ import {
   PeriodEnrollment,
   TaughtCourse,
 } from "@/types";
-import { CloseOutlined, MoreOutlined, UploadOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+  DownloadOutlined,
+  FormOutlined,
+  MoreOutlined,
+  PrinterOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
   Button,
+  Dropdown,
   Form,
+  Input,
+  InputNumber,
   Layout,
   Select,
   Skeleton,
@@ -22,7 +34,7 @@ import {
   Typography,
 } from "antd";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 type NewGradeClass = Omit<
   GradeClass,
@@ -55,6 +67,27 @@ type NewGradeClass = Omit<
   continuous_assessment?: number | null;
   exam?: number | null;
   student?: PeriodEnrollment;
+};
+
+type InputGradeProps = {
+  value?: number | null;
+  onChange?: (value: number | null) => void;
+  disabled?: boolean;
+};
+const InputGrade: FC<InputGradeProps> = ({ value, onChange, disabled }) => {
+  return (
+    <InputNumber
+      min={0.0}
+      max={10}
+      step={0.01}
+      value={value}
+      disabled={disabled}
+      onChange={onChange}
+      variant="filled"
+      // className="text-right"
+      style={{ width: "100%", textAlign: "right" }}
+    />
+  );
 };
 
 export default function Page() {
@@ -114,7 +147,10 @@ export default function Page() {
       >
         <Space>
           {!isPending ? (
-            <Typography.Title level={3} style={{ marginBottom: 0 }}>
+            <Typography.Title
+              level={3}
+              style={{ marginBottom: 0, textTransform: "uppercase" }}
+            >
               {course?.available_course.name} ({course?.available_course.code})
             </Typography.Title>
           ) : (
@@ -159,15 +195,20 @@ export default function Page() {
       >
         <Table
           title={() => (
-            <header className="flex pb-1">
+            <header className="flex pb-1 px-2">
               <Space>
-                <Typography.Title level={3} style={{ marginBottom: 0 }}>
-                  Etudiants
+                <Typography.Title
+                  type="secondary"
+                  level={5}
+                  style={{ marginBottom: 0 }}
+                >
+                  Étudiants
                 </Typography.Title>
               </Space>
               <div className="flex-1" />
               <Space>
                 <Button
+                  icon={<FormOutlined />}
                   color="primary"
                   variant="dashed"
                   style={{ boxShadow: "none" }}
@@ -180,8 +221,34 @@ export default function Page() {
                   icon={<UploadOutlined />}
                   style={{ boxShadow: "none" }}
                 >
-                  Importer
+                  Importer un fichier CSV
                 </Button>
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: "export",
+                        label: "Exporter",
+                        icon: <DownloadOutlined />,
+                      },
+                      {
+                        key: "print",
+                        label: "Imprimer",
+                        icon: <PrinterOutlined />,
+                      },
+                    ],
+                    onClick: (e) => {
+                      if (e.key === "export") {
+                        // Handle export logic
+                      } else if (e.key === "print") {
+                        // Handle print logic
+                      }
+                    },
+                  }}
+                  arrow
+                >
+                  <Button icon={<MoreOutlined />} type="text" />
+                </Dropdown>
               </Space>
             </header>
           )}
@@ -191,7 +258,11 @@ export default function Page() {
               key: "matricule",
               dataIndex: "matricule",
               title: "Matricule",
-              render:(_, record)=>`${record.student?.year_enrollment.user.matricule.padStart(6, "0")}`,
+              render: (_, record) =>
+                `${record.student?.year_enrollment.user.matricule.padStart(
+                  6,
+                  "0"
+                )}`,
               width: 96,
               align: "center",
             },
@@ -207,21 +278,66 @@ export default function Page() {
               key: "cc",
               dataIndex: "cc",
               title: "C. continu",
-              width: 100,
+              render: (_, record) => (
+                <InputGrade
+                  value={record.continuous_assessment}
+                  onChange={(value) => {
+                    const updatedItems = [...(newGradeClassItems ?? [])];
+                    const index = updatedItems.findIndex(
+                      (item) => item.student?.id === record.student?.id
+                    );
+                    if (index !== -1) {
+                      updatedItems[index].continuous_assessment = value;
+                      setNewGradeClassItems(updatedItems);
+                    }
+                  }}
+                  disabled={!record.student}
+                />
+              ),
+              width: 106,
+              align: "right",
             },
             {
               key: "exam",
               dataIndex: "exam",
               title: "Examen",
-              width: 100,
+              render: (_, record) => (
+                <InputGrade
+                  value={record.exam}
+                  onChange={(value) => {
+                    const updatedItems = [...(newGradeClassItems ?? [])];
+                    const index = updatedItems.findIndex(
+                      (item) => item.student?.id === record.student?.id
+                    );
+                    if (index !== -1) {
+                      updatedItems[index].exam = value;
+                      setNewGradeClassItems(updatedItems);
+                    }
+                  }}
+                  disabled={!record.student}
+                />
+              ),
+              width: 106,
+              align: "right",
             },
             {
               key: "total",
               dataIndex: "total",
               title: "Total",
-              width: 100,
+              render: (_, record) => (
+                <Typography.Text strong>
+                  {typeof record.continuous_assessment === "number" &&
+                  typeof record.exam === "number"
+                    ? `${record.continuous_assessment + record.exam}`
+                    : ""}
+                </Typography.Text>
+              ),
+              width: 72,
+              align: "right",
             },
           ]}
+          size="small"
+          pagination={false}
         />
       </Layout.Content>
       <Layout.Footer
@@ -245,10 +361,29 @@ export default function Page() {
         {/* <Palette /> */}
 
         <Space>
-          <Button type="primary" style={{ boxShadow: "none" }}>
+          <Button
+            type="primary"
+            icon={<CheckCircleOutlined />}
+            style={{ boxShadow: "none" }}
+          >
             Sauvegarder
           </Button>
-          <Button icon={<MoreOutlined />} type="text" />
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: "delete",
+                  label: "Supprimer les notes",
+                  icon: <DeleteOutlined />,
+                  danger: true,
+                },
+              ],
+            }}
+            arrow
+            placement="topLeft"
+          >
+            <Button icon={<MoreOutlined />} type="text" />
+          </Dropdown>
         </Space>
       </Layout.Footer>
     </Layout>
