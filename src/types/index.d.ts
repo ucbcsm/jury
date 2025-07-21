@@ -1117,6 +1117,39 @@ export const GradeClass = z.object({
 
 export type GradeClass = z.infer<typeof GradeClass>;
 
+export type NewGradeClass = Omit<
+  GradeClass,
+  | "id"
+  | "status"
+  | "is_retaken"
+  | "moment"
+  | "session"
+  | "validation"
+  | "earned_credits"
+  | "grade_letter"
+  | "total"
+  | "course"
+  | "jury"
+  | "continuous_assessment"
+  | "exam"
+  | "student"
+> & {
+  id?: number;
+  status?: "validated" | "pending";
+  is_retaken?: boolean;
+  moment?: "before_appeal" | "after_appeal";
+  session?: "main_session" | "retake_session";
+  validation?: "validated" | "no_validated";
+  earned_credits?: number;
+  grade_letter?: LetterGrading;
+  total?: number;
+  course?: TaughtCourse;
+  jury?: Jury;
+  continuous_assessment?: number | null;
+  exam?: number | null;
+  student?: PeriodEnrollment;
+};
+
 export const TeachingUnitGrades = z.object({
   id: z.number(),
   jury: Jury,

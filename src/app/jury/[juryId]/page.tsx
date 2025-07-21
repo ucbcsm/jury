@@ -46,13 +46,17 @@ export default function Page() {
       <Card style={{ marginBottom: 32 }} variant="borderless">
         <Flex justify="space-between" align="center">
           <Statistic
-            title="Jurys d&apos;évaluation"
+            title="Jury d'évaluation"
             loading={isPending}
             valueRender={() => (
-              <Typography.Title level={3} style={{marginBottom:0}}>{jury?.name}</Typography.Title>
+              <Typography.Title level={3} style={{ marginBottom: 0 }}>
+                {jury?.name}
+              </Typography.Title>
             )}
           />
-          <Typography.Title style={{marginBottom:0}} type="success"><SafetyCertificateOutlined color="#ff00ff" /></Typography.Title>
+          <Typography.Title style={{ marginBottom: 0 }} type="success">
+            <SafetyCertificateOutlined color="#ff00ff" />
+          </Typography.Title>
         </Flex>
       </Card>
       <Row gutter={[32, 32]}>
@@ -211,7 +215,7 @@ export default function Page() {
           </Card>
         </Col>
         <Col xs={24} sm={24} md={16}>
-          <Space style={{marginBottom:24}}>
+          <Space style={{ marginBottom: 24 }}>
             <Badge count={jury?.faculties.length} />
             <Typography.Title level={3} style={{ marginBottom: 0 }}>
               Filières

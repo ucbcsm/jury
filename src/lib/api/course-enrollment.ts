@@ -17,7 +17,7 @@ export async function createCourseEnrollment(data: {
   }[];
 }) {
   const res = await api.post(`/faculty/course-enrollment-from-faculty/`, data);
-  return res.data 
+  return res.data;
 }
 
 export async function updateSingleCourseEnrollment(data: {
@@ -77,4 +77,14 @@ export const getCourseEnrollmentsCountByStatus = (
   status?: "pending" | "validated" | "rejected"
 ) => {
   return getCourseEnrollmentsByStatus(enrollments, status)?.length || 0;
+};
+
+export const getCourseEnrollmentsAsOptions = (
+  enrollments?: CourseEnrollment[]
+) => {
+  const options = enrollments?.map((item) => ({
+    value: item.id,
+    label: `[${item.student.year_enrollment.user.matricule}] ${item.student.year_enrollment.user.first_name} ${item.student.year_enrollment.user.last_name} ${item.student.year_enrollment.user.surname}`,
+  }));
+  return options;
 };

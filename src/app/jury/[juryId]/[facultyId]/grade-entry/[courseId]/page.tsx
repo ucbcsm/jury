@@ -5,6 +5,7 @@ import {
   GradeClass,
   Jury,
   LetterGrading,
+  NewGradeClass,
   PeriodEnrollment,
   TaughtCourse,
 } from "@/types";
@@ -16,15 +17,16 @@ import {
   FormOutlined,
   MoreOutlined,
   PrinterOutlined,
+  TeamOutlined,
   UploadOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
   Button,
+  Checkbox,
   Dropdown,
   Form,
-  Input,
-  InputNumber,
   Layout,
   Select,
   Skeleton,
@@ -34,66 +36,19 @@ import {
   Typography,
 } from "antd";
 import { useParams, useRouter } from "next/navigation";
-import { FC, useEffect, useState } from "react";
-
-type NewGradeClass = Omit<
-  GradeClass,
-  | "id"
-  | "status"
-  | "is_retaken"
-  | "moment"
-  | "session"
-  | "validation"
-  | "earned_credits"
-  | "grade_letter"
-  | "total"
-  | "course"
-  | "jury"
-  | "continuous_assessment"
-  | "exam"
-  | "student"
-> & {
-  id?: number;
-  status?: "validated" | "pending";
-  is_retaken?: boolean;
-  moment?: "before_appeal" | "after_appeal";
-  session?: "main_session" | "retake_session";
-  validation?: "validated" | "no_validated";
-  earned_credits?: number;
-  grade_letter?: LetterGrading;
-  total?: number;
-  course?: TaughtCourse;
-  jury?: Jury;
-  continuous_assessment?: number | null;
-  exam?: number | null;
-  student?: PeriodEnrollment;
-};
-
-type InputGradeProps = {
-  value?: number | null;
-  onChange?: (value: number | null) => void;
-  disabled?: boolean;
-};
-const InputGrade: FC<InputGradeProps> = ({ value, onChange, disabled }) => {
-  return (
-    <InputNumber
-      min={0.0}
-      max={10}
-      step={0.01}
-      value={value}
-      disabled={disabled}
-      onChange={onChange}
-      variant="filled"
-      // className="text-right"
-      style={{ width: "100%", textAlign: "right" }}
-    />
-  );
-};
+import { useState } from "react";
+import { IndividualGradeEntryForm } from "./_components/individual-grade-entry-form";
+import { BulkGradeSubmissionForm } from "./_components/bulk-grade-submission-form";
+import { InputGrade } from "./_components/input-grade";
+import { getGradeByTaughtCourse } from "@/lib/api/grade-class";
 
 export default function Page() {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+  const [openIndividualEntry, setOpenIndividualEntry] =
+    useState<boolean>(false);
+  const [openBulkSubmission, setOpenBulkSubmission] = useState<boolean>(false);
   const { juryId, facultyId, courseId } = useParams();
   const router = useRouter();
   const [newGradeClassItems, setNewGradeClassItems] = useState<
@@ -111,6 +66,16 @@ export default function Page() {
   });
 
   const {
+    data: gradeClasses,
+    isPending: isPendingGradeClasses,
+    isError: isErrorGradeClasses,
+  } = useQuery({
+    queryKey: ["grade_classes", courseId],
+    queryFn: ({ queryKey }) => getGradeByTaughtCourse(Number(queryKey[1])),
+    enabled: !!courseId,
+  });
+
+  const {
     data: courseEnrollments,
     isPending: isPendingCourseEnrollments,
     isError: isErrorCourseEnrollments,
@@ -120,19 +85,20 @@ export default function Page() {
     enabled: !!courseId,
   });
 
+  console.log(gradeClasses);
+
   const getGradeItemsFromCourseEnrollments = () => {
     const items = courseEnrollments?.map((student) => ({
       student: student.student,
       continuous_assessment: null,
       exam: null,
+      is_retaken: false,
+      status: "validated",
+      moment: "before_appeal",
+      session: "retake_session",
     }));
-    return items;
+    return items as NewGradeClass[];
   };
-
-  useEffect(() => {
-    const grades = getGradeItemsFromCourseEnrollments();
-    setNewGradeClassItems(grades);
-  }, [courseEnrollments]);
 
   return (
     <Layout>
@@ -161,33 +127,89 @@ export default function Page() {
         </Space>
         <div className="flex-1" />
         <Space>
-          <Select
-            variant="filled"
-            placeholder="Moment"
-            options={[
-              { value: "before_appeal", label: "Avant recours" },
-              { value: "after_appeal", label: "Après recours" },
-            ]}
-            style={{ width: 150 }}
-          />
-          <Select
-            variant="filled"
-            placeholder="Session"
-            options={[
-              { value: "main_session", label: "Session principale" },
-              { value: "retake_session", label: "Session de rattrapage" },
-            ]}
-            style={{ width: 150 }}
-          />
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: "individualGradeEntry",
+                  label: "Saisie individuelle",
+                  icon: <UserOutlined />,
+                },
+                {
+                  key: "bulkGradeSubmission",
+                  label: "Saisie collective",
+                  icon: <TeamOutlined />,
+                },
+              ],
+              onClick: ({ key }) => {
+                if (key === "individualGradeEntry") {
+                  setOpenIndividualEntry(true);
+                } else if (key === "bulkGradeSubmission") {
+                  setOpenBulkSubmission(true);
+                  const grades = getGradeItemsFromCourseEnrollments();
+                  setNewGradeClassItems(grades);
+                }
+              },
+            }}
+          >
+            <Button
+              icon={<FormOutlined />}
+              color="primary"
+              variant="dashed"
+              style={{ boxShadow: "none" }}
+              title="Saisir manuellement"
+            >
+              Saisir
+            </Button>
+          </Dropdown>
           <Button
-            title="Quitter la saisie des notes de ce cours"
-            icon={<CloseOutlined />}
-            type="text"
+            color="default"
+            variant="dashed"
+            icon={<UploadOutlined />}
             style={{ boxShadow: "none" }}
-            onClick={() =>
-              router.push(`/jury/${juryId}/${facultyId}/grade-entry`)
-            }
-          />
+            title="Importer un fichier CSV"
+          >
+            Importer
+          </Button>
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: "export",
+                  label: "Exporter",
+                  icon: <DownloadOutlined />,
+                  disabled: true,
+                },
+                {
+                  key: "print",
+                  label: "Imprimer",
+                  icon: <PrinterOutlined />,
+                  disabled: true,
+                },
+                {
+                  type: "divider",
+                },
+                {
+                  key: "close",
+                  label: "Quitter",
+                  title: "Quitter la saisie des notes de ce cours",
+                  icon: <CloseOutlined />,
+                },
+              ],
+              onClick: ({ key }) => {
+                if (key === "export") {
+                  // Handle export logic
+                } else if (key === "print") {
+                  // Handle print logic
+                } else if (key === "close") {
+                  router.push(`/jury/${juryId}/${facultyId}/grade-entry`);
+                }
+              },
+            }}
+            arrow
+          >
+            <Button icon={<MoreOutlined />} type="text" />
+          </Dropdown>
         </Space>
       </Layout.Header>
       <Layout.Content
@@ -207,52 +229,32 @@ export default function Page() {
               </Space>
               <div className="flex-1" />
               <Space>
-                <Button
-                  icon={<FormOutlined />}
-                  color="primary"
-                  variant="dashed"
-                  style={{ boxShadow: "none" }}
-                >
-                  Saisir manuellement
-                </Button>
-                <Button
-                  color="default"
-                  variant="dashed"
-                  icon={<UploadOutlined />}
-                  style={{ boxShadow: "none" }}
-                >
-                  Importer un fichier CSV
-                </Button>
-                <Dropdown
-                  menu={{
-                    items: [
-                      {
-                        key: "export",
-                        label: "Exporter",
-                        icon: <DownloadOutlined />,
-                      },
-                      {
-                        key: "print",
-                        label: "Imprimer",
-                        icon: <PrinterOutlined />,
-                      },
-                    ],
-                    onClick: (e) => {
-                      if (e.key === "export") {
-                        // Handle export logic
-                      } else if (e.key === "print") {
-                        // Handle print logic
-                      }
-                    },
-                  }}
-                  arrow
-                >
-                  <Button icon={<MoreOutlined />} type="text" />
-                </Dropdown>
+                <Typography.Text type="secondary">Session: </Typography.Text>
+                <Select
+                  variant="filled"
+                  placeholder="Session"
+                  defaultValue="main_session"
+                  options={[
+                    { value: "main_session", label: "Principale" },
+                    { value: "retake_session", label: "Rattrapage" },
+                  ]}
+                  style={{ width: 180 }}
+                />
+                <Typography.Text type="secondary">Moment: </Typography.Text>
+                <Select
+                  variant="filled"
+                  placeholder="Moment"
+                  defaultValue="before_appeal"
+                  options={[
+                    { value: "before_appeal", label: "Avant recours" },
+                    { value: "after_appeal", label: "Après recours" },
+                  ]}
+                  style={{ width: 150 }}
+                />
               </Space>
             </header>
           )}
-          dataSource={newGradeClassItems}
+          dataSource={gradeClasses}
           columns={[
             {
               key: "matricule",
@@ -294,8 +296,7 @@ export default function Page() {
                   disabled={!record.student}
                 />
               ),
-              width: 106,
-              align: "right",
+              width: 90,
             },
             {
               key: "exam",
@@ -317,8 +318,7 @@ export default function Page() {
                   disabled={!record.student}
                 />
               ),
-              width: 106,
-              align: "right",
+              width: 90,
             },
             {
               key: "total",
@@ -332,12 +332,138 @@ export default function Page() {
                     : ""}
                 </Typography.Text>
               ),
-              width: 72,
-              align: "right",
+              width: 52,
+              align:"right"
             },
+            {
+              key:"grade_letter",
+              dataIndex:"grade_letter",
+              title: "Notation",
+              render:(_, record)=><Space>{record.grade_letter.grade_letter} = {record.grade_letter.appreciation}</Space>
+            },
+            {
+              key:"earned_credits",
+              dataIndex:"earned_credits",
+              title: "Crédits",
+              render:(_, record)=><Typography.Text strong>{record.earned_credits}</Typography.Text>,
+              width:64,
+              align: "center",
+            },
+            {
+              key: "is_retaken",
+              dataIndex: "is_retaken",
+              title: "Repris",
+              render: (_, record) => <Checkbox />,
+              width: 62,
+              align: "center",
+            },
+            {
+              key: "session",
+              dataIndex: "session",
+              title: "Session",
+              render: (_, record) => (
+                <Select
+                  options={[
+                    { value: "main_session", label: "Principale" },
+                    { value: "retake_session", label: "Rattrapage" },
+                  ]}
+                  value={record.session}
+                  style={{ width: 128 }}
+                  variant="filled"
+                  onSelect={(value) => {
+                    const updatedItems = [...(newGradeClassItems ?? [])];
+                    const index = updatedItems.findIndex(
+                      (item) => item.student?.id === record.student?.id
+                    );
+                    if (index !== -1) {
+                      updatedItems[index].session = value as
+                        | "main_session"
+                        | "retake_session";
+                      setNewGradeClassItems(updatedItems);
+                    }
+                  }}
+                />
+              ),
+            },
+            {
+              key: "moment",
+              dataIndex: "moment",
+              title: "Moment",
+              render: (_, record) => (
+                <Select
+                  options={[
+                    { value: "before_appeal", label: "Avant recours" },
+                    { value: "after_appeal", label: "Après recours" },
+                  ]}
+                  value={record.moment}
+                  style={{ width: 128 }}
+                  variant="filled"
+                  onSelect={(value) => {
+                    const updatedItems = [...(newGradeClassItems ?? [])];
+                    const index = updatedItems.findIndex(
+                      (item) => item.student?.id === record.student?.id
+                    );
+                    if (index !== -1) {
+                      updatedItems[index].moment = value as
+                        | "before_appeal"
+                        | "after_appeal";
+                      setNewGradeClassItems(updatedItems);
+                    }
+                  }}
+                />
+              ),
+            },
+            {
+              key: "status",
+              dataIndex: "status",
+              title: "Statut",
+              render: (_, record) => (
+                <Select
+                  options={[
+                    { value: "validated", label: "Validée" },
+                    { value: "pending", label: "En attente" },
+                  ]}
+                  value={record.status}
+                  style={{ width: 108 }}
+                  variant="filled"
+                  status={record.status === "validated" ? undefined : "warning"}
+                  onSelect={(value) => {
+                    const updatedItems = [...(newGradeClassItems ?? [])];
+                    const index = updatedItems.findIndex(
+                      (item) => item.student?.id === record.student?.id
+                    );
+                    if (index !== -1) {
+                      updatedItems[index].status = value as
+                        | "validated"
+                        | "pending";
+                      setNewGradeClassItems(updatedItems);
+                    }
+                  }}
+                />
+              ),
+              width: 128,
+            },
+            {
+              key:"validation",
+              dataIndex:"validation",
+              title: "Validation",
+              
+            }
           ]}
           size="small"
           pagination={false}
+        />
+        <IndividualGradeEntryForm
+          open={openIndividualEntry}
+          setOpen={setOpenIndividualEntry}
+          students={courseEnrollments}
+        />
+        <BulkGradeSubmissionForm
+          open={openBulkSubmission}
+          setOpen={setOpenBulkSubmission}
+          newGradeClassItems={newGradeClassItems}
+          setNewGradeClassItems={setNewGradeClassItems}
+          course={course}
         />
       </Layout.Content>
       <Layout.Footer
@@ -356,11 +482,10 @@ export default function Page() {
           level={3}
           style={{ marginBottom: 0 }}
         >
-          Saisie des notes
+          {/* Saisie des notes */}
         </Typography.Title>
-        {/* <Palette /> */}
-
         <Space>
+          {/* <Button>Annuler</Button> */}
           <Button
             type="primary"
             icon={<CheckCircleOutlined />}

@@ -58,7 +58,7 @@ export default function GradeEntryLayout({
         <Flex style={{ padding: `12px 16px 0 16px`, height:64 }}>
           <Typography.Title
             type="secondary"
-            level={3}
+            level={5}
             style={{ marginBottom: 0 }}
           >
             Cours & Périodes
