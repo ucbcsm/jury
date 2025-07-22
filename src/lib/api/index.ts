@@ -31,3 +31,4 @@ export * from "./role"
 export * from "./jury"
 export * from "./letter-grading"
 export * from "./class-president"
+export * from "./grade-class";

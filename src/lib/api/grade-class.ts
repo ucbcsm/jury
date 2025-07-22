@@ -10,3 +10,30 @@ export async function getGradeByTaughtCourse(id:number) {
     const res = await api.get(`/jury/grades-class?course__id=${id}`)
     return res.data.results as GradeClass[]
 }
+
+
+export function getGradeValidationColor(
+  validation: "validated" | "no_validated"
+): string {
+  switch (validation) {
+    case "validated":
+      return "success";
+    case "no_validated":
+      return "error";
+    default:
+      return "default";
+  }
+}
+
+export function getGradeValidationText(
+  validation: "validated" | "no_validated"
+): string {
+  switch (validation) {
+    case "validated":
+      return "Validé";
+    case "no_validated":
+      return "Non validé";
+    default:
+      return "Inconnu";
+  }
+}

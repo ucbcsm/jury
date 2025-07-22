@@ -1,6 +1,6 @@
 "use client";
 
-import { getCourseEnrollments, getTaughtCours } from "@/lib/api";
+import { getCourseEnrollments, getGradeByTaughtCourse, getGradeValidationColor, getGradeValidationText, getTaughtCours } from "@/lib/api";
 import {
   GradeClass,
   Jury,
@@ -32,6 +32,7 @@ import {
   Skeleton,
   Space,
   Table,
+  Tag,
   theme,
   Typography,
 } from "antd";
@@ -40,7 +41,8 @@ import { useState } from "react";
 import { IndividualGradeEntryForm } from "./_components/individual-grade-entry-form";
 import { BulkGradeSubmissionForm } from "./_components/bulk-grade-submission-form";
 import { InputGrade } from "./_components/input-grade";
-import { getGradeByTaughtCourse } from "@/lib/api/grade-class";
+import { FileGradeSubmissionForm } from "./_components/file-grade-entry-form";
+
 
 export default function Page() {
   const {
@@ -49,6 +51,7 @@ export default function Page() {
   const [openIndividualEntry, setOpenIndividualEntry] =
     useState<boolean>(false);
   const [openBulkSubmission, setOpenBulkSubmission] = useState<boolean>(false);
+  const [openFileSubmission, setOpenFileSubmission] =useState<boolean>(false)
   const { juryId, facultyId, courseId } = useParams();
   const router = useRouter();
   const [newGradeClassItems, setNewGradeClassItems] = useState<
@@ -168,6 +171,7 @@ export default function Page() {
             icon={<UploadOutlined />}
             style={{ boxShadow: "none" }}
             title="Importer un fichier CSV"
+            onClick={() => setOpenFileSubmission(true)}
           >
             Importer
           </Button>
@@ -333,20 +337,26 @@ export default function Page() {
                 </Typography.Text>
               ),
               width: 52,
-              align:"right"
+              align: "right",
             },
             {
-              key:"grade_letter",
-              dataIndex:"grade_letter",
+              key: "grade_letter",
+              dataIndex: "grade_letter",
               title: "Notation",
-              render:(_, record)=><Space>{record.grade_letter.grade_letter} = {record.grade_letter.appreciation}</Space>
+              render: (_, record) => `${record.grade_letter.grade_letter}`,
+              width: 74,
+              align: "center",
             },
             {
-              key:"earned_credits",
-              dataIndex:"earned_credits",
+              key: "earned_credits",
+              dataIndex: "earned_credits",
               title: "Crédits",
-              render:(_, record)=><Typography.Text strong>{record.earned_credits}</Typography.Text>,
-              width:64,
+              render: (_, record) => (
+                <Typography.Text strong>
+                  {record.earned_credits}
+                </Typography.Text>
+              ),
+              width: 64,
               align: "center",
             },
             {
@@ -368,7 +378,7 @@ export default function Page() {
                     { value: "retake_session", label: "Rattrapage" },
                   ]}
                   value={record.session}
-                  style={{ width: 128 }}
+                  style={{ width: 120 }}
                   variant="filled"
                   onSelect={(value) => {
                     const updatedItems = [...(newGradeClassItems ?? [])];
@@ -384,6 +394,7 @@ export default function Page() {
                   }}
                 />
               ),
+              width:136
             },
             {
               key: "moment",
@@ -412,6 +423,7 @@ export default function Page() {
                   }}
                 />
               ),
+              width:144
             },
             {
               key: "status",
@@ -444,11 +456,20 @@ export default function Page() {
               width: 128,
             },
             {
-              key:"validation",
-              dataIndex:"validation",
+              key: "validation",
+              dataIndex: "validation",
               title: "Validation",
-              
-            }
+              render: (_, record) => (
+                <Tag
+                  color={getGradeValidationColor(record.validation)}
+                  bordered={false}
+                  style={{width:"100%"}}
+                >
+                  {getGradeValidationText(record.validation)}
+                </Tag>
+              ),
+              width: 82,
+            },
           ]}
           size="small"
           pagination={false}
@@ -465,6 +486,7 @@ export default function Page() {
           setNewGradeClassItems={setNewGradeClassItems}
           course={course}
         />
+        <FileGradeSubmissionForm open={openFileSubmission} setOpen={setOpenFileSubmission} course={course}/>
       </Layout.Content>
       <Layout.Footer
         style={{
