@@ -470,7 +470,7 @@ export default function Page() {
                   }}
                 />
               ),
-              width: 66,
+              width: 68,
               align: "center",
             },
             {
@@ -602,7 +602,7 @@ export default function Page() {
                   {getGradeValidationText(record.validation)}
                 </Tag>
               ),
-              width: 82,
+              width: 96,
             },
           ]}
           size="small"
