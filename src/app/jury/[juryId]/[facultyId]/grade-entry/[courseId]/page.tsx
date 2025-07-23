@@ -454,7 +454,7 @@ export default function Page() {
             {
               key: "is_retaken",
               dataIndex: "is_retaken",
-              title: "Repris",
+              title: "Retake?",
               render: (_, record) => (
                 <Checkbox
                   checked={record.is_retaken}
@@ -470,7 +470,7 @@ export default function Page() {
                   }}
                 />
               ),
-              width: 62,
+              width: 66,
               align: "center",
             },
             {
