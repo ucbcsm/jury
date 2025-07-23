@@ -1,33 +1,36 @@
 "use client";
 
-import { getCourseEnrollments, getGradeByTaughtCourse, getGradeValidationColor, getGradeValidationText, getTaughtCours } from "@/lib/api";
 import {
-  GradeClass,
-  Jury,
-  LetterGrading,
-  NewGradeClass,
-  PeriodEnrollment,
-  TaughtCourse,
-} from "@/types";
+  getCourseEnrollments,
+  getGradeByTaughtCourse,
+  getGradeValidationColor,
+  getGradeValidationText,
+  getTaughtCours,
+  multiUpdateGradeClasses,
+} from "@/lib/api";
+import { GradeClass, NewGradeClass } from "@/types";
 import {
   CheckCircleOutlined,
+  CloseCircleOutlined,
   CloseOutlined,
   DeleteOutlined,
   DownloadOutlined,
   FormOutlined,
+  HourglassOutlined,
   MoreOutlined,
   PrinterOutlined,
   TeamOutlined,
   UploadOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
   Checkbox,
   Dropdown,
   Form,
   Layout,
+  message,
   Select,
   Skeleton,
   Space,
@@ -37,26 +40,58 @@ import {
   Typography,
 } from "antd";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IndividualGradeEntryForm } from "./_components/individual-grade-entry-form";
 import { BulkGradeSubmissionForm } from "./_components/bulk-grade-submission-form";
 import { InputGrade } from "./_components/input-grade";
 import { FileGradeSubmissionForm } from "./_components/file-grade-entry-form";
-
+import { parseAsStringEnum, useQueryState } from "nuqs";
+import { ButtonMultiUpdateFormConfirm } from "./_components/button-multi-update-form-confirm";
+import { ButtonMultiUpdateFormReject } from "./_components/reject-multi-update-form";
+import { ButtonDeleteGrades } from "./_components/delete-grades";
 
 export default function Page() {
   const {
-    token: { colorBgContainer },
+    token: { colorBgContainer, colorSuccess, colorWarning, colorSuccessBgHover },
   } = theme.useToken();
+  const [messageApi, contextHolder] = message.useMessage();
   const [openIndividualEntry, setOpenIndividualEntry] =
     useState<boolean>(false);
   const [openBulkSubmission, setOpenBulkSubmission] = useState<boolean>(false);
-  const [openFileSubmission, setOpenFileSubmission] =useState<boolean>(false)
+  const [openFileSubmission, setOpenFileSubmission] = useState<boolean>(false);
+  const [disabled, setDisabled] = useState<boolean>(true);
+  const [openMultiUpdateConfirm, setOpenMultiUpdateConfirm] =
+    useState<boolean>(false);
+  const [openRejectUpdates, setOpenRejectUpdates] = useState<boolean>(false);
+  const [openDeleteGrades, setOpenDeleteGrades] = useState<boolean>(false);
   const { juryId, facultyId, courseId } = useParams();
   const router = useRouter();
   const [newGradeClassItems, setNewGradeClassItems] = useState<
     NewGradeClass[] | undefined
   >([]);
+
+  const [editGradeClassItems, setEditGradeClassItems] = useState<
+    GradeClass[] | undefined
+  >();
+
+  const [session, setSession] = useQueryState(
+    "session",
+    parseAsStringEnum(["main_session", "retake_session"]).withDefault(
+      "main_session"
+    )
+  );
+  const [moment, setMoment] = useQueryState(
+    "moment",
+    parseAsStringEnum(["before_appeal", "after_appeal"]).withDefault(
+      "before_appeal"
+    )
+  );
+
+  const queryClient = useQueryClient();
+  const { mutateAsync: mutateMultiGrades, isPending: isPendingMultiupdate } =
+    useMutation({
+      mutationFn: multiUpdateGradeClasses,
+    });
 
   const {
     data: course,
@@ -73,9 +108,10 @@ export default function Page() {
     isPending: isPendingGradeClasses,
     isError: isErrorGradeClasses,
   } = useQuery({
-    queryKey: ["grade_classes", courseId],
-    queryFn: ({ queryKey }) => getGradeByTaughtCourse(Number(queryKey[1])),
-    enabled: !!courseId,
+    queryKey: ["grade_classes", courseId, session, moment],
+    queryFn: ({ queryKey }) =>
+      getGradeByTaughtCourse(Number(queryKey[1]), session, moment),
+    enabled: !!courseId && !!session && !!moment,
   });
 
   const {
@@ -87,8 +123,6 @@ export default function Page() {
     queryFn: ({ queryKey }) => getCourseEnrollments(Number(queryKey[1])),
     enabled: !!courseId,
   });
-
-  console.log(gradeClasses);
 
   const getGradeItemsFromCourseEnrollments = () => {
     const items = courseEnrollments?.map((student) => ({
@@ -103,8 +137,57 @@ export default function Page() {
     return items as NewGradeClass[];
   };
 
+  const onFinishMultiUpdateGrades = () => {
+    mutateMultiGrades([...(editGradeClassItems || [])], {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["grade_classes", courseId, session, moment],
+        });
+        messageApi.success("Notes mise à jour avec succès !");
+        setOpenMultiUpdateConfirm(false);
+      },
+      onError: (error) => {
+        messageApi.error(
+          "Une erreur s'est produite lors de la mise à jour des notes"
+        );
+      },
+    });
+  };
+
+  useEffect(() => {
+    if (gradeClasses) {
+      const items = [...gradeClasses];
+      setEditGradeClassItems(items);
+    }
+  }, [gradeClasses]);
+
+  useEffect(() => {
+    if (editGradeClassItems && gradeClasses) {
+      // Use a map for faster lookup by id
+      const editedMap = new Map(
+        editGradeClassItems.map((item) => [item.id, item])
+      );
+
+      for (const original of gradeClasses) {
+        const edited = editedMap.get(original.id);
+
+        if (
+          original.continuous_assessment !== edited?.continuous_assessment ||
+          original.exam !== edited?.exam ||
+          original.is_retaken !== edited?.is_retaken ||
+          original.session !== edited?.session ||
+          original.moment !== edited?.moment ||
+          original.status !== edited?.status
+        ) {
+          setDisabled(false);
+        }
+      }
+    }
+  }, [gradeClasses, editGradeClassItems]);
+
   return (
     <Layout>
+      {contextHolder}
       <Layout.Header
         style={{
           display: "flex",
@@ -237,28 +320,35 @@ export default function Page() {
                 <Select
                   variant="filled"
                   placeholder="Session"
-                  defaultValue="main_session"
+                  value={session}
                   options={[
                     { value: "main_session", label: "Principale" },
                     { value: "retake_session", label: "Rattrapage" },
                   ]}
                   style={{ width: 180 }}
+                  onSelect={(value) => {
+                    setSession(value as "main_session" | "retake_session");
+                  }}
                 />
                 <Typography.Text type="secondary">Moment: </Typography.Text>
                 <Select
                   variant="filled"
                   placeholder="Moment"
-                  defaultValue="before_appeal"
+                  value={moment}
                   options={[
                     { value: "before_appeal", label: "Avant recours" },
                     { value: "after_appeal", label: "Après recours" },
                   ]}
                   style={{ width: 150 }}
+                  onSelect={(value) => {
+                    setMoment(value as "before_appeal" | "after_appeal");
+                  }}
                 />
               </Space>
             </header>
           )}
-          dataSource={gradeClasses}
+          dataSource={editGradeClassItems}
+          loading={isPendingGradeClasses}
           columns={[
             {
               key: "matricule",
@@ -288,13 +378,13 @@ export default function Page() {
                 <InputGrade
                   value={record.continuous_assessment}
                   onChange={(value) => {
-                    const updatedItems = [...(newGradeClassItems ?? [])];
+                    const updatedItems = [...(editGradeClassItems ?? [])];
                     const index = updatedItems.findIndex(
                       (item) => item.student?.id === record.student?.id
                     );
                     if (index !== -1) {
                       updatedItems[index].continuous_assessment = value;
-                      setNewGradeClassItems(updatedItems);
+                      setEditGradeClassItems(updatedItems);
                     }
                   }}
                   disabled={!record.student}
@@ -310,13 +400,13 @@ export default function Page() {
                 <InputGrade
                   value={record.exam}
                   onChange={(value) => {
-                    const updatedItems = [...(newGradeClassItems ?? [])];
+                    const updatedItems = [...(editGradeClassItems ?? [])];
                     const index = updatedItems.findIndex(
                       (item) => item.student?.id === record.student?.id
                     );
                     if (index !== -1) {
                       updatedItems[index].exam = value;
-                      setNewGradeClassItems(updatedItems);
+                      setEditGradeClassItems(updatedItems);
                     }
                   }}
                   disabled={!record.student}
@@ -332,7 +422,9 @@ export default function Page() {
                 <Typography.Text strong>
                   {typeof record.continuous_assessment === "number" &&
                   typeof record.exam === "number"
-                    ? `${record.continuous_assessment + record.exam}`
+                    ? `${Number(
+                        record.continuous_assessment + record.exam
+                      ).toFixed(2)}`
                     : ""}
                 </Typography.Text>
               ),
@@ -363,7 +455,21 @@ export default function Page() {
               key: "is_retaken",
               dataIndex: "is_retaken",
               title: "Repris",
-              render: (_, record) => <Checkbox />,
+              render: (_, record) => (
+                <Checkbox
+                  checked={record.is_retaken}
+                  onChange={(e) => {
+                    const updatedItems = [...(editGradeClassItems ?? [])];
+                    const index = updatedItems.findIndex(
+                      (item) => item.student?.id === record.student?.id
+                    );
+                    if (index !== -1) {
+                      updatedItems[index].is_retaken = e.target.checked;
+                      setEditGradeClassItems(updatedItems);
+                    }
+                  }}
+                />
+              ),
               width: 62,
               align: "center",
             },
@@ -381,7 +487,7 @@ export default function Page() {
                   style={{ width: 120 }}
                   variant="filled"
                   onSelect={(value) => {
-                    const updatedItems = [...(newGradeClassItems ?? [])];
+                    const updatedItems = [...(editGradeClassItems ?? [])];
                     const index = updatedItems.findIndex(
                       (item) => item.student?.id === record.student?.id
                     );
@@ -389,12 +495,12 @@ export default function Page() {
                       updatedItems[index].session = value as
                         | "main_session"
                         | "retake_session";
-                      setNewGradeClassItems(updatedItems);
+                      setEditGradeClassItems(updatedItems);
                     }
                   }}
                 />
               ),
-              width:136
+              width: 136,
             },
             {
               key: "moment",
@@ -410,7 +516,7 @@ export default function Page() {
                   style={{ width: 128 }}
                   variant="filled"
                   onSelect={(value) => {
-                    const updatedItems = [...(newGradeClassItems ?? [])];
+                    const updatedItems = [...(editGradeClassItems ?? [])];
                     const index = updatedItems.findIndex(
                       (item) => item.student?.id === record.student?.id
                     );
@@ -418,40 +524,66 @@ export default function Page() {
                       updatedItems[index].moment = value as
                         | "before_appeal"
                         | "after_appeal";
-                      setNewGradeClassItems(updatedItems);
+                      setEditGradeClassItems(updatedItems);
                     }
                   }}
                 />
               ),
-              width:144
+              width: 144,
             },
             {
               key: "status",
               dataIndex: "status",
               title: "Statut",
               render: (_, record) => (
-                <Select
-                  options={[
-                    { value: "validated", label: "Validée" },
-                    { value: "pending", label: "En attente" },
-                  ]}
-                  value={record.status}
-                  style={{ width: 108 }}
-                  variant="filled"
-                  status={record.status === "validated" ? undefined : "warning"}
-                  onSelect={(value) => {
-                    const updatedItems = [...(newGradeClassItems ?? [])];
-                    const index = updatedItems.findIndex(
-                      (item) => item.student?.id === record.student?.id
-                    );
-                    if (index !== -1) {
-                      updatedItems[index].status = value as
-                        | "validated"
-                        | "pending";
-                      setNewGradeClassItems(updatedItems);
-                    }
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: "validated",
+                        label: "Validée",
+                        icon: <CheckCircleOutlined />,
+                        // className:"bg-green-100 text-green-800",
+                        style: {  color: colorSuccess },
+                      },
+                      {
+                        key: "pending",
+                        label: "En attente",
+                        icon: <HourglassOutlined />,
+                        style: { color: colorWarning },
+                      },
+                    ],
+                    onClick: ({ key }) => {
+                      const updatedItems = [...(editGradeClassItems ?? [])];
+                      const index = updatedItems.findIndex(
+                        (item) => item.student?.id === record.student?.id
+                      );
+                      if (index !== -1) {
+                        updatedItems[index].status = key as
+                          | "validated"
+                          | "pending";
+                        setEditGradeClassItems(updatedItems);
+                      }
+                    },
                   }}
-                />
+                  arrow
+                >
+                  <Tag
+                    color={record.status === "validated" ? "success" : "warning"}
+                    
+                    bordered={false}
+                    style={{ width: "100%", padding: "4px 8px" }}
+                    icon={
+                      record.status === "validated" ? (
+                        <CheckCircleOutlined style={{ color: colorSuccess }} />
+                      ) : (
+                        <HourglassOutlined />
+                      )}
+                      
+                  >
+                    {record.status === "validated" ? "Validée" : "En attente"}
+                  </Tag>
+                </Dropdown>
               ),
               width: 128,
             },
@@ -463,7 +595,9 @@ export default function Page() {
                 <Tag
                   color={getGradeValidationColor(record.validation)}
                   bordered={false}
-                  style={{width:"100%"}}
+                  style={{ width: "100%", padding: "4px 8px" }}
+                  icon={record.validation === "validated" ? (
+                    <CheckCircleOutlined />):(<CloseCircleOutlined />)}
                 >
                   {getGradeValidationText(record.validation)}
                 </Tag>
@@ -473,6 +607,7 @@ export default function Page() {
           ]}
           size="small"
           pagination={false}
+          rowKey="id"
         />
         <IndividualGradeEntryForm
           open={openIndividualEntry}
@@ -486,7 +621,11 @@ export default function Page() {
           setNewGradeClassItems={setNewGradeClassItems}
           course={course}
         />
-        <FileGradeSubmissionForm open={openFileSubmission} setOpen={setOpenFileSubmission} course={course}/>
+        <FileGradeSubmissionForm
+          open={openFileSubmission}
+          setOpen={setOpenFileSubmission}
+          course={course}
+        />
       </Layout.Content>
       <Layout.Footer
         style={{
@@ -507,14 +646,25 @@ export default function Page() {
           {/* Saisie des notes */}
         </Typography.Title>
         <Space>
-          {/* <Button>Annuler</Button> */}
-          <Button
-            type="primary"
-            icon={<CheckCircleOutlined />}
-            style={{ boxShadow: "none" }}
-          >
-            Sauvegarder
-          </Button>
+          <ButtonMultiUpdateFormReject
+            open={openRejectUpdates}
+            setOpen={setOpenRejectUpdates}
+            onFinish={() => setEditGradeClassItems(gradeClasses)}
+          />
+
+          <ButtonMultiUpdateFormConfirm
+            open={openMultiUpdateConfirm}
+            setOpen={setOpenMultiUpdateConfirm}
+            onFinish={onFinishMultiUpdateGrades}
+            isPending={isPendingMultiupdate}
+          />
+
+          <ButtonDeleteGrades
+            open={openDeleteGrades}
+            setOpen={setOpenDeleteGrades}
+            onFinish={() => {}}
+          />
+
           <Dropdown
             menu={{
               items: [
@@ -525,6 +675,11 @@ export default function Page() {
                   danger: true,
                 },
               ],
+              onClick: ({ key }) => {
+                if (key === "delete") {
+                  setOpenDeleteGrades(true);
+                }
+              },
             }}
             arrow
             placement="topLeft"

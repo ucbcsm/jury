@@ -6,11 +6,28 @@ export async function createBulkGradeClasses(data: NewGradeClass[]) {
   return res.data;
 }
 
-export async function getGradeByTaughtCourse(id:number) {
-    const res = await api.get(`/jury/grades-class?course__id=${id}`)
-    return res.data.results as GradeClass[]
+export async function getGradeByTaughtCourse(
+  id: number,
+  session: "main_session" | "retake_session",
+  moment: "before_appeal" | "after_appeal"
+) {
+  const res = await api.get(
+    `/jury/grades-class?course__id=${id}&session=${session}&moment=${moment}`
+  );
+  return res.data.results as GradeClass[];
 }
 
+
+export async function multiUpdateGradeClasses(data: GradeClass[]) {
+  const formatedData = data.map((item) => ({
+    ...item,
+    student: item.student.id,
+    course: item.course.id,
+    jury:item.jury.id
+  }));
+  const res = await api.post(`/jury/grades-class/multi-update/`, formatedData);
+  return res.data;
+}
 
 export function getGradeValidationColor(
   validation: "validated" | "no_validated"

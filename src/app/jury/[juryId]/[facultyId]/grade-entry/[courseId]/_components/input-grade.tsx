@@ -15,7 +15,7 @@ export const InputGrade: FC<InputGradeProps> = ({
 }) => {
   return (
     <InputNumber
-      min={0.0}
+      min={0}
       max={10}
       step={0.01}
       value={value}
@@ -23,6 +23,7 @@ export const InputGrade: FC<InputGradeProps> = ({
       onChange={onChange}
       variant="filled"
       style={{ width: "100%", textAlign: "right" }}
+      precision={2}
     />
   );
 };
