@@ -17,8 +17,11 @@ import {
   DownloadOutlined,
   FormOutlined,
   HourglassOutlined,
+  InfoOutlined,
+  LoadingOutlined,
   MoreOutlined,
   PrinterOutlined,
+  ReloadOutlined,
   TeamOutlined,
   UploadOutlined,
   UserOutlined,
@@ -31,6 +34,7 @@ import {
   Form,
   Layout,
   message,
+  Popover,
   Select,
   Skeleton,
   Space,
@@ -49,28 +53,31 @@ import { parseAsStringEnum, useQueryState } from "nuqs";
 import { ButtonMultiUpdateFormConfirm } from "./_components/button-multi-update-form-confirm";
 import { ButtonMultiUpdateFormReject } from "./_components/reject-multi-update-form";
 import { ButtonDeleteGrades } from "./_components/delete-grades";
+import { DataFetchErrorResult } from "@/components/errorResult";
+import { useGradeClassArraysDifferent } from "@/hooks/use-grade-class-arrays-different";
 
 export default function Page() {
   const {
-    token: { colorBgContainer, colorSuccess, colorWarning, colorSuccessBgHover },
+    token: { colorBgContainer, colorSuccess, colorWarning },
   } = theme.useToken();
   const [messageApi, contextHolder] = message.useMessage();
   const [openIndividualEntry, setOpenIndividualEntry] =
     useState<boolean>(false);
   const [openBulkSubmission, setOpenBulkSubmission] = useState<boolean>(false);
   const [openFileSubmission, setOpenFileSubmission] = useState<boolean>(false);
-  const [disabled, setDisabled] = useState<boolean>(true);
   const [openMultiUpdateConfirm, setOpenMultiUpdateConfirm] =
     useState<boolean>(false);
   const [openRejectUpdates, setOpenRejectUpdates] = useState<boolean>(false);
   const [openDeleteGrades, setOpenDeleteGrades] = useState<boolean>(false);
+
   const { juryId, facultyId, courseId } = useParams();
   const router = useRouter();
+
   const [newGradeClassItems, setNewGradeClassItems] = useState<
     NewGradeClass[] | undefined
   >([]);
 
-  const [editGradeClassItems, setEditGradeClassItems] = useState<
+  const [editedGradeClassItems, setEditedGradeClassItems] = useState<
     GradeClass[] | undefined
   >();
 
@@ -95,8 +102,8 @@ export default function Page() {
 
   const {
     data: course,
-    isPending,
-    isError,
+    isPending: isPendingCourse,
+    isError: isErrorCourse,
   } = useQuery({
     queryKey: ["taught_courses", courseId],
     queryFn: ({ queryKey }) => getTaughtCours(Number(queryKey[1])),
@@ -107,11 +114,15 @@ export default function Page() {
     data: gradeClasses,
     isPending: isPendingGradeClasses,
     isError: isErrorGradeClasses,
+    refetch: refetchGradeClasses,
+    isLoading: isLoadingGradeClasses,
   } = useQuery({
     queryKey: ["grade_classes", courseId, session, moment],
     queryFn: ({ queryKey }) =>
       getGradeByTaughtCourse(Number(queryKey[1]), session, moment),
     enabled: !!courseId && !!session && !!moment,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   const {
@@ -124,21 +135,21 @@ export default function Page() {
     enabled: !!courseId,
   });
 
-  const getGradeItemsFromCourseEnrollments = () => {
-    const items = courseEnrollments?.map((student) => ({
-      student: student.student,
-      continuous_assessment: null,
-      exam: null,
-      is_retaken: false,
-      status: "validated",
-      moment: "before_appeal",
-      session: "retake_session",
-    }));
-    return items as NewGradeClass[];
-  };
+  // const getGradeItemsFromCourseEnrollments = () => {
+  //   const items = courseEnrollments?.map((student) => ({
+  //     student: student.student,
+  //     continuous_assessment: null,
+  //     exam: null,
+  //     is_retaken: false,
+  //     status: "validated",
+  //     moment: "before_appeal",
+  //     session: "retake_session",
+  //   }));
+  //   return items as NewGradeClass[];
+  // };
 
   const onFinishMultiUpdateGrades = () => {
-    mutateMultiGrades([...(editGradeClassItems || [])], {
+    mutateMultiGrades([...(editedGradeClassItems || [])], {
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: ["grade_classes", courseId, session, moment],
@@ -156,35 +167,41 @@ export default function Page() {
 
   useEffect(() => {
     if (gradeClasses) {
-      const items = [...gradeClasses];
-      setEditGradeClassItems(items);
+      setEditedGradeClassItems(gradeClasses);
     }
   }, [gradeClasses]);
 
-  useEffect(() => {
-    if (editGradeClassItems && gradeClasses) {
-      // Use a map for faster lookup by id
-      const editedMap = new Map(
-        editGradeClassItems.map((item) => [item.id, item])
-      );
+  const isDifferent = useGradeClassArraysDifferent(
+    gradeClasses,
+    editedGradeClassItems
+  );
 
-      for (const original of gradeClasses) {
-        const edited = editedMap.get(original.id);
+  // useEffect(() => {
+  //   if (editGradeClassItems && gradeClasses) {
+  //     // Use a map for faster lookup by id
+  //     const editedMap = new Map(
+  //       editGradeClassItems.map((item) => [item.id, item])
+  //     );
 
-        if (
-          original.continuous_assessment !== edited?.continuous_assessment ||
-          original.exam !== edited?.exam ||
-          original.is_retaken !== edited?.is_retaken ||
-          original.session !== edited?.session ||
-          original.moment !== edited?.moment ||
-          original.status !== edited?.status
-        ) {
-          setDisabled(false);
-        }
-      }
-    }
-  }, [gradeClasses, editGradeClassItems]);
+  //     for (const original of gradeClasses) {
+  //       const edited = editedMap.get(original.id);
 
+  //       if (
+  //         original.continuous_assessment !== edited?.continuous_assessment ||
+  //         original.exam !== edited?.exam ||
+  //         original.is_retaken !== edited?.is_retaken ||
+  //         original.session !== edited?.session ||
+  //         original.moment !== edited?.moment ||
+  //         original.status !== edited?.status
+  //       ) {
+  //         setDisabled(false);
+  //       }
+  //     }
+  //   }
+  // }, [gradeClasses, editGradeClassItems]);
+  console.log("Tableau 1:", gradeClasses);
+  console.log("Tableau 2:", editedGradeClassItems);
+  console.log("Loading: ", isDifferent);
   return (
     <Layout>
       {contextHolder}
@@ -198,7 +215,7 @@ export default function Page() {
         }}
       >
         <Space>
-          {!isPending ? (
+          {!isPendingCourse ? (
             <Typography.Title
               level={3}
               style={{ marginBottom: 0, textTransform: "uppercase" }}
@@ -232,8 +249,8 @@ export default function Page() {
                   setOpenIndividualEntry(true);
                 } else if (key === "bulkGradeSubmission") {
                   setOpenBulkSubmission(true);
-                  const grades = getGradeItemsFromCourseEnrollments();
-                  setNewGradeClassItems(grades);
+                  // const grades = getGradeItemsFromCourseEnrollments();
+                  // setNewGradeClassItems(grades);
                 }
               },
             }}
@@ -244,6 +261,11 @@ export default function Page() {
               variant="dashed"
               style={{ boxShadow: "none" }}
               title="Saisir manuellement"
+              disabled={
+                isPendingCourse ||
+                isPendingCourseEnrollments ||
+                isPendingGradeClasses
+              }
             >
               Saisir
             </Button>
@@ -255,6 +277,11 @@ export default function Page() {
             style={{ boxShadow: "none" }}
             title="Importer un fichier CSV"
             onClick={() => setOpenFileSubmission(true)}
+            disabled={
+              isPendingCourse ||
+              isPendingCourseEnrollments ||
+              isPendingGradeClasses
+            }
           >
             Importer
           </Button>
@@ -295,320 +322,384 @@ export default function Page() {
             }}
             arrow
           >
-            <Button icon={<MoreOutlined />} type="text" />
+            <Button
+              icon={<MoreOutlined />}
+              type="text"
+              disabled={
+                isPendingCourse ||
+                isPendingCourseEnrollments ||
+                isPendingGradeClasses
+              }
+            />
           </Dropdown>
         </Space>
       </Layout.Header>
       <Layout.Content
         style={{ height: `calc(100vh - 238px)`, overflow: "auto", padding: 28 }}
       >
-        <Table
-          title={() => (
-            <header className="flex pb-1 px-2">
-              <Space>
-                <Typography.Title
-                  type="secondary"
-                  level={5}
-                  style={{ marginBottom: 0 }}
-                >
-                  Étudiants
-                </Typography.Title>
-              </Space>
-              <div className="flex-1" />
-              <Space>
-                <Typography.Text type="secondary">Session: </Typography.Text>
-                <Select
-                  variant="filled"
-                  placeholder="Session"
-                  value={session}
-                  options={[
-                    { value: "main_session", label: "Principale" },
-                    { value: "retake_session", label: "Rattrapage" },
-                  ]}
-                  style={{ width: 180 }}
-                  onSelect={(value) => {
-                    setSession(value as "main_session" | "retake_session");
-                  }}
-                />
-                <Typography.Text type="secondary">Moment: </Typography.Text>
-                <Select
-                  variant="filled"
-                  placeholder="Moment"
-                  value={moment}
-                  options={[
-                    { value: "before_appeal", label: "Avant recours" },
-                    { value: "after_appeal", label: "Après recours" },
-                  ]}
-                  style={{ width: 150 }}
-                  onSelect={(value) => {
-                    setMoment(value as "before_appeal" | "after_appeal");
-                  }}
-                />
-              </Space>
-            </header>
-          )}
-          dataSource={editGradeClassItems}
-          loading={isPendingGradeClasses}
-          columns={[
-            {
-              key: "matricule",
-              dataIndex: "matricule",
-              title: "Matricule",
-              render: (_, record) =>
-                `${record.student?.year_enrollment.user.matricule.padStart(
-                  6,
-                  "0"
-                )}`,
-              width: 96,
-              align: "center",
-            },
-            {
-              key: "names",
-              dataIndex: "names",
-              title: "Noms",
-              render: (_, record) =>
-                `${record.student?.year_enrollment.user.first_name} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.surname}`,
-              ellipsis: true,
-            },
-            {
-              key: "cc",
-              dataIndex: "cc",
-              title: "C. continu",
-              render: (_, record) => (
-                <InputGrade
-                  value={record.continuous_assessment}
-                  onChange={(value) => {
-                    const updatedItems = [...(editGradeClassItems ?? [])];
-                    const index = updatedItems.findIndex(
-                      (item) => item.student?.id === record.student?.id
-                    );
-                    if (index !== -1) {
-                      updatedItems[index].continuous_assessment = value;
-                      setEditGradeClassItems(updatedItems);
+        {isErrorCourse || isErrorGradeClasses || isErrorCourseEnrollments ? (
+          <DataFetchErrorResult />
+        ) : (
+          <Table
+            title={() => (
+              <header className="flex pb-1 px-2">
+                <Space>
+                  <Typography.Title
+                    type="secondary"
+                    level={5}
+                    style={{ marginBottom: 0 }}
+                  >
+                    Étudiants
+                  </Typography.Title>
+                </Space>
+                <div className="flex-1" />
+                <Space>
+                  <Typography.Text type="secondary">Session: </Typography.Text>
+                  <Select
+                    variant="filled"
+                    placeholder="Session"
+                    value={session}
+                    options={[
+                      { value: "main_session", label: "Principale" },
+                      { value: "retake_session", label: "Rattrapage" },
+                    ]}
+                    style={{ width: 180 }}
+                    onSelect={(value) => {
+                      setSession(value as "main_session" | "retake_session");
+                    }}
+                  />
+                  <Typography.Text type="secondary">Moment: </Typography.Text>
+                  <Select
+                    variant="filled"
+                    placeholder="Moment"
+                    value={moment}
+                    options={[
+                      { value: "before_appeal", label: "Avant recours" },
+                      { value: "after_appeal", label: "Après recours" },
+                    ]}
+                    style={{ width: 150 }}
+                    onSelect={(value) => {
+                      setMoment(value as "before_appeal" | "after_appeal");
+                    }}
+                  />
+                  <Button
+                    icon={
+                      !isLoadingGradeClasses ? (
+                        <ReloadOutlined />
+                      ) : (
+                        <LoadingOutlined />
+                      )
                     }
-                  }}
-                  disabled={!record.student}
-                />
-              ),
-              width: 90,
-            },
-            {
-              key: "exam",
-              dataIndex: "exam",
-              title: "Examen",
-              render: (_, record) => (
-                <InputGrade
-                  value={record.exam}
-                  onChange={(value) => {
-                    const updatedItems = [...(editGradeClassItems ?? [])];
-                    const index = updatedItems.findIndex(
-                      (item) => item.student?.id === record.student?.id
-                    );
-                    if (index !== -1) {
-                      updatedItems[index].exam = value;
-                      setEditGradeClassItems(updatedItems);
-                    }
-                  }}
-                  disabled={!record.student}
-                />
-              ),
-              width: 90,
-            },
-            {
-              key: "total",
-              dataIndex: "total",
-              title: "Total",
-              render: (_, record) => (
-                <Typography.Text strong>
-                  {typeof record.continuous_assessment === "number" &&
-                  typeof record.exam === "number"
-                    ? `${Number(
-                        record.continuous_assessment + record.exam
-                      ).toFixed(2)}`
-                    : ""}
-                </Typography.Text>
-              ),
-              width: 52,
-              align: "right",
-            },
-            {
-              key: "grade_letter",
-              dataIndex: "grade_letter",
-              title: "Notation",
-              render: (_, record) => `${record.grade_letter.grade_letter}`,
-              width: 74,
-              align: "center",
-            },
-            {
-              key: "earned_credits",
-              dataIndex: "earned_credits",
-              title: "Crédits",
-              render: (_, record) => (
-                <Typography.Text strong>
-                  {record.earned_credits}
-                </Typography.Text>
-              ),
-              width: 64,
-              align: "center",
-            },
-            {
-              key: "is_retaken",
-              dataIndex: "is_retaken",
-              title: "Retake?",
-              render: (_, record) => (
-                <Checkbox
-                  checked={record.is_retaken}
-                  onChange={(e) => {
-                    const updatedItems = [...(editGradeClassItems ?? [])];
-                    const index = updatedItems.findIndex(
-                      (item) => item.student?.id === record.student?.id
-                    );
-                    if (index !== -1) {
-                      updatedItems[index].is_retaken = e.target.checked;
-                      setEditGradeClassItems(updatedItems);
-                    }
-                  }}
-                />
-              ),
-              width: 68,
-              align: "center",
-            },
-            {
-              key: "session",
-              dataIndex: "session",
-              title: "Session",
-              render: (_, record) => (
-                <Select
-                  options={[
-                    { value: "main_session", label: "Principale" },
-                    { value: "retake_session", label: "Rattrapage" },
-                  ]}
-                  value={record.session}
-                  style={{ width: 120 }}
-                  variant="filled"
-                  onSelect={(value) => {
-                    const updatedItems = [...(editGradeClassItems ?? [])];
-                    const index = updatedItems.findIndex(
-                      (item) => item.student?.id === record.student?.id
-                    );
-                    if (index !== -1) {
-                      updatedItems[index].session = value as
-                        | "main_session"
-                        | "retake_session";
-                      setEditGradeClassItems(updatedItems);
-                    }
-                  }}
-                />
-              ),
-              width: 136,
-            },
-            {
-              key: "moment",
-              dataIndex: "moment",
-              title: "Moment",
-              render: (_, record) => (
-                <Select
-                  options={[
-                    { value: "before_appeal", label: "Avant recours" },
-                    { value: "after_appeal", label: "Après recours" },
-                  ]}
-                  value={record.moment}
-                  style={{ width: 128 }}
-                  variant="filled"
-                  onSelect={(value) => {
-                    const updatedItems = [...(editGradeClassItems ?? [])];
-                    const index = updatedItems.findIndex(
-                      (item) => item.student?.id === record.student?.id
-                    );
-                    if (index !== -1) {
-                      updatedItems[index].moment = value as
-                        | "before_appeal"
-                        | "after_appeal";
-                      setEditGradeClassItems(updatedItems);
-                    }
-                  }}
-                />
-              ),
-              width: 144,
-            },
-            {
-              key: "status",
-              dataIndex: "status",
-              title: "Statut",
-              render: (_, record) => (
-                <Dropdown
-                  menu={{
-                    items: [
-                      {
-                        key: "validated",
-                        label: "Validée",
-                        icon: <CheckCircleOutlined />,
-                        // className:"bg-green-100 text-green-800",
-                        style: {  color: colorSuccess },
-                      },
-                      {
-                        key: "pending",
-                        label: "En attente",
-                        icon: <HourglassOutlined />,
-                        style: { color: colorWarning },
-                      },
-                    ],
-                    onClick: ({ key }) => {
-                      const updatedItems = [...(editGradeClassItems ?? [])];
+                    title="Rafraichir les notes"
+                    onClick={async () => await refetchGradeClasses()}
+                    type="text"
+                  />
+                </Space>
+              </header>
+            )}
+            dataSource={editedGradeClassItems}
+            loading={isPendingGradeClasses}
+            columns={[
+              {
+                key: "matricule",
+                dataIndex: "matricule",
+                title: "Matricule",
+                render: (_, record) =>
+                  `${record.student?.year_enrollment.user.matricule.padStart(
+                    6,
+                    "0"
+                  )}`,
+                width: 96,
+                align: "center",
+              },
+              {
+                key: "names",
+                dataIndex: "names",
+                title: "Noms",
+                render: (_, record) =>
+                  `${record.student?.year_enrollment.user.first_name} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.surname}`,
+                ellipsis: true,
+              },
+              {
+                key: "cc",
+                dataIndex: "cc",
+                title: "C. continu",
+                render: (_, record) => (
+                  <InputGrade
+                    value={record.continuous_assessment}
+                    onChange={(value) => {
+                      const updatedItems = [...(editedGradeClassItems ?? [])];
                       const index = updatedItems.findIndex(
                         (item) => item.student?.id === record.student?.id
                       );
                       if (index !== -1) {
-                        updatedItems[index].status = key as
-                          | "validated"
-                          | "pending";
-                        setEditGradeClassItems(updatedItems);
+                        const newArr2 = editedGradeClassItems?.map((item, i) =>
+                          i === index
+                            ? { ...item, continuous_assessment: value }
+                            : item
+                        );
+
+                        setEditedGradeClassItems(newArr2);
+                        // updatedItems[index].continuous_assessment = value;
+                        // setEditedGradeClassItems([...updatedItems]);
                       }
-                    },
-                  }}
-                  arrow
-                >
+                    }}
+                    disabled={!record.student}
+                  />
+                ),
+                width: 90,
+              },
+              {
+                key: "exam",
+                dataIndex: "exam",
+                title: "Examen",
+                render: (_, record) => (
+                  <InputGrade
+                    value={record.exam}
+                    onChange={(value) => {
+                      const updatedItems = [...(editedGradeClassItems ?? [])];
+                      const index = updatedItems.findIndex(
+                        (item) => item.student?.id === record.student?.id
+                      );
+                      if (index !== -1) {
+                        updatedItems[index] = {
+                          ...updatedItems[index],
+                          exam: value,
+                        };
+                        setEditedGradeClassItems(updatedItems);
+                      }
+                    }}
+                    disabled={!record.student}
+                  />
+                ),
+                width: 90,
+              },
+              {
+                key: "total",
+                dataIndex: "total",
+                title: "Total",
+                render: (_, record) => (
+                  <Typography.Text strong>
+                    {typeof record.continuous_assessment === "number" &&
+                    typeof record.exam === "number"
+                      ? `${Number(
+                          record.continuous_assessment + record.exam
+                        ).toFixed(2)}`
+                      : ""}
+                  </Typography.Text>
+                ),
+                width: 52,
+                align: "right",
+              },
+              {
+                key: "grade_letter",
+                dataIndex: "grade_letter",
+                title: "Notation",
+                render: (_, record) => (
+                  <Space size={4}>
+                    {record.grade_letter.grade_letter}{" "}
+                    <Popover
+                      content={record.grade_letter.appreciation}
+                      title="Appréciation"
+                    >
+                      <Button
+                        color="blue"
+                        variant="filled"
+                        icon={<InfoOutlined />}
+                        shape="circle"
+                        size="small"
+                      />
+                    </Popover>
+                  </Space>
+                ),
+                width: 74,
+                align: "center",
+              },
+              {
+                key: "earned_credits",
+                dataIndex: "earned_credits",
+                title: "Crédits",
+                render: (_, record) => (
+                  <Typography.Text strong>
+                    {record.earned_credits}
+                  </Typography.Text>
+                ),
+                width: 64,
+                align: "center",
+              },
+              {
+                key: "is_retaken",
+                dataIndex: "is_retaken",
+                title: "Retake?",
+                render: (_, record) => (
+                  <Checkbox
+                    checked={record.is_retaken}
+                    onChange={(e) => {
+                      const updatedItems = [...(editedGradeClassItems ?? [])];
+                      const index = updatedItems.findIndex(
+                        (item) => item.student?.id === record.student?.id
+                      );
+                      if (index !== -1) {
+                        updatedItems[index] = {
+                          ...updatedItems[index],
+                          is_retaken: e.target.checked,
+                        };
+                        setEditedGradeClassItems(updatedItems);
+                      }
+                    }}
+                  />
+                ),
+                width: 68,
+                align: "center",
+              },
+              {
+                key: "session",
+                dataIndex: "session",
+                title: "Session",
+                render: (_, record) => (
+                  <Select
+                    options={[
+                      { value: "main_session", label: "Principale" },
+                      { value: "retake_session", label: "Rattrapage" },
+                    ]}
+                    value={record.session}
+                    style={{ width: 120 }}
+                    variant="filled"
+                    onSelect={(value) => {
+                      const updatedItems = [...(editedGradeClassItems ?? [])];
+                      const index = updatedItems.findIndex(
+                        (item) => item.student?.id === record.student?.id
+                      );
+                      if (index !== -1) {
+                        updatedItems[index] = {
+                          ...updatedItems[index],
+                          session: value,
+                        };
+                        setEditedGradeClassItems(updatedItems);
+                      }
+                    }}
+                  />
+                ),
+                width: 136,
+              },
+              {
+                key: "moment",
+                dataIndex: "moment",
+                title: "Moment",
+                render: (_, record) => (
+                  <Select
+                    options={[
+                      { value: "before_appeal", label: "Avant recours" },
+                      { value: "after_appeal", label: "Après recours" },
+                    ]}
+                    value={record.moment}
+                    style={{ width: 128 }}
+                    variant="filled"
+                    onSelect={(value) => {
+                      const updatedItems = [...(editedGradeClassItems ?? [])];
+                      const index = updatedItems.findIndex(
+                        (item) => item.student?.id === record.student?.id
+                      );
+                      if (index !== -1) {
+                        updatedItems[index] = {
+                          ...updatedItems[index],
+                          moment: value,
+                        };
+                        setEditedGradeClassItems(updatedItems);
+                      }
+                    }}
+                  />
+                ),
+                width: 144,
+              },
+              {
+                key: "status",
+                dataIndex: "status",
+                title: "Statut",
+                render: (_, record) => (
+                  <Dropdown
+                    menu={{
+                      items: [
+                        {
+                          key: "validated",
+                          label: "Validée",
+                          icon: <CheckCircleOutlined />,
+                          // className:"bg-green-100 text-green-800",
+                          style: { color: colorSuccess },
+                        },
+                        {
+                          key: "pending",
+                          label: "En attente",
+                          icon: <HourglassOutlined />,
+                          style: { color: colorWarning },
+                        },
+                      ],
+                      onClick: ({ key }) => {
+                        const updatedItems = [...(editedGradeClassItems ?? [])];
+                        const index = updatedItems.findIndex(
+                          (item) => item.student?.id === record.student?.id
+                        );
+                        if (index !== -1) {
+                          updatedItems[index] = {
+                            ...updatedItems[index],
+                            status: key as "validated" | "pending",
+                          };
+                          setEditedGradeClassItems(updatedItems);
+                        }
+                      },
+                    }}
+                    arrow
+                  >
+                    <Tag
+                      color={
+                        record.status === "validated" ? "success" : "warning"
+                      }
+                      bordered={false}
+                      style={{ width: "100%", padding: "4px 8px" }}
+                      icon={
+                        record.status === "validated" ? (
+                          <CheckCircleOutlined
+                            style={{ color: colorSuccess }}
+                          />
+                        ) : (
+                          <HourglassOutlined />
+                        )
+                      }
+                    >
+                      {record.status === "validated" ? "Validée" : "En attente"}
+                    </Tag>
+                  </Dropdown>
+                ),
+                width: 128,
+              },
+              {
+                key: "validation",
+                dataIndex: "validation",
+                title: "Validation",
+                render: (_, record) => (
                   <Tag
-                    color={record.status === "validated" ? "success" : "warning"}
-                    
+                    color={getGradeValidationColor(record.validation)}
                     bordered={false}
                     style={{ width: "100%", padding: "4px 8px" }}
                     icon={
-                      record.status === "validated" ? (
-                        <CheckCircleOutlined style={{ color: colorSuccess }} />
+                      record.validation === "validated" ? (
+                        <CheckCircleOutlined />
                       ) : (
-                        <HourglassOutlined />
-                      )}
-                      
+                        <CloseCircleOutlined />
+                      )
+                    }
                   >
-                    {record.status === "validated" ? "Validée" : "En attente"}
+                    {getGradeValidationText(record.validation)}
                   </Tag>
-                </Dropdown>
-              ),
-              width: 128,
-            },
-            {
-              key: "validation",
-              dataIndex: "validation",
-              title: "Validation",
-              render: (_, record) => (
-                <Tag
-                  color={getGradeValidationColor(record.validation)}
-                  bordered={false}
-                  style={{ width: "100%", padding: "4px 8px" }}
-                  icon={record.validation === "validated" ? (
-                    <CheckCircleOutlined />):(<CloseCircleOutlined />)}
-                >
-                  {getGradeValidationText(record.validation)}
-                </Tag>
-              ),
-              width: 96,
-            },
-          ]}
-          size="small"
-          pagination={false}
-          rowKey="id"
-        />
+                ),
+                width: 112,
+              },
+            ]}
+            size="small"
+            pagination={false}
+            rowKey="id"
+          />
+        )}
         <IndividualGradeEntryForm
           open={openIndividualEntry}
           setOpen={setOpenIndividualEntry}
@@ -649,7 +740,11 @@ export default function Page() {
           <ButtonMultiUpdateFormReject
             open={openRejectUpdates}
             setOpen={setOpenRejectUpdates}
-            onFinish={() => setEditGradeClassItems(gradeClasses)}
+            onFinish={() => {
+              setEditedGradeClassItems(gradeClasses),
+                setOpenRejectUpdates(false);
+            }}
+            disabled={!isDifferent}
           />
 
           <ButtonMultiUpdateFormConfirm
@@ -657,12 +752,15 @@ export default function Page() {
             setOpen={setOpenMultiUpdateConfirm}
             onFinish={onFinishMultiUpdateGrades}
             isPending={isPendingMultiupdate}
+            disabled={!isDifferent}
           />
 
           <ButtonDeleteGrades
             open={openDeleteGrades}
             setOpen={setOpenDeleteGrades}
-            onFinish={() => {}}
+            gradeClasses={editedGradeClassItems}
+            session={session}
+            moment={moment}
           />
 
           <Dropdown
@@ -673,6 +771,7 @@ export default function Page() {
                   label: "Supprimer les notes",
                   icon: <DeleteOutlined />,
                   danger: true,
+                  disabled: editedGradeClassItems?.length === 0,
                 },
               ],
               onClick: ({ key }) => {
@@ -684,7 +783,15 @@ export default function Page() {
             arrow
             placement="topLeft"
           >
-            <Button icon={<MoreOutlined />} type="text" />
+            <Button
+              icon={<MoreOutlined />}
+              type="text"
+              disabled={
+                isPendingCourse ||
+                isPendingCourseEnrollments ||
+                isPendingGradeClasses
+              }
+            />
           </Dropdown>
         </Space>
       </Layout.Footer>

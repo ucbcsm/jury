@@ -9,13 +9,15 @@ type ButtonMultiUpdateFormConfirmProps = {
   setOpen:Dispatch<SetStateAction<boolean>>;
   onFinish:()=>void;
   isPending: boolean;
+  disabled:boolean;
 };
 
 export const ButtonMultiUpdateFormConfirm: FC<ButtonMultiUpdateFormConfirmProps> = ({
   open,
   setOpen,
   onFinish,
-  isPending
+  isPending,
+  disabled
 }) => {
 
 
@@ -25,7 +27,7 @@ export const ButtonMultiUpdateFormConfirm: FC<ButtonMultiUpdateFormConfirmProps>
         type="primary"
         icon={<CheckCircleOutlined />}
         style={{ boxShadow: "none" }}
-        // disabled={disabled}
+        disabled={disabled}
         title="Sauvegarder les modifications"
         onClick={() => {
           setOpen(true);

@@ -2,7 +2,7 @@
 
 import { getJury, getPeriodsByYear } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
-import { Collapse, type CollapseProps, Flex, Splitter, Typography } from "antd";
+import { Collapse, type CollapseProps, Flex, Splitter, theme, Typography } from "antd";
 import { useParams } from "next/navigation";
 import { ListCourse } from "./_components/list-course";
 import { DataFetchPendingSkeleton } from "@/components/loadingSkeleton";
@@ -13,6 +13,7 @@ export default function GradeEntryLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const {token:{colorBorderSecondary}} = theme.useToken()
   const { juryId } = useParams();
 
   const {
@@ -55,7 +56,7 @@ export default function GradeEntryLayout({
   return (
     <Splitter style={{ height: `calc(100vh - 110px)` }}>
       <Splitter.Panel defaultSize="20%" min="20%" max="25%">
-        <Flex style={{ padding: `12px 16px 0 16px`, height:64 }}>
+        <Flex style={{  height:64, borderBottom:`1px solid ${colorBorderSecondary}` }}>
           <Typography.Title
             type="secondary"
             level={5}
@@ -64,6 +65,7 @@ export default function GradeEntryLayout({
             Cours & Périodes
           </Typography.Title>
         </Flex>
+        <div></div>
         {isPendingPeriods && (
           <div className="p-4">
             <DataFetchPendingSkeleton />
