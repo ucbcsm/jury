@@ -182,7 +182,7 @@ export const IndividualGradeEntryForm: FC<IndividualGradeEntryFormProps> = ({
               <Form.Item
                 name="session"
                 label="Session"
-                initialValue="main_session"
+                rules={[{ required: true }]}
               >
                 <Select
                   variant="filled"
@@ -197,7 +197,7 @@ export const IndividualGradeEntryForm: FC<IndividualGradeEntryFormProps> = ({
               <Form.Item
                 name="moment"
                 label="Moment"
-                initialValue="before_appeal"
+                rules={[{ required: true }]}
               >
                 <Select
                   variant="filled"

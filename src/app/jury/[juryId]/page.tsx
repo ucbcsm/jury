@@ -216,7 +216,7 @@ export default function Page() {
         </Col>
         <Col xs={24} sm={24} md={16}>
           <Space style={{ marginBottom: 24 }}>
-            <Badge count={jury?.faculties.length} />
+            {/* <Badge count={jury?.faculties.length} /> */}
             <Typography.Title level={3} style={{ marginBottom: 0 }}>
               Filières
             </Typography.Title>

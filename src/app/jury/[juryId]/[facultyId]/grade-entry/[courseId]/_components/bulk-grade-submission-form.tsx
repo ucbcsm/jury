@@ -1,6 +1,12 @@
 "use client";
 
-import React, { Dispatch, FC, SetStateAction } from "react";
+import React, {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import {
   Button,
   Drawer,
@@ -13,33 +19,47 @@ import {
   Table,
   Checkbox,
   Flex,
+  Dropdown,
+  Tag,
 } from "antd";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, HourglassOutlined } from "@ant-design/icons";
 import { InputGrade } from "./input-grade";
-import { NewGradeClass, TaughtCourse } from "@/types";
+import { CourseEnrollment, NewGradeClass, TaughtCourse } from "@/types";
+import { DeleteSingleGradeButton } from "../delete-single-grade-button";
 
 type BulkGradeSubmissionFormProps = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  newGradeClassItems?: NewGradeClass[];
-  setNewGradeClassItems: Dispatch<SetStateAction<NewGradeClass[] | undefined>>;
+  // newGradeClassItems?: NewGradeClass[];
+  // setNewGradeClassItems: Dispatch<SetStateAction<NewGradeClass[] | undefined>>;
   course?: TaughtCourse;
+  enrollments?: CourseEnrollment[];
 };
 
 export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
   open,
   setOpen,
-  newGradeClassItems,
-  setNewGradeClassItems,
+  // newGradeClassItems,
+  // setNewGradeClassItems,
   course,
+  enrollments,
 }) => {
   const {
-    token: { colorPrimary },
+    token: { colorPrimary, colorSuccess, colorWarning },
   } = theme.useToken();
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
 
-  const onClose = () => setOpen(false);
+  const [newGradeClassItems, setNewGradeClassItems] = useState<
+    NewGradeClass[] | undefined
+  >([]);
+
+  const onClose = () => {
+    setOpen(false);
+    const items = getGradeItemsFromCourseEnrollments();
+    setNewGradeClassItems(items);
+    form.resetFields();
+  };
 
   const handleFinish = async (values: any) => {
     try {
@@ -50,6 +70,28 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
       messageApi.error("Erreur lors de la soumission en masse.");
     }
   };
+
+  const getGradeItemsFromCourseEnrollments = () => {
+
+    if (!enrollments || !course) return [];
+
+    return enrollments?.map((student) => ({
+      student: student.student,
+      continuous_assessment: null,
+      exam: null,
+      is_retaken: false,
+      status: "validated",
+      moment: "before_appeal",
+      session: "retake_session",
+    })) as NewGradeClass[];
+  };
+
+  useEffect(() => {
+    if (enrollments) {
+      const items = getGradeItemsFromCourseEnrollments();
+      setNewGradeClassItems(items);
+    }
+  }, [enrollments]);
 
   return (
     <>
@@ -127,9 +169,13 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                   <Typography.Title
                     type="secondary"
                     level={5}
-                    style={{ marginBottom: 0,marginTop:0 }}
+                    style={{
+                      marginBottom: 0,
+                      marginTop: 0,
+                      textTransform: "uppercase",
+                    }}
                   >
-                    Étudiants
+                    Notes
                   </Typography.Title>
                 </Space>
                 <div className="flex-1" />
@@ -144,6 +190,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                       },
                     ]}
                     layout="horizontal"
+                    style={{ marginBottom: 0 }}
                   >
                     <Select
                       variant="filled"
@@ -152,7 +199,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                         { value: "main_session", label: "Principale" },
                         { value: "retake_session", label: "Rattrapage" },
                       ]}
-                      style={{ width: "100%" }}
+                      style={{ width: 110 }}
                     />
                   </Form.Item>
                   <Form.Item
@@ -165,6 +212,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                       },
                     ]}
                     layout="horizontal"
+                    style={{ marginBottom: 0 }}
                   >
                     <Select
                       variant="filled"
@@ -173,7 +221,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                         { value: "before_appeal", label: "Avant recours" },
                         { value: "after_appeal", label: "Après recours" },
                       ]}
-                      style={{ width: "100%" }}
+                      style={{ width: 128 }}
                     />
                   </Form.Item>
                 </Space>
@@ -254,52 +302,118 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                   <Typography.Text strong>
                     {typeof record.continuous_assessment === "number" &&
                     typeof record.exam === "number"
-                      ? `${record.continuous_assessment + record.exam}`
+                      ? `${Number(
+                          record.continuous_assessment + record.exam
+                        ).toFixed(2)}`
                       : ""}
                   </Typography.Text>
                 ),
-                width: 72,
+                width: 52,
                 align: "right",
+              },
+              {
+                key: "is_retaken",
+                dataIndex: "is_retaken",
+                title: "Retake?",
+                render: (_, record) => (
+                  <Checkbox
+                    checked={record.is_retaken}
+                    onChange={(e) => {
+                      const updatedItems = [...(newGradeClassItems ?? [])];
+                      const index = updatedItems.findIndex(
+                        (item) => item.student?.id === record.student?.id
+                      );
+                      if (index !== -1) {
+                        updatedItems[index] = {
+                          ...updatedItems[index],
+                          is_retaken: e.target.checked,
+                        };
+                        setNewGradeClassItems(updatedItems);
+                      }
+                    }}
+                  />
+                ),
+                width: 68,
+                align: "center",
               },
               {
                 key: "status",
                 dataIndex: "status",
                 title: "Statut",
                 render: (_, record) => (
-                  <Select
-                    options={[
-                      { value: "validated", label: "Validée" },
-                      { value: "pending", label: "En attente" },
-                    ]}
-                    value={record.status}
-                    style={{ width: 108 }}
-                    variant="filled"
-                    status={
-                      record.status === "validated" ? undefined : "warning"
-                    }
-                    onSelect={(value) => {
+                  <Dropdown
+                    menu={{
+                      items: [
+                        {
+                          key: "validated",
+                          label: "Validée",
+                          icon: <CheckCircleOutlined />,
+                          style: { color: colorSuccess },
+                        },
+                        {
+                          key: "pending",
+                          label: "En attente",
+                          icon: <HourglassOutlined />,
+                          style: { color: colorWarning },
+                        },
+                      ],
+                      onClick: ({ key }) => {
+                        const updatedItems = [...(newGradeClassItems ?? [])];
+                        const index = updatedItems.findIndex(
+                          (item) => item.student?.id === record.student?.id
+                        );
+                        if (index !== -1) {
+                          updatedItems[index] = {
+                            ...updatedItems[index],
+                            status: key as "validated" | "pending",
+                          };
+                          setNewGradeClassItems(updatedItems);
+                        }
+                      },
+                    }}
+                    arrow
+                  >
+                    <Tag
+                      color={
+                        record.status === "validated" ? "success" : "warning"
+                      }
+                      bordered={false}
+                      style={{ width: "100%", padding: "4px 8px" }}
+                      icon={
+                        record.status === "validated" ? (
+                          <CheckCircleOutlined
+                            style={{ color: colorSuccess }}
+                          />
+                        ) : (
+                          <HourglassOutlined />
+                        )
+                      }
+                    >
+                      {record.status === "validated" ? "Validée" : "En attente"}
+                    </Tag>
+                  </Dropdown>
+                ),
+                width: 128,
+              },
+              {
+                key: "actions",
+                dataIndex: "actions",
+                title: "",
+                render: (_, record) => (
+                  <DeleteSingleGradeButton
+                    onDelete={() => {
                       const updatedItems = [...(newGradeClassItems ?? [])];
                       const index = updatedItems.findIndex(
                         (item) => item.student?.id === record.student?.id
                       );
                       if (index !== -1) {
-                        updatedItems[index].status = value as
-                          | "validated"
-                          | "pending";
+                        updatedItems.splice(index, 1);
                         setNewGradeClassItems(updatedItems);
                       }
                     }}
                   />
                 ),
-                width: 128,
-              },
-              {
-                key: "is_retaken",
-                dataIndex: "is_retaken",
-                title: "Retake",
-                render: (_, record) => <Checkbox />,
-                width: 62,
-                align: "center",
+                width: 48,
               },
             ]}
             size="small"

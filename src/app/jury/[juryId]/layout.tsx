@@ -6,18 +6,26 @@ import { logout } from "@/lib/api/auth";
 import { filterOption } from "@/lib/utils";
 import {
   CloseOutlined,
+  FileTextOutlined,
+  FontSizeOutlined,
+  FormOutlined,
+  HomeOutlined,
   LoadingOutlined,
   LogoutOutlined,
+  MailOutlined,
+  MenuOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
+  Badge,
   Button,
   Divider,
   Dropdown,
   Form,
   Image,
   Layout,
+  Menu,
   message,
   Select,
   Skeleton,
@@ -27,8 +35,10 @@ import {
   Typography,
 } from "antd";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { parseAsBoolean, useQueryState } from "nuqs";
 import { useState } from "react";
+import { ListLetterGradings } from "./[facultyId]/letter-gradings/_components/list-letter-gradings";
 
 export default function FacultyLayout({
   children,
@@ -41,7 +51,12 @@ export default function FacultyLayout({
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoadingLogout, setIsLoadingLogout] = useState<boolean>(false);
   const { juryId, facultyId } = useParams();
+  const pathname = usePathname();
   const router = useRouter();
+  const [openLetterGrading, setOpenLetterGrading] = useQueryState(
+    "letter_gradings",
+    parseAsBoolean.withDefault(false)
+  );
 
   const { removeYid } = useYid();
 
@@ -98,22 +113,25 @@ export default function FacultyLayout({
             <Typography.Text type="secondary">Filière:</Typography.Text>
           )}
 
-          {facultyId && (
-            !isPending?<Select
-              value={Number(facultyId)}
-              showSearch
-              variant="filled"
-              filterOption={filterOption}
-              options={getFacultiesAAsOptionsWithAcronym(jury?.faculties)}
-              style={{ width: 108 }}
-              loading={isPending}
-              onSelect={(value) => {
-                router.push(`/jury/${juryId}/${value}/grade-entry`);
-              }}
-            />: <Form>
-              <Skeleton.Input size="small" active />
-            </Form>
-          )}
+          {facultyId &&
+            (!isPending ? (
+              <Select
+                value={Number(facultyId)}
+                showSearch
+                variant="filled"
+                filterOption={filterOption}
+                options={getFacultiesAAsOptionsWithAcronym(jury?.faculties)}
+                style={{ width: 128 }}
+                loading={isPending}
+                onSelect={(value) => {
+                  router.push(`/jury/${juryId}/${value}/grade-entry`);
+                }}
+              />
+            ) : (
+              <Form>
+                <Skeleton.Input size="small" active />
+              </Form>
+            ))}
         </Space>
 
         <div className="flex-1" />
@@ -192,7 +210,63 @@ export default function FacultyLayout({
               borderRadius: borderRadiusLG,
             }}
           >
+            <div>
+              <Menu
+                mode="horizontal"
+                theme="light"
+                defaultSelectedKeys={[pathname]}
+                selectedKeys={[pathname]}
+                overflowedIndicator={<MenuOutlined />}
+                items={[
+                  {
+                    key: `/jury/${juryId}`,
+                    label: "Accueil",
+                    icon: <HomeOutlined />,
+                  },
+                  {
+                    key: `/jury/${juryId}/${facultyId}/grade-entry`,
+                    label: "Saisie des notes",
+                    icon: <FormOutlined />,
+                    disabled:typeof facultyId==="undefined"
+                  },
+                  {
+                    key: `/jury/${juryId}/${facultyId}/deliberations`,
+                    label: "Proclamations",
+                    icon: <FileTextOutlined />,
+                     disabled:typeof facultyId==="undefined"
+                  },
+                  {
+                    key: `/jury/${juryId}/${facultyId}/appeals`,
+                    label: (
+                      <Badge count={10} overflowCount={9}>
+                        Recours
+                      </Badge>
+                    ),
+                    icon: <MailOutlined />,
+                     disabled:typeof facultyId==="undefined"
+                  },
+                  {
+                    key: `/jury/${juryId}/${facultyId}/letter-gradings`,
+                    label: "Notation en lettres",
+                    icon: <FontSizeOutlined />,
+                     
+                  },
+                ]}
+                onClick={({ key }) => {
+                  if (key === `/jury/${juryId}/${facultyId}/letter-gradings`) {
+                    setOpenLetterGrading((prev) => !prev);
+                  } else {
+                    router.push(key);
+                  }
+                }}
+              />
+              <ListLetterGradings
+                open={openLetterGrading}
+                setOpen={setOpenLetterGrading}
+              />
+            </div>
             {children}
+
             <div
               className=""
               style={{

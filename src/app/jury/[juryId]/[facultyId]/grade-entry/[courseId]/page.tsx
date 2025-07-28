@@ -30,6 +30,7 @@ import {
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  Alert,
   Button,
   Checkbox,
   Dropdown,
@@ -50,7 +51,7 @@ import { useEffect, useRef, useState } from "react";
 import { IndividualGradeEntryForm } from "./_components/individual-grade-entry-form";
 import { BulkGradeSubmissionForm } from "./_components/bulk-grade-submission-form";
 import { InputGrade } from "./_components/input-grade";
-import { ImportFileGradeSubmissionForm } from "./_components/file-grade-entry-form";
+import { ImportFileGradeSubmissionForm } from "./_components/import-file-grade-entry-form";
 import { parseAsStringEnum, useQueryState } from "nuqs";
 import { ButtonMultiUpdateFormConfirm } from "./_components/button-multi-update-form-confirm";
 import { ButtonMultiUpdateFormReject } from "./_components/reject-multi-update-form";
@@ -80,10 +81,6 @@ export default function Page() {
   const emptyGradeRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
-
-  const [newGradeClassItems, setNewGradeClassItems] = useState<
-    NewGradeClass[] | undefined
-  >([]);
 
   const [editedGradeClassItems, setEditedGradeClassItems] = useState<
     GradeClass[] | undefined
@@ -142,19 +139,6 @@ export default function Page() {
     queryFn: ({ queryKey }) => getCourseEnrollments(Number(queryKey[1])),
     enabled: !!courseId,
   });
-
-  // const getGradeItemsFromCourseEnrollments = () => {
-  //   const items = courseEnrollments?.map((student) => ({
-  //     student: student.student,
-  //     continuous_assessment: null,
-  //     exam: null,
-  //     is_retaken: false,
-  //     status: "validated",
-  //     moment: "before_appeal",
-  //     session: "retake_session",
-  //   }));
-  //   return items as NewGradeClass[];
-  // };
 
   const printEmptyGradeList = useReactToPrint({
     contentRef: emptyGradeRef,
@@ -307,14 +291,11 @@ export default function Page() {
                   ) {
                     exportEmptyGradesToExcel(courseEnrollments, course, {
                       sheetName: `Notes - ${course?.available_course.name}`,
-                      fileName: `${course?.available_course.name}-notes-vide.xlsx`,
+                      fileName: `${course?.available_course.name}-notes-vide-${course.available_course.code}.xlsx`,
                     });
-                    // exportEmptyGradesToCSV(
-                    //   courseEnrollments,
-                    //   `${course?.available_course.code}-notes-vide.csv`
-                    // );
+
                     messageApi.success(
-                      "Fichier CSV des notes vides exporté avec succès !"
+                      "Fichier Excel des notes vides exporté avec succès !"
                     );
                   } else {
                     messageApi.error(
@@ -363,6 +344,40 @@ export default function Page() {
           <DataFetchErrorResult />
         ) : (
           <div>
+            {isDifferent && (
+              <Alert
+                banner
+                type="info"
+                showIcon
+                closable
+                style={{ marginBottom: 20 }}
+                message="Modifications non enregistrées"
+                description="Vous avez effectué des changements dans la liste des notes. N'oubliez pas de sauvegarder si nécessaire."
+                action={
+                  <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+                    <Button
+                      size="small"
+                      onClick={() => setOpenRejectUpdates(true)}
+                      color="orange"
+                      variant="dashed"
+                      style={{ boxShadow: "none" }}
+                      title="Annuler les modifications"
+                    >
+                      Annuler
+                    </Button>
+                    <Button
+                      type="primary"
+                      size="small"
+                      onClick={() => setOpenMultiUpdateConfirm(true)}
+                      icon={<CheckCircleOutlined />}
+                      style={{ boxShadow: "none" }}
+                    >
+                      Sauvegarder
+                    </Button>
+                  </div>
+                }
+              />
+            )}
             <Table
               title={() => (
                 <header className="flex pb-1 px-2">
@@ -753,8 +768,7 @@ export default function Page() {
         <BulkGradeSubmissionForm
           open={openBulkSubmission}
           setOpen={setOpenBulkSubmission}
-          newGradeClassItems={newGradeClassItems}
-          setNewGradeClassItems={setNewGradeClassItems}
+          enrollments={courseEnrollments}
           course={course}
         />
         <ImportFileGradeSubmissionForm

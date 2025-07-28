@@ -27,7 +27,7 @@ export const ButtonMultiUpdateFormReject: FC<
         color="orange"
         disabled={disabled}
       >
-        Rejeter les modifications
+        Annuler les modifications
       </Button>
 
       <Modal
