@@ -2,7 +2,14 @@
 
 import { getJury, getPeriodsByYear } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
-import { Collapse, type CollapseProps, Flex, Splitter, theme, Typography } from "antd";
+import {
+  Collapse,
+  type CollapseProps,
+  Flex,
+  Splitter,
+  theme,
+  Typography,
+} from "antd";
 import { useParams } from "next/navigation";
 import { ListCourse } from "./_components/list-course";
 import { DataFetchPendingSkeleton } from "@/components/loadingSkeleton";
@@ -13,7 +20,9 @@ export default function GradeEntryLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const {token:{colorBorderSecondary}} = theme.useToken()
+  const {
+    token: { colorBorderSecondary },
+  } = theme.useToken();
   const { juryId } = useParams();
 
   const {
@@ -55,14 +64,21 @@ export default function GradeEntryLayout({
 
   return (
     <Splitter style={{ height: `calc(100vh - 110px)` }}>
-      <Splitter.Panel defaultSize="20%" min="20%" max="25%">
-        <Flex style={{  height:64, borderBottom:`1px solid ${colorBorderSecondary}` }}>
+      <Splitter.Panel defaultSize="20%" min={320} max="25%">
+        <Flex
+          style={{
+            paddingLeft: 16,
+            height: 64,
+            borderBottom: `1px solid ${colorBorderSecondary}`,
+          }}
+          align="center"
+        >
           <Typography.Title
-            type="secondary"
-            level={5}
-            style={{ marginBottom: 0 }}
+            level={3}
+            style={{ marginBottom: 0, textTransform: "uppercase" }}
+            ellipsis={{}}
           >
-            Cours & Périodes
+            Cours / Périodes
           </Typography.Title>
         </Flex>
         <div></div>
@@ -85,7 +101,9 @@ export default function GradeEntryLayout({
           />
         )}
       </Splitter.Panel>
-      <Splitter.Panel>{children}</Splitter.Panel>
+      <Splitter.Panel>
+        {children}
+      </Splitter.Panel>
     </Splitter>
   );
 }

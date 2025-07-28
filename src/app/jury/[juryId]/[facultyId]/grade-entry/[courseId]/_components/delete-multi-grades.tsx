@@ -7,7 +7,7 @@ import { deleteMultiGradeClasses } from "@/lib/api";
 import { GradeClass } from "@/types";
 import { useParams } from "next/navigation";
 
-type ButtonDeleteGradesProps = {
+type DeleteMultiGradesButtonProps = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   gradeClasses?: GradeClass[];
@@ -19,13 +19,14 @@ type FormDataType = {
   validate: string;
 };
 
-export const ButtonDeleteGrades: FC<ButtonDeleteGradesProps> = ({
+export const DeleteMultiGradesButton: FC<DeleteMultiGradesButtonProps> = ({
   open,
   setOpen,
   gradeClasses,
   session,
   moment,
 }) => {
+  
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const {courseId} = useParams()

@@ -216,7 +216,7 @@ export const IndividualGradeEntryForm: FC<IndividualGradeEntryFormProps> = ({
                 style={{ marginBottom: 0 }}
               >
                 <Checkbox style={{ width: "100%" }}>
-                  Cours suivi en rattrapage (Retake) ?
+                  Cours suivi comme Retake ?
                 </Checkbox>
               </Form.Item>
             </div>
