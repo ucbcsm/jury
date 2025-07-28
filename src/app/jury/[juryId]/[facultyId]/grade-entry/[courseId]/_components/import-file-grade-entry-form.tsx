@@ -191,15 +191,27 @@ export const ImportFileGradeSubmissionForm: FC<
               maxCount={1}
               style={{ padding: 12 }}
             >
-              <p className="ant-upload-drag-icon">
-                <UploadOutlined style={{ fontSize: 32, color: "GrayText" }} />
-              </p>
-              <p className="ant-upload-text">
-                Cliquez ou glissez-déposez un fichier XLSX ici pour l'importer
-              </p>
-              <p className="ant-upload-hint">
-                Seuls les fichiers .xlsx sont acceptés.
-              </p>
+              <div
+                style={{
+                  minHeight:100,
+                  height: newMatchedGradeClassItems
+                    ? "auto"
+                    : `calc(100vh - 264px)`,
+                    display:"flex",
+                    flexDirection:"column",
+                    justifyContent:"center"
+                }}
+              >
+                <p className="ant-upload-drag-icon">
+                  <UploadOutlined style={{ fontSize: 32, color: "GrayText" }} />
+                </p>
+                <p className="ant-upload-text">
+                  Cliquez ou glissez-déposez un fichier XLSX ici pour l'importer
+                </p>
+                <p className="ant-upload-hint">
+                  Seuls les fichiers .xlsx sont acceptés.
+                </p>
+              </div>
             </Upload.Dragger>
           </Form.Item>
           {newMatchedGradeClassItems && (
@@ -227,7 +239,7 @@ export const ImportFileGradeSubmissionForm: FC<
                         },
                       ]}
                       layout="horizontal"
-                      style={{marginBottom:0}}
+                      style={{ marginBottom: 0 }}
                     >
                       <Select
                         variant="filled"
@@ -249,7 +261,7 @@ export const ImportFileGradeSubmissionForm: FC<
                         },
                       ]}
                       layout="horizontal"
-                       style={{marginBottom:0}}
+                      style={{ marginBottom: 0 }}
                     >
                       <Select
                         variant="filled"
