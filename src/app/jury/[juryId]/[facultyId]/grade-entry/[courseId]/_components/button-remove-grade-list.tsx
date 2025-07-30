@@ -1,15 +1,17 @@
-'use client';
+"use client";
 
 import { DeleteOutlined } from "@ant-design/icons";
 import { Button, Flex, Popover, Typography } from "antd";
 import { FC, useState } from "react";
 
-type DeleteSingleGradeButtonProps = {
+type ButtonRemoveGradeProps = {
   onDelete?: () => void;
+  disabled?: boolean;
 };
 
-export const DeleteSingleGradeButton: FC<DeleteSingleGradeButtonProps> = ({
+export const ButtonRemoveGrade: FC<ButtonRemoveGradeProps> = ({
   onDelete,
+  disabled,
 }) => {
   const [opened, setOpened] = useState<boolean>(false);
   return (
@@ -38,7 +40,12 @@ export const DeleteSingleGradeButton: FC<DeleteSingleGradeButtonProps> = ({
       title="Confirmer la suppression"
       trigger="click"
     >
-      <Button type="text" icon={<DeleteOutlined />} title="Supprimer la note" />
+      <Button
+        type="text"
+        icon={<DeleteOutlined />}
+        title="Supprimer la note"
+        disabled={disabled}
+      />
     </Popover>
   );
 };

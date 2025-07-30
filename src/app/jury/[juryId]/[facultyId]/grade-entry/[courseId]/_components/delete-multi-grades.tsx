@@ -3,7 +3,11 @@
 import React, { Dispatch, FC, SetStateAction } from "react";
 import { Alert, Form, Input, message, Modal, Typography } from "antd";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteMultiGradeClasses } from "@/lib/api";
+import {
+  deleteMultiGradeClasses,
+  getMomentText,
+  getSessionText,
+} from "@/lib/api";
 import { GradeClass } from "@/types";
 import { useParams } from "next/navigation";
 
@@ -26,34 +30,37 @@ export const DeleteMultiGradesButton: FC<DeleteMultiGradesButtonProps> = ({
   session,
   moment,
 }) => {
-  
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
-  const {courseId} = useParams()
+  const { courseId } = useParams();
   const queryClient = useQueryClient();
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: deleteMultiGradeClasses,
   });
 
-const onFinish = (values: FormDataType) => {
+  const onFinish = (values: FormDataType) => {
     if (values.validate === "DELETE") {
-        mutateAsync([...(gradeClasses || [])], {
-            onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ["grade_classes", courseId, session, moment] });
-                messageApi.success("Les notes ont été supprimées avec succès !");
-                setOpen(false);
-            },
-            onError: () => {
-                messageApi.error(
-                    "Une erreur s'est produite lors de la suppression des notes."
-                );
-            },
-        });
+      mutateAsync([...(gradeClasses || [])], {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: ["grade_classes", courseId, session, moment],
+          });
+          messageApi.success("Les notes ont été supprimées avec succès !");
+          setOpen(false);
+        },
+        onError: () => {
+          messageApi.error(
+            "Une erreur s'est produite lors de la suppression des notes."
+          );
+        },
+      });
     } else {
-        messageApi.error("Veuillez saisir DELETE pour confirmer la suppression des notes.");
+      messageApi.error(
+        "Veuillez saisir DELETE pour confirmer la suppression des notes."
+      );
     }
-};
+  };
 
   return (
     <>
@@ -91,9 +98,26 @@ const onFinish = (values: FormDataType) => {
           </Form>
         )}
       >
-        <Alert
+        {/* <Alert
           message="Confirmation"
           description="Êtes-vous sûr de vouloir supprimer les notes ? Cette action est irréversible et toutes les notes seront définitivement supprimées."
+          type="error"
+          showIcon
+          style={{ border: 0 }}
+        /> */}
+        <Alert
+          message="Suppression des notes"
+          description={
+            <div>
+              Êtes-vous sûr de vouloir supprimer toutes les notes de la session{" "}
+              <Typography.Text strong>
+                {getSessionText(session)}
+              </Typography.Text>{" "}
+              et du moment{" "}
+              <Typography.Text strong>{getMomentText(moment)}</Typography.Text>{" "}
+              ? Cette action ne peut pas être annulée.
+            </div>
+          }
           type="error"
           showIcon
           style={{ border: 0 }}
@@ -106,7 +130,12 @@ const onFinish = (values: FormDataType) => {
               pour confirmer.
             </div>
           }
-          rules={[{ required: true, message: "Veuillez saisir DELETE pour confirmer." }]}
+          rules={[
+            {
+              required: true,
+              message: "Veuillez saisir DELETE pour confirmer.",
+            },
+          ]}
           style={{ marginTop: 24 }}
           layout="vertical"
         >

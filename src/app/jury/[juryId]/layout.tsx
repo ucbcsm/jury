@@ -69,6 +69,7 @@ export default function FacultyLayout({
     queryFn: ({ queryKey }) => getJury(Number(queryKey[1])),
     enabled: !!juryId,
   });
+
   return (
     <Layout>
       {contextHolder}
@@ -212,6 +213,7 @@ export default function FacultyLayout({
           >
             <div>
               <Menu
+                disabled={isPending}
                 mode="horizontal"
                 theme="light"
                 defaultSelectedKeys={[pathname]}

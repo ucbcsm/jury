@@ -14,50 +14,81 @@ import {
   Upload,
   Dropdown,
   Tag,
+  Modal,
+  Alert,
 } from "antd";
 import {
   UploadOutlined,
   CheckCircleOutlined,
   HourglassOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
-import Papa from "papaparse";
 import { InputGrade } from "./input-grade";
 import { CourseEnrollment, NewGradeClass, TaughtCourse } from "@/types";
 import {
+  createBulkGradeClasses,
   importGradesFromExcel,
   matchImportedGradesWithEnrollments,
 } from "@/lib/api";
-import { DeleteSingleGradeButton } from "../delete-single-grade-button";
+import { ButtonRemoveGrade } from "./button-remove-grade-list";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Options } from "nuqs";
 
 type FileGradeSubmissionFormProps = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   enrollments?: CourseEnrollment[];
   course?: TaughtCourse;
+  juryId?: number;
+  setSession: (
+    value:
+      | "main_session"
+      | "retake_session"
+      | ((
+          old: "main_session" | "retake_session"
+        ) => "main_session" | "retake_session" | null)
+      | null,
+    options?: Options
+  ) => Promise<URLSearchParams>;
+  setMoment: (
+    value:
+      | "before_appeal"
+      | "after_appeal"
+      | ((
+          old: "before_appeal" | "after_appeal"
+        ) => "before_appeal" | "after_appeal" | null)
+      | null,
+    options?: Options
+  ) => Promise<URLSearchParams>;
+};
+
+type FormDataType = {
+  moment: "before_appeal" | "after_appeal";
+  session: "main_session" | "retake_session";
 };
 
 export const ImportFileGradeSubmissionForm: FC<
   FileGradeSubmissionFormProps
-> = ({
-  open,
-  setOpen,
-  enrollments,
-  // setNewGradeClassItems,
-  course,
-}) => {
+> = ({ open, setOpen, enrollments, course, setSession, setMoment, juryId }) => {
   const {
     token: { colorPrimary, colorSuccess, colorWarning },
   } = theme.useToken();
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
+  const [openCancelForm, setOpenCancelForm] = useState<boolean>(false);
   const [newMatchedGradeClassItems, setNewMatchedGradeClassItems] = useState<
     NewGradeClass[] | undefined
   >();
 
+  const queryClient = useQueryClient();
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: createBulkGradeClasses,
+  });
+
   const onClose = () => {
     setOpen(false);
     setNewMatchedGradeClassItems(undefined);
-    form.resetFields()
+    form.resetFields();
   };
 
   // Handler for file upload
@@ -107,19 +138,55 @@ export const ImportFileGradeSubmissionForm: FC<
     // return false; // Prevent upload
   };
 
+  const handleFinish = (values: FormDataType) => {
+    if (newMatchedGradeClassItems && newMatchedGradeClassItems.length > 0) {
+      mutateAsync(
+        {
+          juryId: Number(juryId),
+          courseId: Number(course?.id),
+          session: values.session,
+          moment: values.moment,
+          gradesClass: newMatchedGradeClassItems,
+        },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: [
+                "grade_classes",
+                `${course?.id}`,
+                `${values.session}`,
+                `${values.moment}`,
+              ],
+            });
+            setSession(values.session);
+            setMoment(values.moment);
+            messageApi.success("Soumission en masse réussie !");
+            setOpen(false);
+          },
+          onError: () => {
+            messageApi.error("Erreur lors de la soumission en masse.");
+          },
+        }
+      );
+    } else {
+      messageApi.error("Aucun étudiant à soumettre.");
+    }
+  };
+
   return (
     <>
       {contextHolder}
       <Drawer
         open={open}
         title={
-          <Flex justify="space-between" align="center">
+          <Flex align="center" gap={8}>
             <Typography.Title
               level={4}
               style={{ marginBottom: 0, color: "#fff" }}
             >
               Import de notes depuis un fichier .xlsx
             </Typography.Title>
+            <div className="flex-1" />
             <Typography.Title
               level={4}
               style={{
@@ -131,12 +198,18 @@ export const ImportFileGradeSubmissionForm: FC<
             >
               {course?.available_course.name}
             </Typography.Title>
+            <Button
+              onClick={() => setOpenCancelForm(true)}
+              type="text"
+              icon={<CloseOutlined />}
+              disabled={isPending}
+            />
           </Flex>
         }
         destroyOnHidden
         onClose={onClose}
-        closable
-        maskClosable
+        closable={false}
+        maskClosable={false}
         width="60%"
         styles={{ header: { background: colorPrimary, color: "#fff" } }}
         footer={
@@ -154,14 +227,56 @@ export const ImportFileGradeSubmissionForm: FC<
               {/* Saisie des notes */}
             </Typography.Title>
             <Space>
-              <Button onClick={onClose} style={{ boxShadow: "none" }}>
+              <Button
+                onClick={() => setOpenCancelForm(true)}
+                style={{ boxShadow: "none" }}
+                disabled={
+                  isPending ||
+                  newMatchedGradeClassItems?.length === 0 ||
+                  !newMatchedGradeClassItems
+                }
+              >
                 Annuler
               </Button>
+              <Modal
+                title="Annuler l'importation des notes"
+                centered
+                open={openCancelForm}
+                destroyOnHidden
+                onOk={() => {
+                  setOpenCancelForm(false);
+                  onClose();
+                }}
+                onCancel={() => setOpenCancelForm(false)}
+                cancelText="Retour"
+                okText="Confirmer"
+                okType="danger"
+                cancelButtonProps={{
+                  style: { boxShadow: "none" },
+                }}
+                okButtonProps={{
+                  style: { boxShadow: "none" },
+                  type: "primary",
+                }}
+              >
+                <Alert
+                  message="Attention !"
+                  description="En confirmant, vous annulerez l'importation en cours. Toutes les notes de cette importation seront perdues."
+                  type="warning"
+                  showIcon
+                  style={{ border: 0, marginBottom: 16 }}
+                />
+              </Modal>
               <Button
                 type="primary"
                 onClick={() => form.submit()}
                 style={{ boxShadow: "none" }}
                 icon={<CheckCircleOutlined />}
+                disabled={
+                  isPending ||
+                  newMatchedGradeClassItems?.length === 0 ||
+                  !newMatchedGradeClassItems
+                }
               >
                 Sauvegarder
               </Button>
@@ -173,17 +288,12 @@ export const ImportFileGradeSubmissionForm: FC<
           key="bulk_grade_submission_form"
           form={form}
           name="bulk_grade_submission_form"
-          onFinish={async (values: any) => {
-            try {
-              messageApi.success("Soumission en masse réussie !");
-              setOpen(false);
-            } catch {
-              messageApi.error("Erreur lors de la soumission en masse.");
-            }
-          }}
+          onFinish={handleFinish}
           layout="vertical"
         >
-          <Form.Item>
+          <Form.Item
+            style={{ marginBottom: newMatchedGradeClassItems ? 16 : 0 }}
+          >
             <Upload.Dragger
               accept=".xlsx"
               beforeUpload={handleFileUpload}
@@ -193,13 +303,13 @@ export const ImportFileGradeSubmissionForm: FC<
             >
               <div
                 style={{
-                  minHeight:100,
+                  minHeight: 100,
                   height: newMatchedGradeClassItems
                     ? "auto"
-                    : `calc(100vh - 264px)`,
-                    display:"flex",
-                    flexDirection:"column",
-                    justifyContent:"center"
+                    : `calc(100vh - 244px)`,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
                 }}
               >
                 <p className="ant-upload-drag-icon">
@@ -476,7 +586,7 @@ export const ImportFileGradeSubmissionForm: FC<
                   dataIndex: "actions",
                   title: "",
                   render: (_, record) => (
-                    <DeleteSingleGradeButton
+                    <ButtonRemoveGrade
                       onDelete={() => {
                         const updatedItems = [
                           ...(newMatchedGradeClassItems ?? []),
@@ -489,6 +599,7 @@ export const ImportFileGradeSubmissionForm: FC<
                           setNewMatchedGradeClassItems(updatedItems);
                         }
                       }}
+                      disabled={isPending}
                     />
                   ),
                   width: 48,

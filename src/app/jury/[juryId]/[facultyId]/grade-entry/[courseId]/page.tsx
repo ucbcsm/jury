@@ -10,7 +10,7 @@ import {
   getTaughtCours,
   multiUpdateGradeClasses,
 } from "@/lib/api";
-import { GradeClass, NewGradeClass } from "@/types";
+import { GradeClass } from "@/types";
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -58,9 +58,10 @@ import { ButtonMultiUpdateFormReject } from "./_components/reject-multi-update-f
 import { DeleteMultiGradesButton } from "./_components/delete-multi-grades";
 import { DataFetchErrorResult } from "@/components/errorResult";
 import { useGradeClassArraysDifferent } from "@/hooks/use-grade-class-arrays-different";
-import { DeleteSingleGradeButton } from "./delete-single-grade-button";
+import { ButtonRemoveGrade } from "./_components/button-remove-grade-list";
 import { useReactToPrint } from "react-to-print";
-import { EmptyListGrades } from "./_components/printable/empty-list-grades";
+import { EmptyListGradesToPrint } from "./_components/printable/empty-list-grades";
+import { ButtonDeleteSingleGrade } from "./_components/delete-single-grade";
 
 export default function Page() {
   const {
@@ -738,17 +739,20 @@ export default function Page() {
                   dataIndex: "actions",
                   title: "",
                   render: (_, record) => (
-                    <DeleteSingleGradeButton
-                      onDelete={() => {
-                        const updatedItems = [...(editedGradeClassItems ?? [])];
-                        const index = updatedItems.findIndex(
-                          (item) => item.student?.id === record.student?.id
-                        );
-                        if (index !== -1) {
-                          updatedItems.splice(index, 1);
-                          setEditedGradeClassItems(updatedItems);
-                        }
-                      }}
+                    <ButtonDeleteSingleGrade
+                      gradeId={record.id}
+                      session={session}
+                      moment={moment}
+                      // onDelete={() => {
+                      //   const updatedItems = [...(editedGradeClassItems ?? [])];
+                      //   const index = updatedItems.findIndex(
+                      //     (item) => item.student?.id === record.student?.id
+                      //   );
+                      //   if (index !== -1) {
+                      //     updatedItems.splice(index, 1);
+                      //     setEditedGradeClassItems(updatedItems);
+                      //   }
+                      // }}
                     />
                   ),
                   width: 48,
@@ -770,21 +774,25 @@ export default function Page() {
           setOpen={setOpenBulkSubmission}
           enrollments={courseEnrollments}
           course={course}
+          juryId={Number(juryId)}
+          setSession={setSession}
+          setMoment={setMoment}
         />
         <ImportFileGradeSubmissionForm
           open={openFileSubmission}
           setOpen={setOpenFileSubmission}
           course={course}
           enrollments={courseEnrollments}
+          setSession={setSession}
+          setMoment={setMoment}
+          juryId={Number(juryId)}
         />
-        <div className="hidden">
-          <div ref={emptyGradeRef}>
-            <EmptyListGrades
-              courseEnrollments={courseEnrollments}
-              course={course}
-            />
-          </div>
-        </div>
+
+        <EmptyListGradesToPrint
+          courseEnrollments={courseEnrollments}
+          course={course}
+          ref={emptyGradeRef}
+        />
       </Layout.Content>
       <Layout.Footer
         style={{

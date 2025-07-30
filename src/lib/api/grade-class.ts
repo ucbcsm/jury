@@ -8,8 +8,32 @@ import ExcelJS from "exceljs";
 import Papa from "papaparse";
 import api from "../fetcher";
 
-export async function createBulkGradeClasses(data: NewGradeClass[]) {
-  const res = await api.post(`/jury/grades-class/`, data);
+export async function createBulkGradeClasses({
+  courseId,
+  juryId,
+  moment,
+  session,
+  gradesClass,
+}: {
+  courseId: number;
+  juryId: number;
+  moment: "before_appeal" | "after_appeal";
+  session: "main_session" | "retake_session";
+  gradesClass: NewGradeClass[];
+}) {
+  const formatedData = gradesClass.map((item) => ({
+    student: item.student?.id,
+    course: courseId,
+    jury: juryId,
+    continuous_assessment: item.continuous_assessment ?? 0,
+    exam: item.exam ?? 0,
+    total:(item.continuous_assessment ?? 0) + (item.exam ?? 0),
+    session: session,
+    moment: moment,
+    is_retaken: item.is_retaken,
+    status: item.status,
+  }));
+  const res = await api.post(`/jury/grades-class/`, formatedData);
   return res.data;
 }
 
@@ -67,6 +91,32 @@ export async function deleteMultiGradeClasses(data: GradeClass[]) {
     gradesToDelete
   );
   return res.data;
+}
+
+export function getSessionText(
+  session: "main_session" | "retake_session"
+): string {
+  switch (session) {
+    case "main_session":
+      return "Principale";
+    case "retake_session":
+      return "Rattrapage";
+    default:
+      return "Inconnue";
+  }
+}
+
+export function getMomentText(
+  moment: "before_appeal" | "after_appeal"
+): string {
+  switch (moment) {
+    case "before_appeal":
+      return "Avant appel";
+    case "after_appeal":
+      return "Après appel";
+    default:
+      return "Moment inconnu";
+  }
 }
 
 export function getGradeValidationColor(

@@ -21,38 +21,77 @@ import {
   Flex,
   Dropdown,
   Tag,
+  Modal,
+  Alert,
 } from "antd";
-import { CheckCircleOutlined, HourglassOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  CloseOutlined,
+  HourglassOutlined,
+} from "@ant-design/icons";
 import { InputGrade } from "./input-grade";
 import { CourseEnrollment, NewGradeClass, TaughtCourse } from "@/types";
-import { DeleteSingleGradeButton } from "../delete-single-grade-button";
+import { ButtonRemoveGrade } from "./button-remove-grade-list";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createBulkGradeClasses } from "@/lib/api";
+import { Options } from "nuqs";
+
+type FormDataType = {
+  moment: "before_appeal" | "after_appeal";
+  session: "main_session" | "retake_session";
+};
 
 type BulkGradeSubmissionFormProps = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  // newGradeClassItems?: NewGradeClass[];
-  // setNewGradeClassItems: Dispatch<SetStateAction<NewGradeClass[] | undefined>>;
   course?: TaughtCourse;
+  juryId?: number;
   enrollments?: CourseEnrollment[];
+  setSession: (
+    value:
+      | "main_session"
+      | "retake_session"
+      | ((
+          old: "main_session" | "retake_session"
+        ) => "main_session" | "retake_session" | null)
+      | null,
+    options?: Options
+  ) => Promise<URLSearchParams>;
+  setMoment: (
+    value:
+      | "before_appeal"
+      | "after_appeal"
+      | ((
+          old: "before_appeal" | "after_appeal"
+        ) => "before_appeal" | "after_appeal" | null)
+      | null,
+    options?: Options
+  ) => Promise<URLSearchParams>;
 };
 
 export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
   open,
   setOpen,
-  // newGradeClassItems,
-  // setNewGradeClassItems,
   course,
+  juryId,
   enrollments,
+  setSession,
+  setMoment,
 }) => {
   const {
     token: { colorPrimary, colorSuccess, colorWarning },
   } = theme.useToken();
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
-
+  const [openCancelForm, setOpenCancelForm] = useState<boolean>(false);
   const [newGradeClassItems, setNewGradeClassItems] = useState<
     NewGradeClass[] | undefined
-  >([]);
+  >();
+
+  const queryClient = useQueryClient();
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: createBulkGradeClasses,
+  });
 
   const onClose = () => {
     setOpen(false);
@@ -61,28 +100,48 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
     form.resetFields();
   };
 
-  const handleFinish = async (values: any) => {
-    try {
-      // Traitez ici la soumission en masse
-      messageApi.success("Soumission en masse réussie !");
-      setOpen(false);
-    } catch {
-      messageApi.error("Erreur lors de la soumission en masse.");
+  const handleFinish = (values: FormDataType) => {
+    if (newGradeClassItems && newGradeClassItems.length > 0) {
+      mutateAsync(
+        {
+          juryId: Number(juryId),
+          courseId: Number(course?.id),
+          session: values.session,
+          moment: values.moment,
+          gradesClass: newGradeClassItems,
+        },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({
+              queryKey: [
+                "grade_classes",
+                `${course?.id}`,
+                `${values.session}`,
+                `${values.moment}`,
+              ],
+            });
+            setSession(values.session);
+            setMoment(values.moment);
+            messageApi.success("Soumission en masse réussie !");
+            setOpen(false);
+          },
+          onError: () => {
+            messageApi.error("Erreur lors de la soumission en masse.");
+          },
+        }
+      );
+    } else {
+      messageApi.error("Aucun étudiant à soumettre.");
     }
   };
 
   const getGradeItemsFromCourseEnrollments = () => {
-
-    if (!enrollments || !course) return [];
-
     return enrollments?.map((student) => ({
       student: student.student,
       continuous_assessment: null,
       exam: null,
       is_retaken: false,
       status: "validated",
-      moment: "before_appeal",
-      session: "retake_session",
     })) as NewGradeClass[];
   };
 
@@ -99,13 +158,14 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
       <Drawer
         open={open}
         title={
-          <Flex justify="space-between" align="center">
+          <Flex align="center" gap={8}>
             <Typography.Title
               level={4}
               style={{ marginBottom: 0, color: "#fff" }}
             >
               Saisie collective des notes
             </Typography.Title>
+            <div className="flex-1" />
             <Typography.Title
               level={4}
               style={{
@@ -117,12 +177,22 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
             >
               {course?.available_course.name}
             </Typography.Title>
+            <Button
+              onClick={() => setOpenCancelForm(true)}
+              type="text"
+              icon={<CloseOutlined />}
+              disabled={
+                isPending ||
+                newGradeClassItems?.length === 0 ||
+                !newGradeClassItems
+              }
+            />
           </Flex>
         }
         destroyOnHidden
         onClose={onClose}
-        closable
-        maskClosable
+        closable={false}
+        maskClosable={false}
         width="60%"
         styles={{ header: { background: colorPrimary, color: "#fff" } }}
         footer={
@@ -140,14 +210,51 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
               Saisie des notes
             </Typography.Title>
             <Space>
-              <Button onClick={onClose} style={{ boxShadow: "none" }}>
+              <Button
+                disabled={
+                  isPending ||
+                  newGradeClassItems?.length === 0 ||
+                  !newGradeClassItems
+                }
+                onClick={() => setOpenCancelForm(true)}
+                style={{ boxShadow: "none" }}
+              >
                 Annuler
               </Button>
+              <Modal
+                title="Annuler la saisie des notes"
+                centered
+                open={openCancelForm}
+                destroyOnHidden
+                cancelText="Retour"
+                okText="Confirmer"
+                onOk={() => {
+                  setOpenCancelForm(false);
+                  onClose();
+                }}
+                onCancel={() => setOpenCancelForm(false)}
+                cancelButtonProps={{ style: { boxShadow: "none" } }}
+                okButtonProps={{ style: { boxShadow: "none" }, danger: true }}
+              >
+                <Alert
+                  message="Attention !"
+                  description="Vous êtes sur le point de quitter ce formulaire. Toutes les notes non enregistrées seront perdues."
+                  type="warning"
+                  showIcon
+                  style={{ border: 0, marginBottom: 16 }}
+                />
+              </Modal>
               <Button
                 type="primary"
                 onClick={() => form.submit()}
                 style={{ boxShadow: "none" }}
                 icon={<CheckCircleOutlined />}
+                disabled={
+                  isPending ||
+                  newGradeClassItems?.length === 0 ||
+                  !newGradeClassItems
+                }
+                loading={isPending}
               >
                 Sauvegarder
               </Button>
@@ -160,7 +267,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
           form={form}
           name="bulk_grade_submission_form"
           onFinish={handleFinish}
-          layout="vertical"
+          disabled={isPending}
         >
           <Table
             title={() => (
@@ -266,7 +373,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                         setNewGradeClassItems(updatedItems);
                       }
                     }}
-                    disabled={!record.student}
+                    disabled={!record.student || isPending}
                   />
                 ),
                 width: 92,
@@ -288,7 +395,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                         setNewGradeClassItems(updatedItems);
                       }
                     }}
-                    disabled={!record.student}
+                    disabled={!record.student || isPending}
                   />
                 ),
                 width: 92,
@@ -331,6 +438,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                         setNewGradeClassItems(updatedItems);
                       }
                     }}
+                    disabled={isPending}
                   />
                 ),
                 width: 68,
@@ -372,6 +480,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                       },
                     }}
                     arrow
+                    disabled={isPending}
                   >
                     <Tag
                       color={
@@ -400,7 +509,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                 dataIndex: "actions",
                 title: "",
                 render: (_, record) => (
-                  <DeleteSingleGradeButton
+                  <ButtonRemoveGrade
                     onDelete={() => {
                       const updatedItems = [...(newGradeClassItems ?? [])];
                       const index = updatedItems.findIndex(
@@ -411,6 +520,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                         setNewGradeClassItems(updatedItems);
                       }
                     }}
+                    disabled={isPending}
                   />
                 ),
                 width: 48,
