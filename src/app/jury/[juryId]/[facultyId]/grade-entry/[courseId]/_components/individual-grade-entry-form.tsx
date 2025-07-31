@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Dispatch, FC, SetStateAction } from "react";
+import React, { Dispatch, FC, SetStateAction, useState } from "react";
 import {
   Button,
   Drawer,
@@ -16,51 +16,119 @@ import {
   Typography,
   Checkbox,
 } from "antd";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, CloseOutlined } from "@ant-design/icons";
 import { filterOption } from "@/lib/utils";
-import { CourseEnrollment } from "@/types";
-import { getCourseEnrollmentsAsOptions } from "@/lib/api";
-// import { updateGradeEntry } from "@/lib/api"; // À adapter selon votre API
+import { CourseEnrollment, NewGradeClass } from "@/types";
+import {
+  createBulkGradeClasses,
+  getCourseEnrollmentsAsOptions,
+} from "@/lib/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import { Options } from "nuqs";
 
 type IndividualGradeEntryFormProps = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   students?: CourseEnrollment[];
-  //   initialValues?: {
-  //     continuous_assessment: number | null;
-  //     exam: number | null;
-  //     total: number;
-  //   };
-  //   onSubmit: (values: {
-  //     continuous_assessment: number | null;
-  //     exam: number | null;
-  //     total: number;
-  //   }) => Promise<void>;
+  setSession: (
+    value:
+      | "main_session"
+      | "retake_session"
+      | ((
+          old: "main_session" | "retake_session"
+        ) => "main_session" | "retake_session" | null)
+      | null,
+    options?: Options
+  ) => Promise<URLSearchParams>;
+  setMoment: (
+    value:
+      | "before_appeal"
+      | "after_appeal"
+      | ((
+          old: "before_appeal" | "after_appeal"
+        ) => "before_appeal" | "after_appeal" | null)
+      | null,
+    options?: Options
+  ) => Promise<URLSearchParams>;
+};
+
+type FormDataType = {
+  student_id: number;
+  continuous_assessment?: number;
+  exam?: number;
+  session: "main_session" | "retake_session";
+  moment: "before_appeal" | "after_appeal";
+  is_retaken?: boolean;
 };
 
 export const IndividualGradeEntryForm: FC<IndividualGradeEntryFormProps> = ({
   open,
   setOpen,
   students,
-  //   initialValues,
-  //   onSubmit,
+  setSession,
+  setMoment,
 }) => {
   const {
     token: { colorPrimary },
   } = theme.useToken();
+
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
+  const { juryId, courseId } = useParams();
+  const [total, setTotal] = useState<number | undefined>();
 
-  const onClose = () => setOpen(false);
+  const queryClient = useQueryClient();
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: createBulkGradeClasses,
+  });
 
-  const handleFinish = async (values: any) => {
-    try {
-      //   await onSubmit(values);
-      messageApi.success("Note enregistrée avec succès !");
-      setOpen(false);
-    } catch {
-      messageApi.error("Erreur lors de l'enregistrement de la note.");
-    }
+  const onClose = () => {
+    form.resetFields();
+    setOpen(false);
+    setTotal(undefined)
+  };
+
+  const handleFinish = async (values: FormDataType) => {
+    const formatedData: NewGradeClass[] = [
+      {
+        student: students?.find((item) => item.id === values.student_id)
+          ?.student,
+        continuous_assessment: values.continuous_assessment,
+        exam: values.exam,
+        is_retaken: values.is_retaken ?? false,
+        status: "pending",
+      },
+    ];
+
+    mutateAsync(
+      {
+        juryId: Number(juryId),
+        courseId: Number(courseId),
+        session: values.session,
+        moment: values.moment,
+        gradesClass: formatedData,
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: [
+              "grade_classes",
+              courseId,
+              `${values.session}`,
+              `${values.moment}`,
+            ],
+          });
+          setSession(values.session);
+          setMoment(values.moment);
+          messageApi.success("Note enregistrée avec succès !");
+          onClose();
+        },
+        onError: () => {
+          messageApi.error("Erreur lors de l'enregistrement de la note.");
+        },
+      }
+    );
   };
 
   return (
@@ -68,11 +136,21 @@ export const IndividualGradeEntryForm: FC<IndividualGradeEntryFormProps> = ({
       {contextHolder}
       <Drawer
         open={open}
-        title="Saisie individuelle des notes"
+        title={
+          <Flex justify="space-between">
+            <Typography.Title
+              level={4}
+              style={{ marginBottom: 0, color: "#fff" }}
+            >
+              Saisie individuelle des notes
+            </Typography.Title>
+            <Button onClick={onClose} type="text" icon={<CloseOutlined />} />
+          </Flex>
+        }
         destroyOnHidden
         onClose={onClose}
-        closable
-        maskClosable
+        closable={false}
+        maskClosable={false}
         styles={{ header: { background: colorPrimary, color: "#fff" } }}
         footer={
           <div
@@ -83,7 +161,11 @@ export const IndividualGradeEntryForm: FC<IndividualGradeEntryFormProps> = ({
             }}
           >
             <Space>
-              <Button onClick={onClose} style={{ boxShadow: "none" }}>
+              <Button
+                onClick={onClose}
+                style={{ boxShadow: "none" }}
+                disabled={isPending}
+              >
                 Annuler
               </Button>
               <Button
@@ -91,6 +173,8 @@ export const IndividualGradeEntryForm: FC<IndividualGradeEntryFormProps> = ({
                 onClick={() => form.submit()}
                 style={{ boxShadow: "none" }}
                 icon={<CheckCircleOutlined />}
+                loading={isPending}
+                disabled={isPending}
               >
                 Sauvegarder
               </Button>
@@ -102,8 +186,8 @@ export const IndividualGradeEntryForm: FC<IndividualGradeEntryFormProps> = ({
           key="individual_grade_entry_form"
           form={form}
           name="individual_grade_entry_form"
-          //   initialValues={initialValues}
           onFinish={handleFinish}
+          disabled={isPending}
         >
           <Card>
             <Form.Item
@@ -143,6 +227,12 @@ export const IndividualGradeEntryForm: FC<IndividualGradeEntryFormProps> = ({
                 max={10}
                 addonAfter="/10"
                 variant="filled"
+                onChange={(value) => {
+                  if (typeof form.getFieldValue("exam") === "number") {
+                    const newTotal = value + form.getFieldValue("exam");
+                    setTotal(newTotal);
+                  }
+                }}
               />
             </Form.Item>
             <Form.Item
@@ -160,6 +250,12 @@ export const IndividualGradeEntryForm: FC<IndividualGradeEntryFormProps> = ({
                 max={10}
                 addonAfter="/10"
                 variant="filled"
+                onChange={(value) => {
+                  if (typeof form.getFieldValue("continuous_assessment") === "number") {
+                    const newTotal = value + form.getFieldValue("continuous_assessment");
+                    setTotal(newTotal);
+                  }
+                }}
               />
             </Form.Item>
             <Divider />
@@ -174,7 +270,7 @@ export const IndividualGradeEntryForm: FC<IndividualGradeEntryFormProps> = ({
                 level={5}
                 style={{ marginBottom: 0, marginTop: 0 }}
               >
-                /20
+                {total}/20
               </Typography.Title>
             </Flex>
             <Divider />

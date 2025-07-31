@@ -345,7 +345,7 @@ export default function Page() {
           <DataFetchErrorResult />
         ) : (
           <div>
-            {isDifferent && (
+            {isDifferent && !isPendingGradeClasses && (
               <Alert
                 banner
                 type="info"
@@ -768,6 +768,8 @@ export default function Page() {
           open={openIndividualEntry}
           setOpen={setOpenIndividualEntry}
           students={courseEnrollments}
+          setMoment={setMoment}
+          setSession={setSession}
         />
         <BulkGradeSubmissionForm
           open={openBulkSubmission}
