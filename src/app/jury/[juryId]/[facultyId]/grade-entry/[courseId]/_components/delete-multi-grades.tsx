@@ -48,6 +48,7 @@ export const DeleteMultiGradesButton: FC<DeleteMultiGradesButtonProps> = ({
           });
           messageApi.success("Les notes ont été supprimées avec succès !");
           setOpen(false);
+          form.resetFields()
         },
         onError: () => {
           messageApi.error(
@@ -81,7 +82,7 @@ export const DeleteMultiGradesButton: FC<DeleteMultiGradesButtonProps> = ({
           style: { boxShadow: "none" },
           disabled: isPending,
         }}
-        onCancel={() => setOpen(false)}
+        onCancel={() => {setOpen(false), form.resetFields()}}
         destroyOnHidden
         closable={{ disabled: isPending }}
         maskClosable={!isPending}

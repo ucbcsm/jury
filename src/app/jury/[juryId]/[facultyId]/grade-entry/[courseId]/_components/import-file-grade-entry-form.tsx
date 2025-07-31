@@ -161,7 +161,7 @@ export const ImportFileGradeSubmissionForm: FC<
             setSession(values.session);
             setMoment(values.moment);
             messageApi.success("Soumission en masse réussie !");
-            setOpen(false);
+           onClose()
           },
           onError: () => {
             messageApi.error("Erreur lors de la soumission en masse.");
@@ -277,6 +277,7 @@ export const ImportFileGradeSubmissionForm: FC<
                   newMatchedGradeClassItems?.length === 0 ||
                   !newMatchedGradeClassItems
                 }
+                loading={isPending}
               >
                 Sauvegarder
               </Button>
