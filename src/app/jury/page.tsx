@@ -49,6 +49,8 @@ export default function Page() {
     queryKey: ["get", `${yearId}`],
     queryFn: ({ queryKey }) => getUserIsJury(Number(queryKey[1])),
     enabled: !!yearId,
+    refetchOnReconnect:false,
+    refetchOnWindowFocus:false
   });
 
   if (jury) {
@@ -78,7 +80,6 @@ export default function Page() {
   useEffect(() => {
     if (isErrorJury && error?.status === 404) {
       messageApi.error("Vous n'êtes associé(e) à aucun jury dans le système.");
-      setYearId(undefined)
     } else if (isErrorJury) {
       messageApi.error("Erreur inconnue. Merci de réessayer.");
        setYearId(undefined)
