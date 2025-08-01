@@ -6,7 +6,7 @@ import { getDepartmentsByFacultyId, getTaughtCoursesByFacultyPediodAndDepartemen
 import { Period, TaughtCourse } from "@/types";
 import { BookOutlined, SearchOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Flex, Input, List, Tag, theme } from "antd";
+import { Alert, Flex, Input, List, Tag, theme } from "antd";
 import { useParams, useRouter } from "next/navigation";
 import { FC, useState } from "react";
 
@@ -111,6 +111,9 @@ export const ListCourse: FC<ListCourseProps> = ({ period }) => {
         ))}
       </Flex>
       <div className="pt-4">
+        {searchResult && searchResult.length > 0 && (
+          <Alert message={`${searchResult.length} resultat (s) de recherche`} type="info" banner />
+        )}
         <List
           size="small"
           dataSource={
