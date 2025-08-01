@@ -3,7 +3,7 @@
 import { DataFetchErrorResult } from "@/components/errorResult";
 import { DataFetchPendingSkeleton } from "@/components/loadingSkeleton";
 import { getDepartmentsByFacultyId, getTaughtCoursesByFacultyPediodAndDepartement } from "@/lib/api";
-import { Period } from "@/types";
+import { Period, TaughtCourse } from "@/types";
 import { BookOutlined, SearchOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Flex, Input, List, Tag, theme } from "antd";
@@ -23,6 +23,9 @@ export const ListCourse: FC<ListCourseProps> = ({ period }) => {
     const { juryId, facultyId, courseId } = useParams();
     const router = useRouter();
     const [departmentId, setDepartmentId] = useState<string | number>("all");
+    const [searchResult, setSearchResult] = useState<
+      TaughtCourse[] | undefined
+    >();
 
   const { data: departments } = useQuery({
     queryKey: ["departments", facultyId],
@@ -52,6 +55,20 @@ export const ListCourse: FC<ListCourseProps> = ({ period }) => {
     enabled: !!period.academic_year.id && !!facultyId,
   });
 
+  const handleSearch = (searchString: string) => {
+    if (searchString.length > 0) {
+      setDepartmentId("all");
+      searchString.toLowerCase();
+      const newSearchResult = courses?.filter(
+        (course) =>
+          course.available_course.code.toLowerCase().includes(searchString) ||
+          course.available_course.name.toLowerCase().includes(searchString)
+      );
+      setSearchResult(newSearchResult);
+    } else {
+      setSearchResult(undefined);
+    }
+  };
 
   if (isPendingCourses) {
     return <DataFetchPendingSkeleton />;
@@ -68,11 +85,15 @@ export const ListCourse: FC<ListCourseProps> = ({ period }) => {
         variant="filled"
         placeholder="Rechercher ..."
         prefix={<SearchOutlined />}
+        onChange={(e) => {
+          handleSearch(e.target.value);
+        }}
+        allowClear
       />
       <Flex gap={4} wrap align="center" style={{ paddingTop: 16 }}>
         <Tag.CheckableTag
           key="all"
-          checked={departmentId=== "all"}
+          checked={departmentId === "all"}
           onChange={(checked) => setDepartmentId("all")}
           style={{ borderRadius: 12 }}
         >
@@ -82,10 +103,8 @@ export const ListCourse: FC<ListCourseProps> = ({ period }) => {
           <Tag.CheckableTag
             key={department.id}
             checked={departmentId === department.id}
-            onChange={(checked) =>
-              setDepartmentId( department.id)
-            }
-            style={{ borderRadius: 12 , textTransform: "uppercase"}}
+            onChange={(checked) => setDepartmentId(department.id)}
+            style={{ borderRadius: 12, textTransform: "uppercase" }}
           >
             {department.acronym}
           </Tag.CheckableTag>
@@ -94,7 +113,9 @@ export const ListCourse: FC<ListCourseProps> = ({ period }) => {
       <div className="pt-4">
         <List
           size="small"
-          dataSource={courses}
+          dataSource={
+            searchResult && searchResult.length > 0 ? searchResult : courses
+          }
           renderItem={(item) => (
             <List.Item
               key={item.id}
