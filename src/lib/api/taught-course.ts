@@ -22,6 +22,35 @@ export async function getTaughtCoursesByDepartmentId(
   return res.data.results as TaughtCourse[];
 }
 
+
+export async function getTaughtCoursesByFacultyPediodAndDepartement(params: {
+  yearId: number;
+  facultyId: number;
+  periodId?: number;
+  departmentId?: number;
+}) {
+  const { yearId, facultyId, periodId, departmentId } = params;
+
+  const queryParams = new URLSearchParams();
+
+  // Paramètres obligatoires
+  queryParams.append("academic_year__id", yearId.toString());
+  queryParams.append("faculty__id", facultyId.toString());
+
+  // Paramètres optionnels
+  if (periodId !== undefined) {
+    queryParams.append("period__id", periodId.toString());
+  }
+  if (departmentId !== undefined) {
+    queryParams.append("departements__id", departmentId.toString());
+  }
+
+  const res = await api.get(
+    `/faculty/taught-course/?${queryParams.toString()}`
+  );
+  return res.data.results as TaughtCourse[];
+}
+
 export async function getTaughtCours(taughtCourseId: number) {
   const res = await api.get(`/faculty/taught-course/${taughtCourseId}/`);
   return res.data as TaughtCourse;

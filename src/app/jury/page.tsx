@@ -26,7 +26,7 @@ import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Page() {
-  const [yearId, setYearId] = useState<number>();
+  const [yearId, setYearId] = useState<number | undefined>();
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoadingLogout, setIsLoadingLogout] = useState<boolean>(false);
   const { removeYid } = useYid();
@@ -45,11 +45,10 @@ export default function Page() {
     isLoading,
     isError: isErrorJury,
     error,
-    refetch,
   } = useQuery({
     queryKey: ["get", `${yearId}`],
     queryFn: ({ queryKey }) => getUserIsJury(Number(queryKey[1])),
-    enabled: false,
+    enabled: !!yearId,
   });
 
   if (jury) {
@@ -79,8 +78,10 @@ export default function Page() {
   useEffect(() => {
     if (isErrorJury && error?.status === 404) {
       messageApi.error("Vous n'êtes associé(e) à aucun jury dans le système.");
+      setYearId(undefined)
     } else if (isErrorJury) {
       messageApi.error("Erreur inconnue. Merci de réessayer.");
+       setYearId(undefined)
     }
   }, [error]);
 
@@ -134,7 +135,7 @@ export default function Page() {
               }
             />
           )}
-          <Card loading={isPending}>
+          <Card loading={isPending} >
             <Typography.Title level={4}>Année</Typography.Title>
             <List
               dataSource={years}
@@ -151,8 +152,9 @@ export default function Page() {
                   }
                   style={{ paddingLeft: 16, paddingRight: 16 }}
                   onClick={() => {
-                    setYearId(item.id);
-                    refetch();
+                    if (!isLoading) {
+                      setYearId(item.id);
+                    }
                   }}
                 >
                   <List.Item.Meta

@@ -2,13 +2,13 @@
 
 import { DataFetchErrorResult } from "@/components/errorResult";
 import { DataFetchPendingSkeleton } from "@/components/loadingSkeleton";
-import { getTaughtCoursesByFacultyId } from "@/lib/api";
+import { getDepartmentsByFacultyId, getTaughtCoursesByFacultyPediodAndDepartement } from "@/lib/api";
 import { Period } from "@/types";
 import { BookOutlined, SearchOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Flex, Input, List, Tag, theme } from "antd";
 import { useParams, useRouter } from "next/navigation";
-import { FC } from "react";
+import { FC, useState } from "react";
 
 type ListCourseProps = {
   period: Period;
@@ -22,23 +22,42 @@ export const ListCourse: FC<ListCourseProps> = ({ period }) => {
 
     const { juryId, facultyId, courseId } = useParams();
     const router = useRouter();
+    const [departmentId, setDepartmentId] = useState<string | number>("all");
+
+  const { data: departments } = useQuery({
+    queryKey: ["departments", facultyId],
+    queryFn: ({ queryKey }) => getDepartmentsByFacultyId(Number(queryKey[1])),
+    enabled: !!facultyId,
+  });
 
   const {
-    data: taughtCourses,
-    isPending,
-    isError,
+    data: courses,
+    isPending: isPendingCourses,
+    isError:isErrorCourses,
   } = useQuery({
-    queryKey: ["taught_courses", `${period.academic_year.id}`, facultyId],
-    queryFn: ({ queryKey }) =>
-      getTaughtCoursesByFacultyId(Number(queryKey[1]), Number(queryKey[2])),
+    queryKey: [
+      "taughtCourses",
+      `${period.academic_year.id}`,
+      facultyId,
+      `${period.id}`,
+      `${departmentId}`,
+    ],
+    queryFn: () =>
+      getTaughtCoursesByFacultyPediodAndDepartement({
+        yearId: Number(period.academic_year.id),
+        facultyId: Number(facultyId),
+        periodId:period.id,
+        departmentId: departmentId !== "all" ? Number(departmentId) : undefined,
+      }),
     enabled: !!period.academic_year.id && !!facultyId,
   });
 
-  if (isPending) {
+
+  if (isPendingCourses) {
     return <DataFetchPendingSkeleton />;
   }
 
-  if (isError) {
+  if (isErrorCourses) {
     return <DataFetchErrorResult />;
   }
 
@@ -53,39 +72,37 @@ export const ListCourse: FC<ListCourseProps> = ({ period }) => {
       <Flex gap={4} wrap align="center" style={{ paddingTop: 16 }}>
         <Tag.CheckableTag
           key="all"
-          checked={true}
-          // onChange={(checked) => setSelectedTag("new")}
+          checked={departmentId=== "all"}
+          onChange={(checked) => setDepartmentId("all")}
           style={{ borderRadius: 12 }}
         >
           Tous
         </Tag.CheckableTag>
-        <Tag.CheckableTag
-          key="gi"
-          checked={false}
-          // onChange={(checked) => setSelectedTag("new")}
-          style={{ borderRadius: 12 }}
-        >
-          GI
-        </Tag.CheckableTag>
-
-        <Tag.CheckableTag
-          key="em"
-          checked={false}
-          // onChange={(checked) => setSelectedTag("old")}
-          style={{ borderRadius: 12 }}
-        >
-          EM
-        </Tag.CheckableTag>
+        {departments?.map((department) => (
+          <Tag.CheckableTag
+            key={department.id}
+            checked={departmentId === department.id}
+            onChange={(checked) =>
+              setDepartmentId( department.id)
+            }
+            style={{ borderRadius: 12 , textTransform: "uppercase"}}
+          >
+            {department.acronym}
+          </Tag.CheckableTag>
+        ))}
       </Flex>
       <div className="pt-4">
         <List
           size="small"
-          dataSource={taughtCourses}
+          dataSource={courses}
           renderItem={(item) => (
             <List.Item
               key={item.id}
               className=" hover:cursor-pointer hover:bg-gray-50"
-              style={{ background: item.id === Number(courseId) ? colorBgTextHover : "",}}
+              style={{
+                background:
+                  item.id === Number(courseId) ? colorBgTextHover : "",
+              }}
               onClick={() => {
                 router.push(
                   `/jury/${juryId}/${facultyId}/grade-entry/${item.id}`

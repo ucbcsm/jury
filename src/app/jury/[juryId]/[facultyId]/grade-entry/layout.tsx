@@ -21,7 +21,7 @@ export default function GradeEntryLayout({
   children: React.ReactNode;
 }>) {
   const {
-    token: { colorBorderSecondary },
+    token: { colorBorder },
   } = theme.useToken();
   const { juryId } = useParams();
 
@@ -69,7 +69,7 @@ export default function GradeEntryLayout({
           style={{
             paddingLeft: 16,
             height: 64,
-            borderBottom: `1px solid ${colorBorderSecondary}`,
+            borderBottom: `1px solid ${colorBorder}`,
           }}
           align="center"
         >
@@ -81,7 +81,7 @@ export default function GradeEntryLayout({
             Cours / Périodes
           </Typography.Title>
         </Flex>
-        <div></div>
+       
         {isPendingPeriods && (
           <div className="p-4">
             <DataFetchPendingSkeleton />
