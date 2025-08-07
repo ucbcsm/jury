@@ -1,7 +1,7 @@
 "use client";
 
 import { getClasses, getDepartmentsByFacultyId, getJury, getPeriodsByYear } from "@/lib/api";
-import { SearchOutlined, SubnodeOutlined } from "@ant-design/icons";
+import { SearchOutlined, SubnodeOutlined, TagOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
   Collapse,
@@ -11,15 +11,18 @@ import {
   List,
   Splitter,
   Tag,
+  theme,
   Typography,
 } from "antd";
 import { useParams } from "next/navigation";
+import { ListClasses } from "./_components/list-classes";
 
 export default function DeliberationsLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const {token:{colorBorder}}=theme.useToken()
   const { juryId, facultyId } = useParams();
 
   const {
@@ -40,8 +43,8 @@ export default function DeliberationsLayout({
 
     const {
         data: classes,
-        // isPending,
-        // isError,
+        isPending:isPendingClasses,
+        isError:isErrorClasses,
       } = useQuery({
         queryKey: ["classes"],
         queryFn: getClasses,
@@ -54,15 +57,7 @@ export default function DeliberationsLayout({
         icon: <SubnodeOutlined />,
         children: (
           <div className="pl-8">
-          <List
-            bordered={false}
-            dataSource={classes}
-            renderItem={(item) => (
-              <List.Item key={item.id}>
-                {item.acronym} ({item.name})
-              </List.Item>
-            )}
-          />
+            <ListClasses classes={classes} department={dep}/>
           </div>
         ),
         styles: {
@@ -80,9 +75,14 @@ export default function DeliberationsLayout({
   return (
     <Splitter style={{ height: `calc(100vh - 110px)` }}>
       <Splitter.Panel defaultSize="20%" min="20%" max="25%">
-        <Flex style={{ padding: `12px 16px 0 16px` }}>
-          <Typography.Title level={3} type="secondary" style={{ marginBottom: 0 }}>
-            Mentions & Promotions
+        <Flex  style={{
+            paddingLeft: 16,
+            height: 64,
+            borderBottom: `1px solid ${colorBorder}`,
+          }}
+          align="center">
+          <Typography.Title level={3} style={{ marginBottom: 0, textTransform:"uppercase" }}>
+            Promotions
           </Typography.Title>
         </Flex>
         <Collapse

@@ -6,6 +6,11 @@ export async function getClasses() {
   return res.data.results as Class[];
 }
 
+export async function getClassById(id: number) {
+  const res = await api.get(`/main_config/class-year/${id}`);
+  return res.data as Class;
+}
+
 export async function createClass(
   params: Omit<Class, "id" | "cycle"> & { cycle_id: number }
 ) {

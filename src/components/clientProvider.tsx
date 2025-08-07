@@ -4,7 +4,6 @@ import { useSessionStore } from "@/store";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConfigProvider, ThemeConfig } from "antd";
-import { usePathname } from "next/navigation";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { useEffect } from "react";
 

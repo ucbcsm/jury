@@ -38,7 +38,7 @@ export default function DepartmentLayout({
     queryFn: ({ queryKey }) => getDepartment(Number(queryKey[1])),
     enabled: !!departmentId,
   });
-  console.log(department);
+
   return (
     <Layout>
       <Layout.Content

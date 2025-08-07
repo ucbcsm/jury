@@ -147,7 +147,8 @@
 //  https://ciucbc.pythonanywhere.com/api/v01/jury/jury (OK)
 //  https://ciucbc.pythonanywhere.com/api/v01/jury/sheet-field-grades
 //  https://ciucbc.pythonanywhere.com/api/v01/jury/sheet-grades
-//  https://ciucbc.pythonanywhere.com/api/v01/jury/grades-class
+//  https://ciucbc.pythonanywhere.com/api/v01/jury/grades-class (OK)
+
 //  https://ciucbc.pythonanywhere.com/api/v01/jury/teaching-unit-grades
 //  https://ciucbc.pythonanywhere.com/api/v01/jury/period-grades
 //  https://ciucbc.pythonanywhere.com/api/v01/jury/year-grades

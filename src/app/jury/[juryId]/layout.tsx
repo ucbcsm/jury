@@ -98,7 +98,7 @@ export default function FacultyLayout({
               />
             </div>
             <Typography.Title level={5} style={{ marginBottom: 0 }}>
-              CI-UCBC
+              UCBC
             </Typography.Title>
           </Link>
           <Divider type="vertical" />
