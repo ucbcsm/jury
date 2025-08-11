@@ -1,5 +1,5 @@
 import { title } from "process";
-import { number, z } from "zod";
+import { number, string, z } from "zod";
 
 /**
  * Represents a Year object with various properties.
@@ -502,7 +502,6 @@ export const TeachingUnit = z.object({
 });
 
 export type TeachingUnit = z.infer<typeof TeachingUnit>;
-
 
 /**
  * Represents a course taught during an academic period.
@@ -1176,7 +1175,7 @@ export const PeriodGrades = z.object({
   jury: Jury,
   student: PeriodEnrollment,
   period: Period,
-  teaching_unit_grades_list:z.array(TeachingUnitGrades),
+  teaching_unit_grades_list: z.array(TeachingUnitGrades),
   credit_sum: z.number(),
   validated_credit_sum: z.number(),
   unvalidated_credit_sum: z.number(),
@@ -1187,7 +1186,7 @@ export const PeriodGrades = z.object({
   session: z.enum(["main_session", "retake_session"]),
   validated_TU_sum: z.number(),
   unvalidated_TU_sum: z.number(),
-  period_decision: z.enum(["passed","postponed"]),
+  period_decision: z.enum(["passed", "postponed"]),
 });
 
 export type PeriodGrades = z.infer<typeof PeriodGrades>;
@@ -1230,7 +1229,7 @@ export const Announcement = z.object({
   status: z.enum(["locked", "unlocked"]),
 });
 
-export type Announcement = z.infer<typeof Announcement>
+export type Announcement = z.infer<typeof Announcement>;
 
 export const RetakeCourse = z.object({
   id: z.number(),
@@ -1244,3 +1243,98 @@ export const RetakeCourse = z.object({
 });
 
 export type RetakeCourse = z.infer<typeof RetakeCourse>;
+
+export const ResultGrid = z.object({
+  HeaderData: z.object({
+    no_retaken: z.object({
+      course_list: z.array(TaughtCourse),
+      credits: z.array(number),
+      period_list: z.array(
+        z.object({
+          course_counter: z.number(),
+          period: Period,
+          teaching_unit_counter: z.number(),
+        })
+      ),
+      teaching_unit_list: z.array(
+        z.object({
+          course_counter: z.number(),
+          course_id_list: z.array(number),
+          teaching_unit: TeachingUnit,
+        })
+      ),
+    }),
+    retaken: z.object({
+      course_list: z.array(TaughtCourse),
+      credits: z.array(number),
+      header: z.array(
+        z.object({
+          course_counter: z.number(),
+          retake_title: z.string(),
+          teaching_unit_counter: z.number(),
+        })
+      ),
+      teaching_unit_list: z.array(
+        z.object({
+          course_counter: z.number(),
+          course_id_list: z.array(number),
+          teaching_unit: TeachingUnit,
+        })
+      ),
+    }),
+  }),
+  BodyDataList: z.array(
+    z.object({
+      credit_sum: z.number(),
+      decision: z.enum(["passed", "postponed"]),
+      first_name: z.string(),
+      gender: z.enum(["M", "F"]),
+      grade_letter: z.string(),
+      id: z.number(),
+      last_name: z.string(),
+      matricule: z.string(),
+      obj_userId: z.number(),
+      percentage: z.number(),
+      surname: z.string(),
+      unvalidated_TU_sum: z.number(),
+      unvalidated_credit_sum: z.number(),
+      validated_TU_sum: z.number(),
+      validated_credit_sum: z.number(),
+      weighted_average: z.number(),
+      no_retaken: z.object({
+        continuous_assessments: z.array(number),
+        course_decisions: z.array(z.enum(["validated", "no_validated"])),
+        earned_credits: z.array(number),
+        exams: z.array(number),
+        grade_letters: z.array(string),
+        teaching_unit_decisions: z.array(
+          z.object({
+            cols_counter: z.number(),
+            name: z.string(),
+            value: z.enum(["validated", "no_validated"]),
+          })
+        ),
+        teaching_units: z.array(number),
+        totals: z.array(number),
+      }),
+      retaken: z.object({
+        continuous_assessments: z.array(number),
+        course_decisions: z.array(z.enum(["validated", "no_validated"])),
+        earned_credits: z.array(number),
+        exams: z.array(number),
+        grade_letters: z.array(string),
+        teaching_unit_decisions: z.array(
+          z.object({
+            cols_counter: z.number(),
+            name: z.string(),
+            value: z.enum(["validated", "no_validated"]),
+          })
+        ),
+        teaching_units: z.array(number),
+        totals: z.array(number),
+      }),
+    })
+  ),
+});
+
+export type ResultGrid = z.infer<typeof ResultGrid>;

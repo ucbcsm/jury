@@ -154,3 +154,13 @@
 //  https://ciucbc.pythonanywhere.com/api/v01/jury/year-grades
 //  https://ciucbc.pythonanywhere.com/api/v01/jury/announcement
 //  https://ciucbc.pythonanywhere.com/api/v01/jury/retake-course
+
+//  https://ciucbc.pythonanywhere.com/api/v01/jury/student-results-grid
+        // academic_year__id
+        // period__ids
+        // faculty__id
+        // department__id
+        // class_year__id
+        // session
+        // moment
+        // search_matricule

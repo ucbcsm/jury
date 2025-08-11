@@ -1,7 +1,7 @@
-import { PeriodGrades } from "@/types";
+import { ResultGrid } from "@/types";
 import api from "../fetcher";
 
-export async function getGradeByPeriod(searchParams: {
+export async function getResultGrid(searchParams: {
   yearId: number;
   facultyId: number;
   departmentId: number;
@@ -25,11 +25,13 @@ export async function getGradeByPeriod(searchParams: {
   queryParams.append("faculty__id", facultyId.toString());
   queryParams.append("departement__id", departmentId.toString());
   queryParams.append("class_year__id", classId.toString());
-  queryParams.append("period__id", periodId.toString());
+  queryParams.append("period__ids", periodId.toString());
   queryParams.append("session", session.toString());
   queryParams.append("moment", moment.toString());
 
-  const res = await api.get(`/jury/period-grades?${queryParams.toString()}`);
+  const res = await api.get(
+    `/jury/student-results-grid?${queryParams.toString()}`
+  );
 
-  return res.data.results as PeriodGrades[];
+  return res.data as ResultGrid;
 }

@@ -1,11 +1,10 @@
 "use client";
 
-import { getGradeByPeriod } from "@/lib/api";
+import { getGradeByPeriod, getResultGrid } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { Layout, Table } from "antd";
 import { useParams } from "next/navigation";
 import { FC } from "react";
-import { record } from "zod";
 
 type ListGradesProps = {
   moment: "before_appeal" | "after_appeal";
@@ -25,7 +24,7 @@ export const ListGrades: FC<ListGradesProps> = ({
   const { data, isPending, isError } = useQuery({
     queryKey: ["grades", facultyId, departmentId, classId, session, moment],
     queryFn: () =>
-      getGradeByPeriod({
+      getResultGrid({
         yearId: Number(yearId),
         facultyId: Number(facultyId),
         departmentId: Number(departmentId),
@@ -36,12 +35,13 @@ export const ListGrades: FC<ListGradesProps> = ({
       }),
     enabled: !!yearId && !!facultyId && !!departmentId && !!classId && !!period,
   });
+
   return (
     <Layout>
       <Layout.Content
         style={{ height: `calc(100vh - 213px)`, padding: 28, overflow: "auto" }}
       >
-        <Table
+        {/* <Table
           loading={isPending}
           dataSource={data}
           columns={[
@@ -61,19 +61,48 @@ export const ListGrades: FC<ListGradesProps> = ({
               ellipsis: true,
             },
             {
-                key:"period",
-                dataIndex:"percentage",
-                title:"Pourcentage",
-                render:(_, record)=>record.percentage
+              key: "period",
+              dataIndex: "percentage",
+              title: "Pourcentage",
+              render: (_, record) => record.percentage,
             },
             {
-                key:"letter",
-                dataIndex:"percentage",
-                title:"Grade",
-                render:(_, record)=>record.grade_letter.grade_letter
-            }
+              key: "letter",
+              dataIndex: "percentage",
+              title: "Grade",
+              render: (_, record) => record.grade_letter.grade_letter,
+            },
+            {
+              key: "session",
+              dataIndex: "session",
+              title: "Session",
+              render: (_, record) => record.session,
+            },
+            {
+              key: "moment",
+              dataIndex: "moment",
+              title: "Moment",
+              render: (_, record) => record.moment,
+            },
+            {
+              key: "tec",
+              title: "TEC",
+              render: (_, record) =>
+                record.teaching_unit_grades_list.map((t) => (
+                  <Table
+                    columns={[
+                      {
+                        key: "CC",
+                        title: "CC",
+                        render: (_, record) => record.continuous_assessment,
+                      },
+                    ]}
+                    dataSource={t.course_grades_list}
+                  />
+                )),
+            },
           ]}
-        />
+        /> */}
       </Layout.Content>
     </Layout>
   );
