@@ -4,6 +4,7 @@ import { getGradeByPeriod, getResultGrid } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { Layout, Table } from "antd";
 import { useParams } from "next/navigation";
+import { title } from "node:process";
 import { FC } from "react";
 
 type ListGradesProps = {
@@ -41,23 +42,59 @@ export const ListGrades: FC<ListGradesProps> = ({
       <Layout.Content
         style={{ height: `calc(100vh - 213px)`, padding: 28, overflow: "auto" }}
       >
-        {/* <Table
+        <Table
+          bordered
+          size="small"
           loading={isPending}
-          dataSource={data}
+          dataSource={data?.BodyDataList}
           columns={[
-            {
-              key: "matricule",
-              dataIndex: "matricule",
-              title: "Matricule",
-              render: (_, record) =>
-                record.student.year_enrollment.user.matricule,
-            },
+            ...(data?.HeaderData.no_retaken.period_list.map((period) => ({
+              key: "period",
+              dataIndex: "period",
+              title: period.period.name,
+              children: [
+                ...(data?.HeaderData.no_retaken.teaching_unit_list
+                  .slice(0, period.teaching_unit_counter)
+                  .map((TU) => ({
+                    key: TU.teaching_unit.id,
+                    title: TU.teaching_unit.name,
+                    children: [
+                      ...data.HeaderData.no_retaken.course_list
+                        .filter(
+                          (course) =>
+                            course.teaching_unit?.id === TU.teaching_unit.id
+                        )
+                        .map((course) => ({
+                          key: course.id,
+                          title: course.available_course.name,
+                          onHeaderCell: () => ({
+                            style: {
+                              writingMode: "sideways-lr",
+                              textOrientation: "mixed",
+                            },
+                          }),
+                        })),
+                    ],
+                  })) || []),
+              ],
+            })) || []),
+            // {
+            //   key: "period",
+            //   dataIndex: "period",
+            //   title: `${}`,
+            //   // width: 51,
+            //   // align:"left",
+            //   // render: (_, record) => 19.58,
+            //   // onHeaderCell: () => ({
+            //   //   style: { writingMode: "sideways-lr", textOrientation:"unset" },
+            //   // }),
+            // },
             {
               key: "names",
               dataIndex: "names",
               title: "Noms",
               render: (_, record) =>
-                `${record.student?.year_enrollment.user.first_name} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.surname}`,
+                `${record.first_name} ${record.last_name} ${record.surname}`,
               ellipsis: true,
             },
             {
@@ -70,39 +107,10 @@ export const ListGrades: FC<ListGradesProps> = ({
               key: "letter",
               dataIndex: "percentage",
               title: "Grade",
-              render: (_, record) => record.grade_letter.grade_letter,
-            },
-            {
-              key: "session",
-              dataIndex: "session",
-              title: "Session",
-              render: (_, record) => record.session,
-            },
-            {
-              key: "moment",
-              dataIndex: "moment",
-              title: "Moment",
-              render: (_, record) => record.moment,
-            },
-            {
-              key: "tec",
-              title: "TEC",
-              render: (_, record) =>
-                record.teaching_unit_grades_list.map((t) => (
-                  <Table
-                    columns={[
-                      {
-                        key: "CC",
-                        title: "CC",
-                        render: (_, record) => record.continuous_assessment,
-                      },
-                    ]}
-                    dataSource={t.course_grades_list}
-                  />
-                )),
+              render: (_, record) => record.grade_letter,
             },
           ]}
-        /> */}
+        />
       </Layout.Content>
     </Layout>
   );
