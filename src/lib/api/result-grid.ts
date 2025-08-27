@@ -35,3 +35,13 @@ export async function getResultGrid(searchParams: {
 
   return res.data as ResultGrid;
 }
+
+
+export function getDecisionText(decision: "passed" | "postponed") {
+  if (decision === "passed") {
+    return "Admis (e)";
+  } else if (decision === "postponed") {
+    return "Ajourné (e)";
+  }
+  return "";
+}

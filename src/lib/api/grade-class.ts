@@ -145,6 +145,19 @@ export function getGradeValidationText(
   }
 }
 
+export function getShortGradeValidationText(
+  validation: "validated" | "no_validated"
+): string {
+  switch (validation) {
+    case "validated":
+      return "V";
+    case "no_validated":
+      return "NV";
+    default:
+      return "";
+  }
+}
+
 export function exportEmptyGradesToCSV(
   enrollments: CourseEnrollment[],
   fileName: string = "empty-grades.csv"
