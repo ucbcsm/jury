@@ -23,6 +23,7 @@ import { useParams } from "next/navigation";
 import { parseAsInteger, parseAsStringEnum, useQueryState } from "nuqs";
 import { NoSelectedPeriodToview } from "./_components/no-selected-period";
 import { ListGrades } from "./_components/list-grades";
+import { ListAnnouncements } from "./_components/list-annoucements";
 
 export default function Page() {
   const {
@@ -85,12 +86,12 @@ export default function Page() {
     enabled: !!juryId,
   });
 
-  const getPeriodsAsTabs = () => {
-    return periods?.map((period) => ({
-      key: `${period.id}`,
-      label: `${period.name} (${period.acronym})`,
-    }));
-  };
+  // const getPeriodsAsTabs = () => {
+  //   return periods?.map((period) => ({
+  //     key: `${period.id}`,
+  //     label: `${period.name} (${period.acronym})`,
+  //   }));
+  // };
 
   return (
     <Card
@@ -112,70 +113,58 @@ export default function Page() {
           </Form>
         )
       }
-      tabList={[
-        ...(getPeriodsAsTabs() || []),
-        {
-          key: "year",
-          label: "Toute année",
-        },
-      ]}
-      defaultActiveTabKey={undefined}
       activeTabKey={period || undefined}
       onTabChange={(key) => {
         setPeriod(key);
       }}
-      tabBarExtraContent={
-        <Space>
-          <Typography.Text type="secondary">Session: </Typography.Text>
-          <Select
-            variant="filled"
-            placeholder="Session"
-            value={session}
-            options={[
-              { value: "main_session", label: "Principale" },
-              { value: "retake_session", label: "Rattrapage" },
-            ]}
-            style={{ width: 180 }}
-            onSelect={(value) => {
-              setSession(value as "main_session" | "retake_session");
-            }}
-          />
-          <Typography.Text type="secondary">Moment: </Typography.Text>
-          <Select
-            variant="filled"
-            placeholder="Moment"
-            value={moment}
-            options={[
-              { value: "before_appeal", label: "Avant recours" },
-              { value: "after_appeal", label: "Après recours" },
-            ]}
-            style={{ width: 150 }}
-            onSelect={(value) => {
-              setMoment(value as "before_appeal" | "after_appeal");
-            }}
-          />
-          <Typography.Text type="secondary">Statut: </Typography.Text>
-          <Switch
-            checkedChildren="Verrouillé"
-            unCheckedChildren="Déverrouillé"
-          />
-        </Space>
-      }
+      // extra={
+      //   <Space>
+      //     <Typography.Text type="secondary">Session: </Typography.Text>
+      //     <Select
+      //       variant="filled"
+      //       placeholder="Session"
+      //       value={session}
+      //       options={[
+      //         { value: "main_session", label: "Principale" },
+      //         { value: "retake_session", label: "Rattrapage" },
+      //       ]}
+      //       style={{ width: 180 }}
+      //       onSelect={(value) => {
+      //         setSession(value as "main_session" | "retake_session");
+      //       }}
+      //     />
+      //     <Typography.Text type="secondary">Moment: </Typography.Text>
+      //     <Select
+      //       variant="filled"
+      //       placeholder="Moment"
+      //       value={moment}
+      //       options={[
+      //         { value: "before_appeal", label: "Avant recours" },
+      //         { value: "after_appeal", label: "Après recours" },
+      //       ]}
+      //       style={{ width: 150 }}
+      //       onSelect={(value) => {
+      //         setMoment(value as "before_appeal" | "after_appeal");
+      //       }}
+      //     />
+      //     <Typography.Text type="secondary">Statut: </Typography.Text>
+      //     <Switch
+      //       checkedChildren="Verrouillé"
+      //       unCheckedChildren="Déverrouillé"
+      //     />
+      //   </Space>
+      // }
     >
-      {period && period.length !== 0 ? (
-        <ListGrades
-          yearId={jury?.academic_year.id!}
-          period={period}
-          session={session}
-          moment={moment}
-        />
-      ) : (
+      {/* {period && period.length !== 0 ? ( */}
+        <ListAnnouncements yearId={jury?.academic_year.id} department={department} classYear={classe} periods={periods}  />
+      {/* ) : (
         <NoSelectedPeriodToview
           period={period}
           setPeriod={setPeriod}
           periods={periods}
         />
-      )}
+      )} */}
+      
     </Card>
   );
 }

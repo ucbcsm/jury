@@ -111,9 +111,9 @@ export function getMomentText(
 ): string {
   switch (moment) {
     case "before_appeal":
-      return "Avant appel";
+      return "Avant recours";
     case "after_appeal":
-      return "Après appel";
+      return "Après recours";
     default:
       return "Moment inconnu";
   }
