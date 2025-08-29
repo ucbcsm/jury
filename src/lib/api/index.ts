@@ -34,3 +34,4 @@ export * from "./class-president";
 export * from "./grade-class";
 export * from "./grade-period";
 export * from "./result-grid"
+export * from "./annoucement"

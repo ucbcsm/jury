@@ -1296,9 +1296,11 @@ export const ResultGrid = z.object({
       obj_userId: z.number(),
       percentage: z.number(),
       surname: z.string(),
-      unvalidated_TU_sum: z.number(),
+      unvalidated_TU_count: z.number(),
       unvalidated_credit_sum: z.number(),
-      validated_TU_sum: z.number(),
+      validated_TU_count: z.number(),
+      validated_courses_count:z.number(),
+      unvalidated_courses_count:z.number(),
       validated_credit_sum: z.number(),
       weighted_average: z.number(),
       no_retaken: z.object({

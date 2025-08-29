@@ -2,26 +2,85 @@
 
 import { getMomentText, getSessionText } from "@/lib/api";
 import { getAnnoucements } from "@/lib/api/annoucement";
-import {
-  EyeOutlined,
-  LockOutlined,
-  UnlockOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EyeOutlined, LockOutlined, MoreOutlined, UnlockOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Layout, Space, Table, Tag, Typography } from "antd";
+import { Button, Dropdown, Layout, Space, Table, Tag, Typography } from "antd";
 import dayjs from "dayjs";
 import { useParams } from "next/navigation";
-import { FC } from "react";
-import {  NewAnnoucementForm } from "./new-announcement";
-import { Class, Department, Period } from "@/types";
+import { FC, useState } from "react";
+import { NewAnnoucementForm } from "./new-announcement-form";
+import { Announcement, Class, Department, Period } from "@/types";
+import { parseAsInteger, useQueryState } from "nuqs";
+import { ListGrades } from "./list-grades";
+import { DeleteAnnouncementForm } from "./delete-announcement-form";
+
+type ActionsBarProps = {
+  announcement: Announcement;
+};
+const ActionsBar: FC<ActionsBarProps> = ({ announcement }) => {
+  const [anouncementId, setAnnoucementId] = useQueryState(
+    "grid",
+    parseAsInteger
+  );
+  const [openDeleteAnnouncement, setOpenDeleteAnnouncement] =
+    useState<boolean>(false);
+  return (
+    <>
+      <Space>
+        <Button
+          icon={<EyeOutlined />}
+          color="primary"
+          variant="dashed"
+          style={{ boxShadow: "none" }}
+          block
+          onClick={() => {
+            setAnnoucementId(announcement.id);
+          }}
+        >
+          Voir la grille
+        </Button>
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "delete",
+                label: "Supprimer la publication",
+                icon: <DeleteOutlined />,
+                danger: true,
+                onClick: () => setOpenDeleteAnnouncement(true),
+              },
+            ],
+          }}
+        >
+          <Button type="text" icon={<MoreOutlined />} />
+        </Dropdown>
+      </Space>
+      <ListGrades
+        annoucement={announcement}
+        anouncementId={anouncementId}
+        setAnnoucementId={setAnnoucementId}
+      />
+      <DeleteAnnouncementForm
+        open={openDeleteAnnouncement}
+        setOpen={setOpenDeleteAnnouncement}
+        announcement={announcement}
+      />
+    </>
+  );
+};
 
 type ListAnnouncementsProps = {
   yearId?: number;
-  department?:Department,
-  classYear?:Class,
-  periods?:Period[]
+  department?: Department;
+  classYear?: Class;
+  periods?: Period[];
 };
-export const ListAnnouncements: FC<ListAnnouncementsProps> = ({ yearId,department, classYear, periods  }) => {
+export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
+  yearId,
+  department,
+  classYear,
+  periods,
+}) => {
   const { facultyId, departmentId, classId } = useParams();
 
   const { data, isPending, isError } = useQuery({
@@ -42,7 +101,8 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({ yearId,departmen
         style={{ height: `calc(100vh - 213px)`, padding: 28, overflow: "auto" }}
       >
         <Table
-        //   size="small"
+          //   size="small"
+          loading={isPending}
           title={() => (
             <header className="flex">
               <Space>
@@ -52,7 +112,12 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({ yearId,departmen
               </Space>
               <div className="flex-1" />
               <Space>
-                <NewAnnoucementForm department={department} classYear={classYear} yearId={yearId} periods={periods}/>
+                <NewAnnoucementForm
+                  department={department}
+                  classYear={classYear}
+                  yearId={yearId}
+                  periods={periods}
+                />
               </Space>
             </header>
           )}
@@ -134,19 +199,8 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({ yearId,departmen
             {
               key: "actions",
               dataIndex: "view",
-              render: (_, record) => (
-                // <Space>
-                <Button
-                  icon={<EyeOutlined />}
-                  color="primary"
-                  variant="dashed"
-                  style={{ boxShadow: "none" }}
-                  block
-                >
-                  Voir la grille
-                </Button>
-                // </Space>
-              ),
+              render: (_, record) => <ActionsBar announcement={record} />,
+              width:120
             },
           ]}
           dataSource={data}

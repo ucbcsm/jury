@@ -27,7 +27,7 @@ export async function getAnnoucement(id: number | string) {
 }
 
 export async function deleteAnnoucement(id: number | string) {
-  const res = await api.delete(`/jury/announcement/${id}`);
+  const res = await api.delete(`/jury/announcement/${id}/`);
   return res.data;
 }
 
