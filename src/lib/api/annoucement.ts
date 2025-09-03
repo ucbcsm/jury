@@ -42,7 +42,7 @@ export async function createAnnoucement(data: {
   moment: "before_appeal" | "after_appeal";
   status: "locked" | "unlocked";
 }) {
-  const res = await api.post(`/jury/announcement`, {
+  const res = await api.post(`/jury/announcement/`, {
     academic_year: data.year_id,
     field: data.field_id,
     period_id: data.period_id,

@@ -3,9 +3,20 @@
 import { getCurrentPeriodsAsOptions } from "@/lib/api";
 import { createAnnoucement } from "@/lib/api/annoucement";
 import { Class, Department, Period } from "@/types";
-import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
-import { useMutation } from "@tanstack/react-query";
-import { Button, Descriptions, Drawer, Flex, Form, Select, theme } from "antd";
+import { CloseOutlined, LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  Button,
+  Descriptions,
+  Drawer,
+  Flex,
+  Form,
+  message,
+  Select,
+  Spin,
+  theme,
+  Typography,
+} from "antd";
 import { useParams } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { FC } from "react";
@@ -33,6 +44,7 @@ export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
   const {
     token: { colorPrimary },
   } = theme.useToken();
+  const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const { facultyId, departmentId, classId } = useParams();
   const [open, setOpen] = useQueryState(
@@ -40,7 +52,9 @@ export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
     parseAsBoolean.withDefault(false)
   );
 
-  const { mutateAsync, isPending, isError } = useMutation({
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending } = useMutation({
     mutationFn: createAnnoucement,
   });
 
@@ -60,14 +74,24 @@ export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
         field_id: Number(),
       },
       {
-        onSuccess: () => {},
-        onError: () => {},
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["annoucements"] });
+          messageApi.success("Publication Créée avec succès !");
+          setOpen(false);
+        },
+        onError: (error: Error) => {
+          messageApi.error(
+            error.message ||
+              "Une erreur s'est produite lors de la création de la publication."
+          );
+        },
       }
     );
   };
 
   return (
     <>
+      {contextHolder}
       <Button
         icon={<PlusOutlined />}
         color="primary"
@@ -80,7 +104,12 @@ export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
       <Drawer
         title="Nouvelle publication"
         extra={
-          <Button icon={<CloseOutlined />} type="text" onClick={onClose} />
+          <Button
+            icon={<CloseOutlined />}
+            type="text"
+            onClick={onClose}
+            disabled={isPending}
+          />
         }
         open={open}
         onClose={onClose}
@@ -88,11 +117,17 @@ export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
         maskClosable={false}
         footer={
           <Flex justify="end" gap={8}>
-            <Button onClick={onClose} style={{ boxShadow: "none" }}>
+            <Button
+              onClick={onClose}
+              style={{ boxShadow: "none" }}
+              disabled={isPending}
+            >
               Annuler
             </Button>
             <Button
               type="primary"
+              disabled={isPending}
+              loading={isPending}
               onClick={() => {
                 form.submit();
               }}
@@ -103,8 +138,14 @@ export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
           </Flex>
         }
         styles={{ header: { background: colorPrimary, color: "#fff" } }}
+        width={isPending ? "100%" : "auto"}
       >
-        <Form form={form} layout="vertical" onFinish={onFinish}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          style={{ display: !isPending ? "block" : "none" }}
+        >
           <Descriptions
             title="Détails"
             bordered
@@ -190,6 +231,25 @@ export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
             </Form.Item>
           </div>
         </Form>
+        <div
+          className="h-[calc(100vh-196px)] flex-col justify-center items-center"
+          style={{ display: !isPending ? "none" : "flex" }}
+        >
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+          <Typography.Title
+            type="secondary"
+            level={3}
+            style={{ marginTop: 10 }}
+          >
+            Calcul en cours ...
+          </Typography.Title>
+          <Typography.Text type="secondary">
+            Cette opération peut prendre jusqu&apos;à 1min selon le cas.
+          </Typography.Text>
+          <Typography.Text type="secondary">
+            Veuillez donc patienter!
+          </Typography.Text>
+        </div>
       </Drawer>
     </>
   );

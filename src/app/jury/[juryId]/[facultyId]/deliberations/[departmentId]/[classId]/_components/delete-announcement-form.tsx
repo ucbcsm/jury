@@ -35,8 +35,9 @@ export const DeleteAnnouncementForm: FC<DeleteAnnouncementFormProps> = ({
                     messageApi.success("Publication supprimée avec succès !");
                     setOpen(false);
                 },
-                onError: () => {
+                onError: (error: Error) => {
                     messageApi.error(
+                      error.message ||
                         "Une erreur s'est produite lors de la suppression de la publication."
                     );
                 },
@@ -51,9 +52,9 @@ export const DeleteAnnouncementForm: FC<DeleteAnnouncementFormProps> = ({
         {contextHolder}
         <Modal
           open={open}
-          title={`Suppression publication ${
-            announcement.class_year.acronym
-          } ${announcement.departement.name}, ${announcement.period.acronym} (${
+          title={`Suppression publication ${announcement.class_year.acronym} ${
+            announcement.departement.name
+          }, ${announcement.period.acronym} (${
             announcement.period.name
           }), Session: ${getSessionText(
             announcement.session
@@ -73,7 +74,10 @@ export const DeleteAnnouncementForm: FC<DeleteAnnouncementFormProps> = ({
             style: { boxShadow: "none" },
             disabled: isPending,
           }}
-          onCancel={() => setOpen(false)}
+          onCancel={() => {
+            setOpen(false);
+            form.resetFields()
+          }}
           destroyOnHidden
           closable={{ disabled: isPending }}
           maskClosable={!isPending}
