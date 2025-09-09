@@ -105,7 +105,29 @@ export const ListGrades: FC<ListGradesProps> = ({
               variant="dashed"
               onClick={() => {
                 if (data) {
-                  exportGridToExcel(data);
+                  exportGridToExcel(data, {
+                    sheetName: `${
+                      annoucement.class_year.acronym
+                    } ${annoucement.departement.name.replace(
+                      " ",
+                      "-"
+                    )}-${getSessionText(annoucement.session).replace(
+                      " ",
+                      "-"
+                    )}-${getMomentText(annoucement.moment).replace(" ", "-")}`,
+                    fileName: `${
+                      annoucement.class_year.acronym
+                    }-${annoucement.departement.name.replace(
+                      " ",
+                      "-"
+                    )}-${getSessionText(annoucement.session).replace(
+                      " ",
+                      "-"
+                    )}-${getMomentText(annoucement.moment).replace(
+                      " ",
+                      "-"
+                    )}.xlsx`,
+                  });
                 }
               }}
               disabled={!data}
@@ -201,7 +223,7 @@ export const ListGrades: FC<ListGradesProps> = ({
                     colSpan={4}
                     className="px-4 py-2 bg-gray-100 text-sm font-medium border-b border border-gray-300"
                   >
-                    Unités d'Enseignement
+                    Unités d&apos;Enseignement
                   </th>
                   {data?.HeaderData?.no_retaken?.teaching_unit_list
                     .slice(0, period.teaching_unit_counter)
@@ -521,20 +543,10 @@ export const ListGrades: FC<ListGradesProps> = ({
                 <td className="bg-white border border-gray-300"></td>
                 <td className="bg-white border border-gray-300"></td>
                 <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
-                  {
-                    record.validated_courses_count
-                    // record.no_retaken.course_decisions.filter(
-                    //   (dec) => dec === "validated"
-                    // ).length
-                  }
+                  {record.validated_courses_count}
                 </td>
                 <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
-                  {
-                    record.unvalidated_courses_count
-                    // record.no_retaken.course_decisions.filter(
-                    //   (dec) => dec === "no_validated"
-                    // ).length
-                  }
+                  {record.unvalidated_courses_count}
                 </td>
                 <td className="bg-white border border-gray-300"></td>
               </tr>

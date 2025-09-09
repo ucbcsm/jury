@@ -1,7 +1,7 @@
 import { ResultGrid } from "@/types";
 import api from "../fetcher";
 import ExcelJS from "exceljs";
-
+import { getShortGradeValidationText } from "./grade-class";
 
 export async function getResultGrid(searchParams: {
   yearId: number;
@@ -38,7 +38,6 @@ export async function getResultGrid(searchParams: {
   return res.data as ResultGrid;
 }
 
-
 export function getDecisionText(decision: "passed" | "postponed") {
   if (decision === "passed") {
     return "Admis (e)";
@@ -47,10 +46,6 @@ export function getDecisionText(decision: "passed" | "postponed") {
   }
   return "";
 }
-
-
-
-
 
 /**
  * Exporte les données ResultGrid dans un fichier Excel (.xlsx)
@@ -65,185 +60,230 @@ export async function exportGridToExcel(
   }
 ) {
   const workbook = new ExcelJS.Workbook();
-  const sheet = workbook.addWorksheet(options.sheetName);
+  const ws = workbook.addWorksheet(options.sheetName);
 
-  // Styles (corrigé avec as const)
-  const headerStyle = {
-    font: { bold: true, size: 12 },
-    alignment: { vertical: "middle" as const, horizontal: "center" as const },
-    border: {
-      top: { style: "thin" as const },
-      left: { style: "thin" as const },
-      bottom: { style: "thin" as const },
-      right: { style: "thin" as const },
-    },
-  };
+  // Colonnes dynamiques
+  const courses = data.HeaderData.no_retaken.course_list;
+  const credits = data.HeaderData.no_retaken.credits;
+  const nbCourses = courses.length;
+  const colOffset = 4; // Index, Nom, Matricule, Genre
+  const colAfterCourses = colOffset + nbCourses;
 
-  const cellStyle = {
-    alignment: { vertical: "middle" as const, horizontal: "center" as const },
-    border: {
-      top: { style: "thin" as const },
-      left: { style: "thin" as const },
-      bottom: { style: "thin" as const },
-      right: { style: "thin" as const },
-    },
-  };
+  // Colonnes fixes après les cours
+  const afterCoursesTitles = [
+    { title: "Total Crédits", key: "total_credits" },
+    { title: "Pourcentage", key: "pourcentage" },
+    { title: "Grade", key: "grade" },
+    { title: "Total des EC et Crédits Validés et Non Validés", key: "VNV" }, // Fusionné au-dessus de V/NV
+    { title: "Décision", key: "decision" },
+  ];
 
-  // On suppose une seule période (sinon adapter la logique)
-  const noRetaken = data.HeaderData?.no_retaken;
-  if (!noRetaken) throw new Error("HeaderData.no_retaken absent");
+  // --- Construction du header ---
+  // Ligne 1: Période (fusionné uniquement sur les cours)
+  ws.mergeCells(1, 1, 1, colOffset); // 4 premières colonnes vides
+  ws.getCell(1, 1).value = "";
+  ws.mergeCells(1, colOffset + 1, 1, colOffset + nbCourses);
+  ws.getCell(1, colOffset + 1).value = data.HeaderData.no_retaken.period_list[0]?.period.name || "";
+  ws.getCell(1, colOffset + 1).alignment = { horizontal: "center", vertical: "middle" };
 
-  let colOffset = 4; // N°, Nom, Matricule, Genre
-  let currentRow = 1;
+  // Après les cours: chaque colonne a son propre titre sauf "VNV" fusionné sur 2 colonnes
+  let afterCol = colAfterCourses + 1;
+  ws.getCell(1, afterCol).value = afterCoursesTitles[0].title; // Total Crédits
+  ws.mergeCells(1, afterCol + 1, 3, afterCol + 1); // Pourcentage (vertical sur 3 lignes)
+  ws.getCell(1, afterCol + 1).value = afterCoursesTitles[1].title;
+  ws.getCell(1, afterCol + 1).alignment = { textRotation: 90, vertical: "middle", horizontal: "center" };
+  ws.mergeCells(1, afterCol + 2, 3, afterCol + 2); // Grade (vertical sur 3 lignes)
+  ws.getCell(1, afterCol + 2).value = afterCoursesTitles[2].title;
+  ws.getCell(1, afterCol + 2).alignment = { textRotation: 90, vertical: "middle", horizontal: "center" };
+  ws.mergeCells(1, afterCol + 3, 1, afterCol + 4); // V+NV
+  ws.getCell(1, afterCol + 3).value = afterCoursesTitles[3].title;
+  ws.getCell(1, afterCol + 3).alignment = { horizontal: "center", vertical: "middle" };
+  ws.mergeCells(1, afterCol + 5, 3, afterCol + 5); // Décision (vertical sur 3 lignes)
+  ws.getCell(1, afterCol + 5).value = afterCoursesTitles[4].title;
+  ws.getCell(1, afterCol + 5).alignment = { textRotation: 90, vertical: "middle", horizontal: "center" };
 
-  for (const period of noRetaken.period_list) {
-    // Ligne 1 : Nom de la période
-    const totalCols = colOffset + period.course_counter + 7;
-    sheet.mergeCells(currentRow, 1, currentRow, totalCols);
-    sheet.getCell(currentRow, 1).value = period.period.name;
-    sheet.getCell(currentRow, 1).style = headerStyle;
-    currentRow++;
+  // Ligne 2: Unités d'enseignement (UE)
+  ws.mergeCells(2, 1, 2, colOffset);
+  ws.getCell(2, 1).value = "Unités d'Enseignement";
+  let tuCol = colOffset + 1;
+  data.HeaderData.no_retaken.teaching_unit_list.forEach((TU) => {
+    ws.mergeCells(2, tuCol, 2, tuCol + TU.course_counter - 1);
+    ws.getCell(2, tuCol).value = TU.teaching_unit.code;
+    ws.getCell(2, tuCol).alignment = { horizontal: "center", vertical: "middle" };
+    tuCol += TU.course_counter;
+  });
+  // Après les cours: Total Crédits + V + NV
+  ws.mergeCells(2, afterCol, 4, afterCol); // Total Crédits (vertical fusion sur 3 lignes)
+  ws.getCell(2, afterCol).value = ""; // déjà rempli
+  ws.getCell(2, afterCol).alignment = { textRotation: 90 };
+  ws.getCell(2, afterCol + 1).value = ""; // déja rempli (Pourcentage)
+  ws.getCell(2, afterCol + 2).value = ""; // déjà rempli (Grade)
+  ws.getCell(2, afterCol + 3).value = "V";
+  ws.getCell(2, afterCol + 4).value = "NV";
+  ws.getCell(2, afterCol + 3).alignment = { horizontal: "center" };
+  ws.getCell(2, afterCol + 4).alignment = { horizontal: "center" };
+  ws.getCell(2, afterCol + 5).value = ""; // déjà rempli (Décision)
 
-    // Ligne 2 : Unités d'Enseignement + colonnes fixes après EC
-    for (let i = 0; i < 4; i++) {
-      sheet.mergeCells(currentRow, i + 1, currentRow + 1, i + 1);
-      sheet.getCell(currentRow, i + 1).value = [
-        "N°",
-        "Nom & Prénom",
-        "Matricule",
-        "Genre",
-      ][i];
-      sheet.getCell(currentRow, i + 1).style = headerStyle;
-    }
-    let col = 5;
-    for (const TU of noRetaken.teaching_unit_list.slice(
-      0,
-      period.teaching_unit_counter
-    )) {
-      sheet.mergeCells(
-        currentRow,
-        col,
-        currentRow,
-        col + TU.course_counter - 1
-      );
-      sheet.getCell(currentRow, col).value = TU.teaching_unit.code;
-      sheet.getCell(currentRow, col).style = headerStyle;
-      col += TU.course_counter;
-    }
-    const afterCourseCols = [
-      "Total Crédits",
-      "Pourcentage",
-      "Grade",
-      "EC Validés",
-      "EC Non Validés",
-      "Crédits Validés",
-      "Crédits Non Validés",
-      "Décision",
-    ];
-    for (let i = 0; i < afterCourseCols.length; i++) {
-      sheet.mergeCells(currentRow, col + i, currentRow + 1, col + i);
-      sheet.getCell(currentRow, col + i).value = afterCourseCols[i];
-      sheet.getCell(currentRow, col + i).style = headerStyle;
-    }
-    currentRow++;
+  // Ligne 3: EC (cours)
+  ws.mergeCells(3, 1, 3, colOffset);
+  ws.getCell(3, 1).value = "Éléments Constitutifs";
+  for (let i = 0; i < nbCourses; i++) {
+    ws.getCell(3, colOffset + 1 + i).value = courses[i].available_course.name;
+    ws.getCell(3, colOffset + 1 + i).alignment = { textRotation: 90, horizontal: "center", vertical: "middle" };
+  }
+  // Après les cours: numéros
+  ws.getCell(3, afterCol).value = ""; // déjà fusionné
+  ws.getCell(3, afterCol + 1).value = ""; // déjà fusionné
+  ws.getCell(3, afterCol + 2).value = ""; // déjà fusionné
+  ws.getCell(3, afterCol + 3).value = ""; // V
+  ws.getCell(3, afterCol + 4).value = ""; // NV
+  ws.getCell(3, afterCol + 5).value = ""; // déjà fusionné
 
-    // Ligne 3 : Nom complet des EC
-    col = 5;
-    for (const TU of noRetaken.teaching_unit_list.slice(
-      0,
-      period.teaching_unit_counter
-    )) {
-      for (let j = 0; j < TU.course_counter; j++) {
-        sheet.getCell(currentRow, col).value = TU.teaching_unit.name;
-        sheet.getCell(currentRow, col).style = headerStyle;
-        col++;
-      }
-    }
-    // Colonnes fixes déjà traitées plus haut
-    currentRow++;
+  // Ligne 4: Numérotation EC
+  ws.mergeCells(4, 1, 4, colOffset);
+  ws.getCell(4, 1).value = "";
+  for (let i = 0; i < nbCourses; i++) {
+    ws.getCell(4, colOffset + 1 + i).value = (i + 1).toString();
+    ws.getCell(4, colOffset + 1 + i).alignment = { horizontal: "center" };
+  }
+  ws.getCell(4, afterCol).value = ""; // déjà fusionné
+
+  // Ligne 5: Crédits
+  ws.mergeCells(5, 1, 5, colOffset);
+  ws.getCell(5, 1).value = "Crédits";
+  for (let i = 0; i < credits.length; i++) {
+    ws.getCell(5, colOffset + 1 + i).value = credits[i];
+    ws.getCell(5, colOffset + 1 + i).alignment = { horizontal: "center" };
+  }
+  ws.getCell(5, afterCol).value = credits.reduce((a, b) => a + b, 0);
+
+  // Ligne 6: CC
+  ws.mergeCells(6, 1, 6, colOffset);
+  ws.getCell(6, 1).value = "CC";
+  for (let i = 0; i < nbCourses; i++) {
+    ws.getCell(6, colOffset + 1 + i).value = 10;
+    ws.getCell(6, colOffset + 1 + i).alignment = { horizontal: "center" };
   }
 
-  // Ligne suivante : noms des EC (cours)
-  let courseStartCol = 5;
-  const courseList = noRetaken.course_list;
-  for (let i = 0; i < courseList.length; i++) {
-    sheet.getCell(currentRow, courseStartCol + i).value =
-      courseList[i].available_course.name;
-    sheet.getCell(currentRow, courseStartCol + i).style = headerStyle;
+  // Ligne 7: Examen
+  ws.mergeCells(7, 1, 7, colOffset);
+  ws.getCell(7, 1).value = "Examen";
+  for (let i = 0; i < nbCourses; i++) {
+    ws.getCell(7, colOffset + 1 + i).value = 10;
+    ws.getCell(7, colOffset + 1 + i).alignment = { horizontal: "center" };
   }
-  currentRow++;
 
-  // Ligne suivante : crédits EC
-  for (let i = 0; i < 4; i++) {
-    sheet.getCell(currentRow, i + 1).value = "";
+  // Ligne 8: TOTAL
+  ws.mergeCells(8, 1, 8, colOffset);
+  ws.getCell(8, 1).value = "TOTAL";
+  for (let i = 0; i < nbCourses; i++) {
+    ws.getCell(8, colOffset + 1 + i).value = 20;
+    ws.getCell(8, colOffset + 1 + i).alignment = { horizontal: "center" };
   }
-  for (let i = 0; i < noRetaken.credits.length; i++) {
-    sheet.getCell(currentRow, courseStartCol + i).value = noRetaken.credits[i];
-    sheet.getCell(currentRow, courseStartCol + i).style = cellStyle;
-  }
-  currentRow++;
+  ws.getCell(8, afterCol).value = 20;
+  ws.getCell(8, afterCol + 3).value = "V";
+  ws.getCell(8, afterCol + 4).value = "NV";
 
-  // Ligne suivante : TOTAL (notes sur 20)
-  for (let i = 0; i < 4; i++) {
-    sheet.getCell(currentRow, i + 1).value = "";
-  }
-  for (let i = 0; i < courseList.length; i++) {
-    sheet.getCell(currentRow, courseStartCol + i).value = 20;
-    sheet.getCell(currentRow, courseStartCol + i).style = cellStyle;
-  }
-  currentRow++;
-
-  // Lignes des étudiants (body)
+  // --- Remplissage du corps ---
+  let startRow = 9;
   data.BodyDataList.forEach((record, idx) => {
-    let row = [
-      idx + 1,
-      `${record.first_name} ${record.last_name} ${record.surname}`,
-      record.matricule,
-      record.gender,
-      ...record.no_retaken.totals,
-      record.weighted_average,
-      record.percentage,
-      record.grade_letter,
-      record.no_retaken.course_decisions.filter((x) => x === "validated")
-        .length,
-      record.no_retaken.course_decisions.filter((x) => x === "no_validated")
-        .length,
-      record.validated_credit_sum,
-      record.unvalidated_credit_sum,
-      record.decision === "passed" ? "Admis" : "Ajourné",
-    ];
-    sheet.addRow(row);
-  });
-
-  // Appliquer les styles
-  sheet.eachRow((row, rowNumber) => {
-    row.eachCell((cell) => {
-      cell.style = { ...cell.style, ...cellStyle };
-    });
-    if (rowNumber <= currentRow) {
-      row.eachCell((cell) => {
-        cell.style = { ...cell.style, ...headerStyle };
-      });
+    // CC
+    let ccRow = ws.getRow(startRow);
+    ccRow.getCell(1).value = "";
+    ccRow.getCell(2).value = "";
+    ccRow.getCell(3).value = "";
+    ccRow.getCell(4).value = "";
+    for (let i = 0; i < nbCourses; i++) {
+      ccRow.getCell(colOffset + 1 + i).value = record.no_retaken.continuous_assessments[i] ?? "";
     }
+
+    // Examen
+    let examRow = ws.getRow(startRow + 1);
+    examRow.getCell(1).value = "";
+    examRow.getCell(2).value = "";
+    examRow.getCell(3).value = "";
+    examRow.getCell(4).value = "";
+    for (let i = 0; i < nbCourses; i++) {
+      examRow.getCell(colOffset + 1 + i).value = record.no_retaken.exams[i] ?? "";
+    }
+
+    // Résultats principaux
+    let mainRow = ws.getRow(startRow + 2);
+    mainRow.getCell(1).value = idx + 1;
+    mainRow.getCell(2).value = `${record.first_name} ${record.last_name} ${record.surname}`;
+    mainRow.getCell(3).value = record.matricule;
+    mainRow.getCell(4).value = record.gender;
+    for (let i = 0; i < nbCourses; i++) {
+      mainRow.getCell(colOffset + 1 + i).value = record.no_retaken.totals[i] ?? "";
+    }
+    let cur = colAfterCourses + 1;
+    mainRow.getCell(cur).value = record.weighted_average;
+    mainRow.getCell(cur + 1).value = record.percentage;
+    mainRow.getCell(cur + 2).value = record.grade_letter;
+
+    // Grade
+    ws.mergeCells(startRow + 3, 1, startRow + 3, 4);
+    let gradeRow = ws.getRow(startRow + 3);
+    gradeRow.getCell(1).value = "Grade";
+    for (let i = 0; i < nbCourses; i++) {
+      gradeRow.getCell(colOffset + 1 + i).value = record.no_retaken.grade_letters[i] ?? "";
+    }
+
+    // Validation EC
+    ws.mergeCells(startRow + 4, 1, startRow + 4, 4);
+    let valECRow = ws.getRow(startRow + 4);
+    valECRow.getCell(1).value = "Validation EC";
+    for (let i = 0; i < nbCourses; i++) {
+      valECRow.getCell(colOffset + 1 + i).value = getShortGradeValidationText(record.no_retaken.course_decisions[i] ?? "");
+    }
+    valECRow.getCell(cur + 3).value = record.validated_courses_count;
+    valECRow.getCell(cur + 4).value = record.unvalidated_courses_count;
+
+    // Crédits validés
+    ws.mergeCells(startRow + 5, 1, startRow + 5, 4);
+    let credRow = ws.getRow(startRow + 5);
+    credRow.getCell(1).value = "Crédits validés";
+    for (let i = 0; i < nbCourses; i++) {
+      credRow.getCell(colOffset + 1 + i).value = record.no_retaken.earned_credits[i] ?? "";
+    }
+    credRow.getCell(cur + 3).value = record.validated_credit_sum;
+    credRow.getCell(cur + 4).value = record.unvalidated_credit_sum;
+
+    // Validation UE
+    ws.mergeCells(startRow + 6, 1, startRow + 6, 4);
+    let ueRow = ws.getRow(startRow + 6);
+    ueRow.getCell(1).value = "Validation UE";
+    let col = colOffset + 1;
+    record.no_retaken.teaching_unit_decisions.forEach((TU) => {
+      ws.mergeCells(startRow + 6, col, startRow + 6, col + TU.cols_counter - 1);
+      ueRow.getCell(col).value = getShortGradeValidationText(TU.value);
+      col += TU.cols_counter;
+    });
+    ueRow.getCell(cur + 3).value = record.validated_TU_count;
+    ueRow.getCell(cur + 4).value = record.unvalidated_TU_count;
+    ueRow.getCell(cur + 5).value = getDecisionText(record.decision);
+
+    startRow += 7;
   });
 
- // Auto-fit des colonnes
-sheet.columns.forEach((col) => {
-  if (col && typeof col.eachCell === "function") {
-    let maxLength = 10;
-    col.eachCell({ includeEmpty: true }, (cell) => {
-      if (cell.value && cell.value.toString().length > maxLength) {
-        maxLength = cell.value.toString().length;
-      }
-    });
-    col.width = maxLength + 2;
-  }
-});
+  // Largeur des colonnes
+  ws.columns = [
+    { width: 6 },
+    { width: 28 },
+    { width: 14 },
+    { width: 8 },
+    ...Array(nbCourses).fill({ width: 12 }),
+    { width: 12 }, // Total Crédits
+    { width: 12 }, // Pourcentage
+    { width: 10 }, // Grade
+    { width: 8 },  // V
+    { width: 8 },  // NV
+    { width: 12 }, // Décision
+  ];
 
-  // Générer le fichier et déclencher le téléchargement
+
+  // Enregistre le fichier
   const buffer = await workbook.xlsx.writeBuffer();
-  // saveAs(new Blob([buffer]), filename);
-
   // Téléchargement dans le navigateur
   const blob = new Blob([buffer], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

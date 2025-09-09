@@ -46,7 +46,7 @@ export default function FacultyLayout({
   children: React.ReactNode;
 }>) {
   const {
-    token: { colorBgContainer, borderRadiusLG, colorBorderSecondary },
+    token: { colorBgContainer, borderRadiusLG},
   } = theme.useToken();
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoadingLogout, setIsLoadingLogout] = useState<boolean>(false);
@@ -233,7 +233,7 @@ export default function FacultyLayout({
                   },
                   {
                     key: `/jury/${juryId}/${facultyId}/deliberations`,
-                    label: "Proclamations",
+                    label: "Publications",
                     icon: <FileTextOutlined />,
                      disabled:typeof facultyId==="undefined"
                   },

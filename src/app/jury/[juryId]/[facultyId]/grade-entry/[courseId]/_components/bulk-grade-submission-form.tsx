@@ -183,7 +183,6 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
               icon={<CloseOutlined />}
               disabled={
                 isPending ||
-                newGradeClassItems?.length === 0 ||
                 !newGradeClassItems
               }
             />
