@@ -1,7 +1,7 @@
 "use client";
 
 import { useYid } from "@/hooks/use-yid";
-import { getFacultiesAAsOptionsWithAcronym, getJury } from "@/lib/api";
+import { getAppeals, getFacultiesAAsOptionsWithAcronym, getJury } from "@/lib/api";
 import { logout } from "@/lib/api/auth";
 import { filterOption } from "@/lib/utils";
 import {
@@ -68,6 +68,21 @@ export default function FacultyLayout({
     queryKey: ["jury", juryId],
     queryFn: ({ queryKey }) => getJury(Number(queryKey[1])),
     enabled: !!juryId,
+  });
+
+  const {
+    data: appeals,
+    isPending: isPendingAppeals,
+    isError: isErrorAppeals,
+  } = useQuery({
+    queryKey: ["appeals", juryId, facultyId, "submitted"],
+    queryFn: ({ queryKey }) =>
+      getAppeals({
+        juryId: Number(queryKey[1]),
+        facultyId: Number(queryKey[2]),
+        status: "submitted",
+      }),
+    enabled: !!juryId && !!facultyId,
   });
 
   return (
@@ -229,29 +244,28 @@ export default function FacultyLayout({
                     key: `/jury/${juryId}/${facultyId}/grade-entry`,
                     label: "Saisie des notes",
                     icon: <FormOutlined />,
-                    disabled:typeof facultyId==="undefined"
+                    disabled: typeof facultyId === "undefined",
                   },
                   {
                     key: `/jury/${juryId}/${facultyId}/deliberations`,
                     label: "Publications",
                     icon: <FileTextOutlined />,
-                     disabled:typeof facultyId==="undefined"
+                    disabled: typeof facultyId === "undefined",
                   },
                   {
                     key: `/jury/${juryId}/${facultyId}/appeals`,
                     label: (
-                      <Badge count={10} overflowCount={9}>
+                      <Badge count={appeals?.length} overflowCount={9}>
                         Recours
                       </Badge>
                     ),
                     icon: <MailOutlined />,
-                     disabled:typeof facultyId==="undefined"
+                    disabled: typeof facultyId === "undefined",
                   },
                   {
                     key: `/jury/${juryId}/${facultyId}/letter-gradings`,
                     label: "Notation en lettres",
                     icon: <FontSizeOutlined />,
-                     
                   },
                 ]}
                 onClick={({ key }) => {

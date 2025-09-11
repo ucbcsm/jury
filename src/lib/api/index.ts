@@ -35,3 +35,4 @@ export * from "./grade-class";
 export * from "./grade-period";
 export * from "./result-grid"
 export * from "./annoucement"
+export * from "./appeal"

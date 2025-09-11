@@ -1340,3 +1340,26 @@ export const ResultGrid = z.object({
 });
 
 export type ResultGrid = z.infer<typeof ResultGrid>;
+
+
+export const Appeal = z.object({
+  id: z.number(),
+  student: Enrollment,
+  jury: Jury,
+  subject: z.string(),
+  description: z.string(),
+  submission_date: z.string(),
+  courses: z.array(TaughtCourse),
+  status: z.enum([
+    "submitted",
+    "in_progress",
+    "processed",
+    "rejected",
+    "archived",
+  ]),
+  response: z.string().nullable(),
+  file: z.string().nullable(),
+  session: z.enum(["main_session", "retake_session"]),
+});
+
+export type Appeal = z.infer<typeof Appeal>;

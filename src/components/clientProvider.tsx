@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConfigProvider, ThemeConfig } from "antd";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { useEffect } from "react";
+import locale from "antd/es/locale/fr_FR";
 
 const queryClient = new QueryClient();
 
@@ -31,7 +32,7 @@ export default function ClientProvider({
   return (
     <>
       <NuqsAdapter>
-        <ConfigProvider theme={themeConfig}>
+        <ConfigProvider theme={themeConfig} locale={locale}>
           <AntdRegistry>
             <QueryClientProvider client={queryClient}>
               {children}
