@@ -4,9 +4,11 @@ import api from "../fetcher"
 export async function getAppeals(searchParams: {
   juryId: number | string;
   facultyId: number | string;
+  departmentId?: number;
+  classId?: number;
   status?: string;
 }) {
-  const { juryId, facultyId, status } = searchParams;
+  const { juryId, facultyId, departmentId, classId, status } = searchParams;
 
   const queryParams = new URLSearchParams();
   queryParams.append("jury__id", juryId.toString());
@@ -15,6 +17,13 @@ export async function getAppeals(searchParams: {
   if (status !== undefined) {
     queryParams.append("status", status.toString());
   }
+  if (departmentId !== undefined) {
+    queryParams.append("departement__id", departmentId.toString());
+  }
+  if (classId !== undefined) {
+    queryParams.append("class_year__id", classId.toString());
+  }
+
 
   const res = await api.get(`/jury/appeals?${queryParams.toString()}`);
   return res.data as Appeal[];

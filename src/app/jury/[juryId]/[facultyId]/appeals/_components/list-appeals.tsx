@@ -16,10 +16,18 @@ type ListAppealsProps = {
     value: number | ((old: number | null) => number | null) | null,
     options?: Options
   ) => Promise<URLSearchParams>;
+  departmentId: number;
+  classId: number;
+  status: string;
 };
-export const ListAppeals:FC<ListAppealsProps> = ({setAppealId}) => {
+export const ListAppeals: FC<ListAppealsProps> = ({
+  setAppealId,
+  departmentId,
+  classId,
+  status,
+}) => {
   const { juryId, facultyId } = useParams();
- 
+
   const {
     data: appeals,
     isPending: isPendingAppeals,
@@ -31,14 +39,17 @@ export const ListAppeals:FC<ListAppealsProps> = ({setAppealId}) => {
         juryId: String(queryKey[1]),
         facultyId: String(queryKey[2]),
         status: status !== "all" ? status : undefined,
+        departmentId: departmentId !== 0 ? departmentId : undefined,
+        classId: classId !== 0 ? classId : undefined,
       }),
     enabled: !!juryId && !!facultyId,
   });
-  if(isPendingAppeals) return (
-    <div className="p-4">
-      <DataFetchPendingSkeleton />
-    </div>
-  );
+  if (isPendingAppeals)
+    return (
+      <div className="p-4">
+        <DataFetchPendingSkeleton />
+      </div>
+    );
   return (
     <div>
       <List

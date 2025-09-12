@@ -51,3 +51,20 @@ export function getCurrentClassesAsOptions(classes?: Class[]) {
     return { value: classe.id, label: `${classe.acronym} (${classe.name})` };
   });
 }
+
+export function getClassesYearsAsOptions({classes, withName=false}: {
+  classes?: Class[];
+  withName?: boolean;
+}) {
+  if(withName){
+    return classes?.map((classe) => ({
+      value: classe.id,
+      label: `${classe.name} (${classe.acronym})`,
+    }));
+  }else{
+    return classes?.map((classe) => ({
+      value: classe.id,
+      label: classe.acronym,
+    }));
+  }
+}
