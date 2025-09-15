@@ -14,6 +14,7 @@ import {
   theme,
   Typography,
 } from "antd";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -90,7 +91,7 @@ export default function Page() {
           >
             <Space>
               <Typography.Title level={4} style={{ marginBottom: 0 }}>
-                CI-UCBC
+                UCBC
               </Typography.Title>
             </Space>
             <div className="flex-1" />
@@ -124,7 +125,11 @@ export default function Page() {
                           required: true,
                           message: "Veuillez entrer votre e-mail.",
                         },
-                        {type: "email", message: "Le format de l'adresse mail n'est pas valide!",}
+                        {
+                          type: "email",
+                          message:
+                            "Le format de l'adresse mail n'est pas valide!",
+                        },
                       ]}
                     >
                       <Input
@@ -144,14 +149,16 @@ export default function Page() {
                       </Button>
                     </Form.Item>
                     <Form.Item>
-                      <Button
-                        block
-                        type="link"
-                        htmlType="button"
-                        onClick={() => router.push("/auth/login")}
-                      >
-                        Retour à la connexion
-                      </Button>
+                      <Link href={"/auth/login"}>
+                        <Button
+                          block
+                          type="link"
+                          htmlType="button"
+                          // onClick={() => router.push("/auth/login")}
+                        >
+                          Retour à la connexion
+                        </Button>
+                      </Link>
                     </Form.Item>
                   </Form>
                 </div>
@@ -182,7 +189,7 @@ export default function Page() {
             }}
           >
             <Typography.Text type="secondary">
-              © {new Date().getFullYear()} CI-UCBC. Tous droits réservés.
+              © {new Date().getFullYear()} UCBC. Tous droits réservés.
             </Typography.Text>
           </Layout.Footer>
         </div>

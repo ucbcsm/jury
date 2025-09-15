@@ -26,7 +26,12 @@ export async function getAppeals(searchParams: {
 
 
   const res = await api.get(`/jury/appeals?${queryParams.toString()}`);
-  return res.data as Appeal[];
+  return res.data as {
+    results: Appeal[];
+    count: number;
+    next: string | null;
+    previous: string | null;
+  };
 }
 
 export async function getAppeal(id: number | string) {
@@ -34,8 +39,8 @@ export async function getAppeal(id: number | string) {
   return res.data as Appeal;
 }
 
-export async function updateAppeal(id:number) {
-    const res = await api.put(`/jury/appeals/${id}/`)
+export async function updateAppeal(id:number, data:Partial<Appeal>){ 
+    const res = await api.put(`/jury/appeals/${id}/`, data);
     return res.data
 }
 

@@ -71,7 +71,7 @@ export default function FacultyLayout({
   });
 
   const {
-    data: appeals,
+    data: appealsData,
     isPending: isPendingAppeals,
     isError: isErrorAppeals,
   } = useQuery({
@@ -242,22 +242,33 @@ export default function FacultyLayout({
                   },
                   {
                     key: `/jury/${juryId}/${facultyId}/grade-entry`,
-                    label: <Link href={`/jury/${juryId}/${facultyId}/grade-entry`}>Saisie des notes</Link>,
+                    label: (
+                      <Link href={`/jury/${juryId}/${facultyId}/grade-entry`}>
+                        Saisie des notes
+                      </Link>
+                    ),
                     icon: <FormOutlined />,
                     disabled: typeof facultyId === "undefined",
                   },
                   {
                     key: `/jury/${juryId}/${facultyId}/deliberations`,
-                    label: <Link href={`/jury/${juryId}/${facultyId}/deliberations`}>Publications</Link>,
+                    label: (
+                      <Link href={`/jury/${juryId}/${facultyId}/deliberations`}>
+                        Publications
+                      </Link>
+                    ),
                     icon: <FileTextOutlined />,
                     disabled: typeof facultyId === "undefined",
                   },
                   {
                     key: `/jury/${juryId}/${facultyId}/appeals`,
                     label: (
-                      <Badge count={appeals?.length} overflowCount={9}>
+                      <Badge
+                        count={appealsData?.results?.length}
+                        overflowCount={9}
+                      >
                         <Link href={`/jury/${juryId}/${facultyId}/appeals`}>
-                        Recours
+                          Recours
                         </Link>
                       </Badge>
                     ),

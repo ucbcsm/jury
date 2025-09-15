@@ -29,7 +29,7 @@ export const ListAppeals: FC<ListAppealsProps> = ({
   const { juryId, facultyId } = useParams();
 
   const {
-    data: appeals,
+    data: data,
     isPending: isPendingAppeals,
     isError: isErrorAppeals,
   } = useQuery({
@@ -54,7 +54,7 @@ export const ListAppeals: FC<ListAppealsProps> = ({
     <div>
       <List
         size="small"
-        dataSource={appeals}
+        dataSource={data?.results}
         renderItem={(item) => (
           <List.Item
             key={item.id}
