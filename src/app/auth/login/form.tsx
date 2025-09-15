@@ -13,6 +13,7 @@ import {
   theme,
   Typography,
 } from "antd";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
@@ -85,7 +86,7 @@ export function LoginForm() {
           >
             <Space>
               <Typography.Title level={4} style={{ marginBottom: 0 }}>
-                CI-UCBC
+                UCBC
               </Typography.Title>
             </Space>
             <div className="flex-1" />
@@ -132,14 +133,16 @@ export function LoginForm() {
                   </Button>
                 </Form.Item>
                 <Form.Item>
-                  <Button
-                    block
-                    type="link"
-                    htmlType="button"
-                    onClick={() => router.push("/auth/reset-password")}
-                  >
-                    Mot de passe oublié
-                  </Button>
+                  <Link href={"/auth/reset-password"}>
+                    <Button
+                      block
+                      type="link"
+                      htmlType="button"
+                      // onClick={() => router.push("/auth/reset-password")}
+                    >
+                      Mot de passe oublié
+                    </Button>
+                  </Link>
                 </Form.Item>
               </Form>
             </div>
@@ -153,7 +156,7 @@ export function LoginForm() {
             }}
           >
             <Typography.Text type="secondary">
-              © {new Date().getFullYear()} CI-UCBC. Tous droits réservés.
+              © {new Date().getFullYear()} UCBC. Tous droits réservés.
             </Typography.Text>
           </Layout.Footer>
         </div>
