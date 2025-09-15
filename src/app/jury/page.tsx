@@ -172,7 +172,7 @@ export default function Page() {
             style={{ paddingTop: 16 }}
           >
             <Typography.Text type="secondary">
-              © {new Date().getFullYear()} CI-UCBC. Tous droits réservés.
+              © {new Date().getFullYear()} UCBC. Tous droits réservés.
             </Typography.Text>
             <Palette />
           </Flex>

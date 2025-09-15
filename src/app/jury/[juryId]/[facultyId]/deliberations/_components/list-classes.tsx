@@ -3,6 +3,7 @@
 import { Class, Department } from "@/types";
 import { TagOutlined } from "@ant-design/icons";
 import { List, theme } from "antd";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { FC } from "react";
 
@@ -22,27 +23,31 @@ export const ListClasses: FC<ListClassesProps> = ({ classes, department }) => {
       dataSource={classes}
       size="small"
       renderItem={(item) => (
-        <List.Item
+        <Link
           key={item.id}
-          className=" hover:cursor-pointer hover:bg-gray-50"
-          style={{
-            background:
-              item.id === Number(classId) &&
-              department.id === Number(departmentId)
-                ? colorBgTextHover
-                : "",
-          }}
-          onClick={() => {
-            router.push(
-              `/jury/${juryId}/${facultyId}/deliberations/${department.id}/${item.id}`
-            );
-          }}
+          href={`/jury/${juryId}/${facultyId}/deliberations/${department.id}/${item.id}`}
         >
-          <List.Item.Meta
-            avatar={<TagOutlined />}
-            title={`${item.acronym} (${item.name})`}
-          />
-        </List.Item>
+          <List.Item
+            className=" hover:cursor-pointer hover:bg-gray-50"
+            style={{
+              background:
+                item.id === Number(classId) &&
+                department.id === Number(departmentId)
+                  ? colorBgTextHover
+                  : "",
+            }}
+            // onClick={() => {
+            //   router.push(
+            //     `/jury/${juryId}/${facultyId}/deliberations/${department.id}/${item.id}`
+            //   );
+            // }}
+          >
+            <List.Item.Meta
+              avatar={<TagOutlined />}
+              title={`${item.acronym} (${item.name})`}
+            />
+          </List.Item>
+        </Link>
       )}
     />
   );

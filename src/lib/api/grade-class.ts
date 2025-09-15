@@ -232,7 +232,7 @@ export async function exportEmptyGradesToExcel(
     worksheet.addRow([
       enrollment.student?.year_enrollment.user.matricule ?? "",
       `${enrollment.student.year_enrollment.class_year.acronym} - ${enrollment.student.year_enrollment.departement.acronym}`,
-      `${enrollment.student.year_enrollment.user.first_name} ${enrollment.student.year_enrollment.user.first_name} ${enrollment.student.year_enrollment.user.surname}`,
+      `${enrollment.student.year_enrollment.user.first_name} ${enrollment.student.year_enrollment.user.last_name} ${enrollment.student.year_enrollment.user.surname}`,
       "", // Contrôle Continu
       "", // Examen
       "", // Total

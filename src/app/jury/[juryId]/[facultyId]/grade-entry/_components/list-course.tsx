@@ -7,6 +7,7 @@ import { Period, TaughtCourse } from "@/types";
 import { BookOutlined, SearchOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, Flex, Input, List, Tag, theme } from "antd";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { FC, useState } from "react";
 
@@ -112,7 +113,11 @@ export const ListCourse: FC<ListCourseProps> = ({ period }) => {
       </Flex>
       <div className="pt-4">
         {searchResult && searchResult.length > 0 && (
-          <Alert message={`${searchResult.length} resultat (s) de recherche`} type="info" banner />
+          <Alert
+            message={`${searchResult.length} resultat (s) de recherche`}
+            type="info"
+            banner
+          />
         )}
         <List
           size="small"
@@ -120,24 +125,28 @@ export const ListCourse: FC<ListCourseProps> = ({ period }) => {
             searchResult && searchResult.length > 0 ? searchResult : courses
           }
           renderItem={(item) => (
-            <List.Item
+            <Link
+              href={`/jury/${juryId}/${facultyId}/grade-entry/${item.id}`}
               key={item.id}
-              className=" hover:cursor-pointer hover:bg-gray-50"
-              style={{
-                background:
-                  item.id === Number(courseId) ? colorBgTextHover : "",
-              }}
-              onClick={() => {
-                router.push(
-                  `/jury/${juryId}/${facultyId}/grade-entry/${item.id}`
-                );
-              }}
             >
-              <List.Item.Meta
-                avatar={<BookOutlined />}
-                title={item.available_course.name}
-              />
-            </List.Item>
+              <List.Item
+                className=" hover:cursor-pointer hover:bg-gray-50"
+                style={{
+                  background:
+                    item.id === Number(courseId) ? colorBgTextHover : "",
+                }}
+                // onClick={() => {
+                //   router.push(
+                //     `/jury/${juryId}/${facultyId}/grade-entry/${item.id}`
+                //   );
+                // }}
+              >
+                <List.Item.Meta
+                  avatar={<BookOutlined />}
+                  title={item.available_course.name}
+                />
+              </List.Item>
+            </Link>
           )}
         />
       </div>

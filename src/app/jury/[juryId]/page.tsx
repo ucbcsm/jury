@@ -19,6 +19,7 @@ import {
   Tag,
   Typography,
 } from "antd";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
 export default function Page() {
@@ -224,17 +225,24 @@ export default function Page() {
           <List
             dataSource={jury?.faculties}
             renderItem={(item) => (
-              <List.Item
+              <Link
                 key={item.id}
-                className=" hover:cursor-pointer hover:bg-gray-50"
-                style={{ paddingLeft: 16, paddingRight: 16 }}
-                onClick={() => {
-                  router.push(`/jury/${juryId}/${item.id}/grade-entry`);
-                }}
-                extra={<RightOutlined />}
+                href={`/jury/${juryId}/${item.id}/grade-entry`}
               >
-                <List.Item.Meta title={item.acronym} description={item.name} />
-              </List.Item>
+                <List.Item
+                  className=" hover:cursor-pointer hover:bg-gray-50"
+                  style={{ paddingLeft: 16, paddingRight: 16 }}
+                  // onClick={() => {
+                  //   router.push(`/jury/${juryId}/${item.id}/grade-entry`);
+                  // }}
+                  extra={<RightOutlined />}
+                >
+                  <List.Item.Meta
+                    title={item.acronym}
+                    description={item.name}
+                  />
+                </List.Item>
+              </Link>
             )}
           />
         </Col>
