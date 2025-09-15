@@ -7,6 +7,7 @@ import { ConfigProvider, ThemeConfig } from "antd";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { useEffect } from "react";
 import locale from "antd/es/locale/fr_FR";
+import NextTopLoader from "nextjs-toploader";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,10 @@ export default function ClientProvider({
 
   return (
     <>
+      <NextTopLoader
+        color={themeConfig.token?.colorPrimary}
+        showSpinner={false}
+      />
       <NuqsAdapter>
         <ConfigProvider theme={themeConfig} locale={locale}>
           <AntdRegistry>

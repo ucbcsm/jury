@@ -237,18 +237,18 @@ export default function FacultyLayout({
                 items={[
                   {
                     key: `/jury/${juryId}`,
-                    label: "Accueil",
+                    label: <Link href={`/jury/${juryId}`}>Accueil</Link>,
                     icon: <HomeOutlined />,
                   },
                   {
                     key: `/jury/${juryId}/${facultyId}/grade-entry`,
-                    label: "Saisie des notes",
+                    label: <Link href={`/jury/${juryId}/${facultyId}/grade-entry`}>Saisie des notes</Link>,
                     icon: <FormOutlined />,
                     disabled: typeof facultyId === "undefined",
                   },
                   {
                     key: `/jury/${juryId}/${facultyId}/deliberations`,
-                    label: "Publications",
+                    label: <Link href={`/jury/${juryId}/${facultyId}/deliberations`}>Publications</Link>,
                     icon: <FileTextOutlined />,
                     disabled: typeof facultyId === "undefined",
                   },
@@ -256,7 +256,9 @@ export default function FacultyLayout({
                     key: `/jury/${juryId}/${facultyId}/appeals`,
                     label: (
                       <Badge count={appeals?.length} overflowCount={9}>
+                        <Link href={`/jury/${juryId}/${facultyId}/appeals`}>
                         Recours
+                        </Link>
                       </Badge>
                     ),
                     icon: <MailOutlined />,
@@ -271,8 +273,6 @@ export default function FacultyLayout({
                 onClick={({ key }) => {
                   if (key === `/jury/${juryId}/${facultyId}/letter-gradings`) {
                     setOpenLetterGrading((prev) => !prev);
-                  } else {
-                    router.push(key);
                   }
                 }}
               />

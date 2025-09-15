@@ -174,6 +174,8 @@ export default function Page() {
     editedGradeClassItems
   );
 
+  console.log("",editedGradeClassItems);
+
   return (
     <Layout>
       {contextHolder}
@@ -534,19 +536,21 @@ export default function Page() {
                   title: "Notation",
                   render: (_, record) => (
                     <Space size={4}>
-                      {record.grade_letter.grade_letter}{" "}
-                      <Popover
-                        content={record.grade_letter.appreciation}
-                        title="Appréciation"
-                      >
-                        <Button
-                          color="blue"
-                          variant="filled"
-                          icon={<InfoOutlined />}
-                          shape="circle"
-                          size="small"
-                        />
-                      </Popover>
+                      {record.grade_letter?.grade_letter || ""}{" "}
+                      {record.grade_letter?.grade_letter && (
+                        <Popover
+                          content={record.grade_letter?.appreciation}
+                          title="Appréciation"
+                        >
+                          <Button
+                            color="blue"
+                            variant="filled"
+                            icon={<InfoOutlined />}
+                            shape="circle"
+                            size="small"
+                          />
+                        </Popover>
+                      )}
                     </Space>
                   ),
                   width: 74,
