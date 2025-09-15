@@ -765,6 +765,7 @@ export default function Page() {
               size="small"
               pagination={false}
               rowKey="id"
+              scroll={{ y: "calc(100vh - 385px)" }}
             />
           </div>
         )}

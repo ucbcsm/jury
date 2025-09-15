@@ -608,6 +608,7 @@ export const ImportFileGradeSubmissionForm: FC<
               ]}
               size="small"
               pagination={false}
+              scroll={{ y: "calc(100vh - 454px)" }}
             />
           )}
         </Form>

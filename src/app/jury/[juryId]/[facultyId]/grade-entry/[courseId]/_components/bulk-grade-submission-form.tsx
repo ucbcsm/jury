@@ -527,6 +527,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
             ]}
             size="small"
             pagination={false}
+            scroll={{ y: "calc(100vh - 280px)" }}
           />
         </Form>
       </Drawer>
