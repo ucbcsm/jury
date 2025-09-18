@@ -46,7 +46,7 @@ export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
   } = theme.useToken();
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
-  const { facultyId, departmentId, classId } = useParams();
+  const {juryId, facultyId, departmentId, classId } = useParams();
   const [open, setOpen] = useQueryState(
     "new",
     parseAsBoolean.withDefault(false)
@@ -67,11 +67,11 @@ export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
     mutateAsync(
       {
         ...values,
+        jury_id:Number(juryId),
         faculty_id: Number(facultyId),
         department_id: Number(departmentId),
         class_id: Number(classId),
         year_id: Number(yearId),
-        field_id: Number(),
         mode: "ALL-STUDENTS",
       },
       {

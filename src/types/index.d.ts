@@ -1214,7 +1214,6 @@ export type YearGrades = z.infer<typeof YearGrades>;
 export const Announcement = z.object({
   id: z.number(),
   academic_year: Year,
-  field: Field,
   period: Period,
   faculty: Faculty,
   departement: Department,

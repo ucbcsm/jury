@@ -33,10 +33,10 @@ export async function deleteAnnoucement(id: number | string) {
 
 export async function createAnnoucement(data: {
   year_id: number;
-  field_id: number;
   period_id: number;
   faculty_id: number;
   department_id: number;
+  jury_id:number;
   class_id: number;
   session: "main_session" | "retake_session";
   moment: "before_appeal" | "after_appeal";
@@ -45,11 +45,11 @@ export async function createAnnoucement(data: {
 }) {
   const res = await api.post(`/jury/announcement/`, {
     academic_year: data.year_id,
-    field: data.field_id,
-    period_id: data.period_id,
-    faculty_id: data.faculty_id,
-    departement_id: data.department_id,
-    class_year_id: data.class_id,
+    jury:data.jury_id,
+    period: data.period_id,
+    faculty: data.faculty_id,
+    departement: data.department_id,
+    class_year: data.class_id,
     session: data.session,
     moment: data.moment,
     status: data.status,
