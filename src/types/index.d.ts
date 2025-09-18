@@ -1227,7 +1227,7 @@ export const Announcement = z.object({
   date_created: z.string(),
   date_updated: z.string(),
   status: z.enum(["locked", "unlocked"]),
-  mode:z.enum(["all-students", "some_students"])
+  mode:z.enum(["ALL-STUDENTS", "SOME-STUDENTS"])
 });
 
 export type Announcement = z.infer<typeof Announcement>;

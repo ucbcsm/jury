@@ -72,7 +72,7 @@ export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
         class_id: Number(classId),
         year_id: Number(yearId),
         field_id: Number(),
-        mode: "all-students",
+        mode: "ALL-STUDENTS",
       },
       {
         onSuccess: () => {

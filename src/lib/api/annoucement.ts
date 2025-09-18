@@ -41,7 +41,7 @@ export async function createAnnoucement(data: {
   session: "main_session" | "retake_session";
   moment: "before_appeal" | "after_appeal";
   status: "locked" | "unlocked";
-  mode: "all-students" | "some_students";
+  mode: "ALL-STUDENTS" | "SOME-STUDENTS";
 }) {
   const res = await api.post(`/jury/announcement/`, {
     academic_year: data.year_id,
