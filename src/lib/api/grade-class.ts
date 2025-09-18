@@ -198,17 +198,18 @@ export function exportEmptyGradesToCSV(
 export async function exportEmptyGradesToExcel(
   enrollments: CourseEnrollment[],
   course: TaughtCourse,
-  options: { sheetName: string; fileName: string } = {
+  options: { sheetName: string; fileName: string; onAfter?: () => void } = {
     fileName: "empty-grades.xlsx",
     sheetName: "Notes",
   }
 ) {
   const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet(options.sheetName, {headerFooter: {oddFooter: "Page &P / &N",}});
-  
+  const worksheet = workbook.addWorksheet(options.sheetName, {
+    headerFooter: { oddFooter: "Page &P / &N" },
+  });
 
   worksheet.addRow(["Fiche de notes"]); // row 1
-  worksheet.getRow(1).font = { bold: true, size: 16, name:"Arial" };
+  worksheet.getRow(1).font = { bold: true, size: 16, name: "Arial" };
   worksheet.addRow([]); // row 2
   worksheet.addRow(["Code du cours:", `${course.available_course.code}`]); // row 3
   worksheet.addRow(["Intitulé du cours:", `${course.available_course.name}`]); // row 4
@@ -218,15 +219,15 @@ export async function exportEmptyGradesToExcel(
   ]); // row 5
   worksheet.addRow(["Année académique:", `${course.academic_year?.name}`]); // row 6
   worksheet.addRow(["Semestre:", `${course.period?.acronym}`]); // row 7
-  worksheet.addRow([]) ; // row 8
+  worksheet.addRow([]); // row 8
   worksheet.addRow(["", "", "", "10", "10", "20"]); // row 9
-  worksheet.addRow(["MATRICULE", "PROMOTION", "NOMS", "CC", "EXAMEN","TOTAL"]); // row 10
+  worksheet.addRow(["MATRICULE", "PROMOTION", "NOMS", "CC", "EXAMEN", "TOTAL"]); // row 10
 
   const courseInfomationRows = [3, 4, 5, 6, 7];
   courseInfomationRows.forEach((row) => {
     worksheet.getRow(row).font = { size: 12, name: "Arial" };
   });
- 
+
   // Ajout des données
   enrollments.forEach((enrollment) => {
     worksheet.addRow([
@@ -236,12 +237,12 @@ export async function exportEmptyGradesToExcel(
       "", // Contrôle Continu
       "", // Examen
       "", // Total
-    ])
+    ]);
   });
 
   worksheet.getRow(9).eachCell((cell, colNumber) => {
     if (colNumber === 4 || colNumber === 5 || colNumber === 6) {
-      cell.font = { bold: true, size:12 };
+      cell.font = { bold: true, size: 12 };
       cell.alignment = { vertical: "middle", horizontal: "right" };
       cell.border = {
         top: { style: "thin", color: { argb: "FF000000" } },
@@ -250,13 +251,13 @@ export async function exportEmptyGradesToExcel(
         right: { style: "thin", color: { argb: "FF000000" } },
       };
     }
-  })
+  });
 
   worksheet.getRow(10).eachCell((cell, colNumber) => {
     cell.font = {
       color: { argb: "FFFFFFFF" },
       bold: true,
-      size:12,
+      size: 12,
     };
     cell.fill = {
       type: "pattern",
@@ -268,70 +269,68 @@ export async function exportEmptyGradesToExcel(
       cell.alignment = { vertical: "middle", horizontal: "right" };
     }
   });
-  
 
-  
-// Fonction pour ajuster automatiquement la largeur des colonnes
-function autoFitColumns(worksheet:ExcelJS.Worksheet) {
-  worksheet.columns.forEach(column => {
-    if (!column || !column.eachCell) return; // Sécurité
+  // Fonction pour ajuster automatiquement la largeur des colonnes
+  function autoFitColumns(worksheet: ExcelJS.Worksheet) {
+    worksheet.columns.forEach((column) => {
+      if (!column || !column.eachCell) return; // Sécurité
 
-    let maxWidth = 0;
-    column.eachCell({ includeEmpty: true }, cell => {
-      // Estimer la largeur en fonction du contenu
-      const cellValue = cell.value ? cell.value.toString() : '';
-      const cellWidth = estimateCellWidth(cellValue, cell.font);
-      
-      if (cellWidth > maxWidth) {
-        maxWidth = cellWidth;
+      let maxWidth = 0;
+      column.eachCell({ includeEmpty: true }, (cell) => {
+        // Estimer la largeur en fonction du contenu
+        const cellValue = cell.value ? cell.value.toString() : "";
+        const cellWidth = estimateCellWidth(cellValue, cell.font);
+
+        if (cellWidth > maxWidth) {
+          maxWidth = cellWidth;
+        }
+      });
+
+      // Appliquer la largeur calculée (+ un petit buffer)
+      column.width = Math.min(Math.max(maxWidth + 2, 10), 50); // Limiter entre 10 et 50
+    });
+  }
+
+  interface ExcelFont {
+    size?: number; // Taille de police optionnelle
+    bold?: boolean; // Gras optionnel
+    // Autres propriétés possibles : name, italic, color, etc.
+  }
+
+  function estimateCellWidth(text: string, font: ExcelFont = {}): number {
+    const DEFAULT_CHAR_WIDTH = 1.2;
+    const BOLD_MULTIPLIER = 1.2;
+    const FONT_SIZE_FACTOR = (font.size || 11) / 11;
+
+    let width = 0;
+    if (text) {
+      width = text.length * DEFAULT_CHAR_WIDTH;
+      if (font.bold) width *= BOLD_MULTIPLIER;
+      width *= FONT_SIZE_FACTOR;
+    }
+    return width;
+  }
+
+  // Appliquer l'autofit
+  autoFitColumns(worksheet);
+
+  // 3. Déverrouiller TOUTES les cellules par défaut
+  worksheet.eachRow((row) => {
+    row.eachCell((cell) => {
+      cell.protection = { locked: false }; // Par défaut : modifiable
+
+      if (row.number >= 10) {
+        cell.border = {
+          top: { style: "thin", color: { argb: "FF000000" } },
+          bottom: { style: "thin", color: { argb: "FF000000" } },
+          left: { style: "thin", color: { argb: "FF000000" } },
+          right: { style: "thin", color: { argb: "FF000000" } },
+        };
       }
     });
-
-    // Appliquer la largeur calculée (+ un petit buffer)
-    column.width = Math.min(Math.max(maxWidth + 2, 10), 50); // Limiter entre 10 et 50
   });
-}
 
-interface ExcelFont {
-  size?: number;  // Taille de police optionnelle
-  bold?: boolean; // Gras optionnel
-  // Autres propriétés possibles : name, italic, color, etc.
-}
-
-function estimateCellWidth(text: string, font: ExcelFont = {}): number {
-  const DEFAULT_CHAR_WIDTH = 1.2;
-  const BOLD_MULTIPLIER = 1.2;
-  const FONT_SIZE_FACTOR = (font.size || 11) / 11;
-
-  let width = 0;
-  if (text) {
-    width = text.length * DEFAULT_CHAR_WIDTH;
-    if (font.bold) width *= BOLD_MULTIPLIER;
-    width *= FONT_SIZE_FACTOR;
-  }
-  return width;
-}
-
-// Appliquer l'autofit
-autoFitColumns(worksheet);
-
-// 3. Déverrouiller TOUTES les cellules par défaut
-worksheet.eachRow((row) => {
-  row.eachCell((cell) => {
-    cell.protection = { locked: false }; // Par défaut : modifiable
-    
-    if (row.number >= 10) {
-      cell.border = {
-        top: { style: "thin", color: { argb: "FF000000" } },
-        bottom: { style: "thin", color: { argb: "FF000000" } },
-        left: { style: "thin", color: { argb: "FF000000" } },
-        right: { style: "thin", color: { argb: "FF000000" } },
-      };
-    }
-  });
-});
-
-//Verrouiller uniquement les colonnes A, B, C (1 = A, 2 = B, 3 = C, 6 = F)
+  //Verrouiller uniquement les colonnes A, B, C (1 = A, 2 = B, 3 = C, 6 = F)
   const protectedColumns = [1, 2, 3, 6]; // Index des colonnes à protéger
   protectedColumns.forEach((colNumber) => {
     worksheet.getColumn(colNumber).eachCell((cell) => {
@@ -340,79 +339,90 @@ worksheet.eachRow((row) => {
   });
 
   // - Ligne 8 (en-têtes) ENTIÈREMENT verrouillée
-worksheet.getRow(9).eachCell((cell) => {
-  cell.protection = { locked: true };
-  
-});
-worksheet.getRow(10).eachCell((cell) => {
-  cell.protection = { locked: true };
-});
+  worksheet.getRow(9).eachCell((cell) => {
+    cell.protection = { locked: true };
+  });
+  worksheet.getRow(10).eachCell((cell) => {
+    cell.protection = { locked: true };
+  });
 
   // 5. Activer la protection de la feuille (sans mot de passe)
   worksheet.protect("", {
-    selectLockedCells: true,   // Permet la sélection en lecture seule
+    selectLockedCells: true, // Permet la sélection en lecture seule
     selectUnlockedCells: true, // Permet l'édition des cellules déverrouillées
-    formatCells: false,        // Empêche la modification des styles
+    formatCells: false, // Empêche la modification des styles
   });
 
   // Protection conditionnelle pour les notes
 
-// 2. Ajouter une validation des données (0 ≤ note ≤ 10)
-for (let rowNum = 11; rowNum <= worksheet.rowCount; rowNum++) {
-  worksheet
-  // Validation pour la colonne D (CC)
-  worksheet.getCell(`D${rowNum}`).numFmt = '0.00';
-  worksheet.getCell(`D${rowNum}`).dataValidation = {
-    type: 'decimal',
-    operator: "between",
-    formulae: [0, 10],
-    allowBlank: true,
-    error: 'La note CC doit être entre 0 et 10',
-    errorTitle: 'Valeur invalide',
-    showInputMessage:true,
-    showErrorMessage:true,
-    prompt:"Decimal",
-    promptTitle:"La note CC doit être entre 0 et 10"
-  };
-  worksheet.getCell(`D${rowNum}`).fill={type:"pattern", pattern:"solid", fgColor: { argb: 'FFF5F5F5' }};
-  worksheet.getCell(`D${rowNum}`).alignment = {vertical: 'middle', horizontal: 'right'};
+  // 2. Ajouter une validation des données (0 ≤ note ≤ 10)
+  for (let rowNum = 11; rowNum <= worksheet.rowCount; rowNum++) {
+    worksheet;
+    // Validation pour la colonne D (CC)
+    worksheet.getCell(`D${rowNum}`).numFmt = "0.00";
+    worksheet.getCell(`D${rowNum}`).dataValidation = {
+      type: "decimal",
+      operator: "between",
+      formulae: [0, 10],
+      allowBlank: true,
+      error: "La note CC doit être entre 0 et 10",
+      errorTitle: "Valeur invalide",
+      showInputMessage: true,
+      showErrorMessage: true,
+      prompt: "Decimal",
+      promptTitle: "La note CC doit être entre 0 et 10",
+    };
+    worksheet.getCell(`D${rowNum}`).fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFF5F5F5" },
+    };
+    worksheet.getCell(`D${rowNum}`).alignment = {
+      vertical: "middle",
+      horizontal: "right",
+    };
 
-  // Validation pour la colonne E (Examen)
-  worksheet.getCell(`E${rowNum}`).numFmt = '0.00'; // Format Examen
-  worksheet.getCell(`E${rowNum}`).dataValidation = {
-    type: 'decimal',
-    operator: 'between',
-    formulae: [0, 10],
-    allowBlank: true,
-    error: 'La note d\'examen doit être entre 0 et 10',
-    errorTitle: 'Valeur invalide',
-    showErrorMessage:true,
-    showInputMessage:true,
-    prompt:"Decimal",
-    promptTitle:"La note d\'examen doit être entre 0 et 10"
-  };
-  worksheet.getCell(`E${rowNum}`).fill={type:"pattern", pattern:"solid", fgColor: { argb: 'FFF5F5F5' }};
-  worksheet.getCell(`E${rowNum}`).alignment = {vertical: 'middle', horizontal: 'right'};
+    // Validation pour la colonne E (Examen)
+    worksheet.getCell(`E${rowNum}`).numFmt = "0.00"; // Format Examen
+    worksheet.getCell(`E${rowNum}`).dataValidation = {
+      type: "decimal",
+      operator: "between",
+      formulae: [0, 10],
+      allowBlank: true,
+      error: "La note d'examen doit être entre 0 et 10",
+      errorTitle: "Valeur invalide",
+      showErrorMessage: true,
+      showInputMessage: true,
+      prompt: "Decimal",
+      promptTitle: "La note d'examen doit être entre 0 et 10",
+    };
+    worksheet.getCell(`E${rowNum}`).fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFF5F5F5" },
+    };
+    worksheet.getCell(`E${rowNum}`).alignment = {
+      vertical: "middle",
+      horizontal: "right",
+    };
 
-// Format pour la colonne F (Total)
-  worksheet.getCell(`F${rowNum}`).numFmt = '0.00';
-  worksheet.getCell(`F${rowNum}`).dataValidation = {
-    type: 'decimal',
-    operator: 'between',
-    formulae: [0, 20],
-    allowBlank: true,
-    error: 'La note d\'examen doit être entre 0 et 20',
-    errorTitle: 'Valeur invalide'
-  };
-  worksheet.getCell(`F${rowNum}`).font = { bold: true }; 
-  // Formule pour calculer le Total (colonne F= D + E)
-  worksheet.getCell(`F${rowNum}`).value = {
-    formula:`IF(AND(ISBLANK(D${rowNum}), ISBLANK(E${rowNum})), "", D${rowNum} + E${rowNum})`
-    // formula: `D${rowNum} + E${rowNum}`,
-  };
-
-}
-
+    // Format pour la colonne F (Total)
+    worksheet.getCell(`F${rowNum}`).numFmt = "0.00";
+    worksheet.getCell(`F${rowNum}`).dataValidation = {
+      type: "decimal",
+      operator: "between",
+      formulae: [0, 20],
+      allowBlank: true,
+      error: "La note d'examen doit être entre 0 et 20",
+      errorTitle: "Valeur invalide",
+    };
+    worksheet.getCell(`F${rowNum}`).font = { bold: true };
+    // Formule pour calculer le Total (colonne F= D + E)
+    worksheet.getCell(`F${rowNum}`).value = {
+      formula: `IF(AND(ISBLANK(D${rowNum}), ISBLANK(E${rowNum})), "", D${rowNum} + E${rowNum})`,
+      // formula: `D${rowNum} + E${rowNum}`,
+    };
+  }
 
   // Génération du fichier en mémoire
   const buffer = await workbook.xlsx.writeBuffer();
@@ -427,6 +437,7 @@ for (let rowNum = 11; rowNum <= worksheet.rowCount; rowNum++) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  options?.onAfter?.();
 }
 
 export async function importGradesFromExcel(file: File): Promise<

@@ -4,127 +4,54 @@ import React, {
   Dispatch,
   FC,
   SetStateAction,
-  useEffect,
   useState,
 } from "react";
 import {
   Button,
   Drawer,
-  Form,
-  Select,
   message,
   Space,
   Typography,
   theme,
   Table,
-  Checkbox,
   Flex,
-  Dropdown,
-  Tag,
   Modal,
   Alert,
 } from "antd";
 import {
-  CheckCircleOutlined,
   CloseOutlined,
   DownloadOutlined,
-  HourglassOutlined,
 } from "@ant-design/icons";
-import { InputGrade } from "./input-grade";
-import { CourseEnrollment, NewGradeClass, TaughtCourse } from "@/types";
-import { ButtonRemoveGrade } from "./button-remove-grade-list";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createBulkGradeClasses } from "@/lib/api";
-import { Options } from "nuqs";
-
-type FormDataType = {
-  moment: "before_appeal" | "after_appeal";
-  session: "main_session" | "retake_session";
-};
+import { CourseEnrollment, TaughtCourse } from "@/types";
+import { exportEmptyGradesToExcel } from "@/lib/api";
 
 type ExportSomeStudentsToExcelFormProps = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   course?: TaughtCourse;
-//   juryId?: number;
   enrollments?: CourseEnrollment[];
-//   setSession: (
-//     value:
-//       | "main_session"
-//       | "retake_session"
-//       | ((
-//           old: "main_session" | "retake_session"
-//         ) => "main_session" | "retake_session" | null)
-//       | null,
-//     options?: Options
-//   ) => Promise<URLSearchParams>;
-//   setMoment: (
-//     value:
-//       | "before_appeal"
-//       | "after_appeal"
-//       | ((
-//           old: "before_appeal" | "after_appeal"
-//         ) => "before_appeal" | "after_appeal" | null)
-//       | null,
-//     options?: Options
-//   ) => Promise<URLSearchParams>;
 };
 
-export const ExportSomeStudentsToExcelForm: FC<ExportSomeStudentsToExcelFormProps> = ({
+export const ExportSomeStudentsToExcelForm: FC<
+  ExportSomeStudentsToExcelFormProps
+> = ({
   open,
   setOpen,
   course,
-//   juryId,
   enrollments,
-//   setSession,
-//   setMoment,
 }) => {
   const {
-    token: { colorPrimary, colorSuccess, colorWarning },
+    token: { colorPrimary },
   } = theme.useToken();
   const [messageApi, contextHolder] = message.useMessage();
-  const [form] = Form.useForm();
   const [openCancelForm, setOpenCancelForm] = useState<boolean>(false);
-  const [newGradeClassItems, setNewGradeClassItems] = useState<
-    NewGradeClass[] | undefined
-  >();
 
-//   const queryClient = useQueryClient();
-//   const { mutateAsync, isPending } = useMutation({
-//     mutationFn: createBulkGradeClasses,
-//   });
+  const [selectedRows, setSelectedRows] = useState<CourseEnrollment[]>([]);
 
   const onClose = () => {
     setOpen(false);
-    const items = getGradeItemsFromCourseEnrollments();
-    setNewGradeClassItems(items);
-    form.resetFields();
+    setSelectedRows([]);
   };
-
-  const handleFinish = (values: FormDataType) => {
-    if (newGradeClassItems && newGradeClassItems.length > 0) {
-      
-    } else {
-      messageApi.error("Aucun étudiant à soumettre.");
-    }
-  };
-
-  const getGradeItemsFromCourseEnrollments = () => {
-    return enrollments?.map((student) => ({
-      student: student.student,
-      continuous_assessment: null,
-      exam: null,
-      is_retaken: false,
-      status: "validated",
-    })) as NewGradeClass[];
-  };
-
-  useEffect(() => {
-    if (enrollments) {
-      const items = getGradeItemsFromCourseEnrollments();
-      setNewGradeClassItems(items);
-    }
-  }, [enrollments]);
 
   return (
     <>
@@ -137,7 +64,7 @@ export const ExportSomeStudentsToExcelForm: FC<ExportSomeStudentsToExcelFormProp
               level={4}
               style={{ marginBottom: 0, color: "#fff" }}
             >
-              Exporter vers excel
+              Exportation vers excel
             </Typography.Title>
             <div className="flex-1" />
             <Typography.Title
@@ -147,7 +74,7 @@ export const ExportSomeStudentsToExcelForm: FC<ExportSomeStudentsToExcelFormProp
                 marginTop: 0,
                 textTransform: "uppercase",
               }}
-              type="warning"
+              type="success"
             >
               {course?.available_course.name}
             </Typography.Title>
@@ -155,10 +82,6 @@ export const ExportSomeStudentsToExcelForm: FC<ExportSomeStudentsToExcelFormProp
               onClick={() => setOpenCancelForm(true)}
               type="text"
               icon={<CloseOutlined />}
-            //   disabled={
-            //     isPending ||
-            //     !newGradeClassItems
-            //   }
             />
           </Flex>
         }
@@ -176,19 +99,14 @@ export const ExportSomeStudentsToExcelForm: FC<ExportSomeStudentsToExcelFormProp
             }}
           >
             <Typography.Title
-              type="secondary"
+              type="success"
               level={5}
               style={{ marginBottom: 0 }}
             >
-              Export
+              {selectedRows.length} étudiant(s) sélectionné(s)
             </Typography.Title>
             <Space>
               <Button
-                // disabled={
-                //   isPending ||
-                //   newGradeClassItems?.length === 0 ||
-                //   !newGradeClassItems
-                // }
                 onClick={() => setOpenCancelForm(true)}
                 style={{ boxShadow: "none" }}
               >
@@ -219,15 +137,22 @@ export const ExportSomeStudentsToExcelForm: FC<ExportSomeStudentsToExcelFormProp
               </Modal>
               <Button
                 type="primary"
-                onClick={() => form.submit()}
+                onClick={() => {
+                  if (course) {
+                    exportEmptyGradesToExcel(selectedRows, course, {
+                      sheetName: `Notes - ${course.available_course.name}`,
+                      fileName: `${course.available_course.name}-notes-${course.available_course.code}.xlsx`,
+                      onAfter: onClose,
+                    });
+
+                    messageApi.success(
+                      "Fichier Excel des notes vides exporté avec succès !"
+                    );
+                  }
+                }}
                 style={{ boxShadow: "none" }}
-                icon={<DownloadOutlined/>}
-                // disabled={
-                //   isPending ||
-                //   newGradeClassItems?.length === 0 ||
-                //   !newGradeClassItems
-                // }
-                // loading={isPending}
+                icon={<DownloadOutlined />}
+                disabled={selectedRows.length === 0}
               >
                 Exporter
               </Button>
@@ -235,275 +160,83 @@ export const ExportSomeStudentsToExcelForm: FC<ExportSomeStudentsToExcelFormProp
           </Flex>
         }
       >
-        <Form
-          key="bulk_grade_submission_form"
-          form={form}
-          name="bulk_grade_submission_form"
-          onFinish={handleFinish}
-        //   disabled={isPending}
-        >
-          <Table
-            title={() => (
-              <header className="flex pb-1 px-0">
-                <Space>
-                  <Typography.Title
-                    type="secondary"
-                    level={5}
-                    style={{
-                      marginBottom: 0,
-                      marginTop: 0,
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    Notes
-                  </Typography.Title>
-                </Space>
-                <div className="flex-1" />
-                <Space>
-                  <Form.Item
-                    name="session"
-                    label="Session"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Veuillez sélectionner la session",
-                      },
-                    ]}
-                    layout="horizontal"
-                    style={{ marginBottom: 0 }}
-                  >
-                    <Select
-                      variant="filled"
-                      placeholder="Session"
-                      options={[
-                        { value: "main_session", label: "Principale" },
-                        { value: "retake_session", label: "Rattrapage" },
-                      ]}
-                      style={{ width: 110 }}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name="moment"
-                    label="Moment"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Veuillez sélectionner le moment",
-                      },
-                    ]}
-                    layout="horizontal"
-                    style={{ marginBottom: 0 }}
-                  >
-                    <Select
-                      variant="filled"
-                      placeholder="Moment"
-                      options={[
-                        { value: "before_appeal", label: "Avant recours" },
-                        { value: "after_appeal", label: "Après recours" },
-                      ]}
-                      style={{ width: 128 }}
-                    />
-                  </Form.Item>
-                </Space>
-              </header>
-            )}
-            dataSource={newGradeClassItems}
-            columns={[
-              {
-                key: "matricule",
-                dataIndex: "matricule",
-                title: "Matricule",
-                render: (_, record) =>
-                  `${record.student?.year_enrollment.user.matricule.padStart(
-                    6,
-                    "0"
-                  )}`,
-                width: 96,
-                align: "center",
-              },
-              {
-                key: "names",
-                dataIndex: "names",
-                title: "Noms",
-                render: (_, record) =>
-                  `${record.student?.year_enrollment.user.first_name} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.surname}`,
-               
-              },
-            //   {
-            //     key: "cc",
-            //     dataIndex: "cc",
-            //     title: "C. continu",
-            //     render: (_, record) => (
-            //       <InputGrade
-            //         value={record.continuous_assessment}
-            //         onChange={(value) => {
-            //           const updatedItems = [...(newGradeClassItems ?? [])];
-            //           const index = updatedItems.findIndex(
-            //             (item) => item.student?.id === record.student?.id
-            //           );
-            //           if (index !== -1) {
-            //             updatedItems[index].continuous_assessment = value;
-            //             setNewGradeClassItems(updatedItems);
-            //           }
-            //         }}
-            //         disabled={!record.student}
-            //       />
-            //     ),
-            //     width: 92,
-            //   },
-            //   {
-            //     key: "exam",
-            //     dataIndex: "exam",
-            //     title: "Examen",
-            //     render: (_, record) => (
-            //       <InputGrade
-            //         value={record.exam}
-            //         onChange={(value) => {
-            //           const updatedItems = [...(newGradeClassItems ?? [])];
-            //           const index = updatedItems.findIndex(
-            //             (item) => item.student?.id === record.student?.id
-            //           );
-            //           if (index !== -1) {
-            //             updatedItems[index].exam = value;
-            //             setNewGradeClassItems(updatedItems);
-            //           }
-            //         }}
-            //         disabled={!record.student}
-            //       />
-            //     ),
-            //     width: 92,
-            //     // align: "right",
-            //   },
-            //   {
-            //     key: "total",
-            //     dataIndex: "total",
-            //     title: "Total",
-            //     render: (_, record) => (
-            //       <Typography.Text strong>
-            //         {typeof record.continuous_assessment === "number" &&
-            //         typeof record.exam === "number"
-            //           ? `${Number(
-            //               record.continuous_assessment + record.exam
-            //             ).toFixed(2)}`
-            //           : ""}
-            //       </Typography.Text>
-            //     ),
-            //     width: 52,
-            //     align: "right",
-            //   },
-            //   {
-            //     key: "is_retaken",
-            //     dataIndex: "is_retaken",
-            //     title: "Retake?",
-            //     render: (_, record) => (
-            //       <Checkbox
-            //         checked={record.is_retaken}
-            //         onChange={(e) => {
-            //           const updatedItems = [...(newGradeClassItems ?? [])];
-            //           const index = updatedItems.findIndex(
-            //             (item) => item.student?.id === record.student?.id
-            //           );
-            //           if (index !== -1) {
-            //             updatedItems[index] = {
-            //               ...updatedItems[index],
-            //               is_retaken: e.target.checked,
-            //             };
-            //             setNewGradeClassItems(updatedItems);
-            //           }
-            //         }}
-            //         // disabled={isPending}
-            //       />
-            //     ),
-            //     width: 68,
-            //     align: "center",
-            //   },
-            //   {
-            //     key: "status",
-            //     dataIndex: "status",
-            //     title: "Statut",
-            //     render: (_, record) => (
-            //       <Dropdown
-            //         menu={{
-            //           items: [
-            //             {
-            //               key: "validated",
-            //               label: "Validée",
-            //               icon: <CheckCircleOutlined />,
-            //               style: { color: colorSuccess },
-            //             },
-            //             {
-            //               key: "pending",
-            //               label: "En attente",
-            //               icon: <HourglassOutlined />,
-            //               style: { color: colorWarning },
-            //             },
-            //           ],
-            //           onClick: ({ key }) => {
-            //             const updatedItems = [...(newGradeClassItems ?? [])];
-            //             const index = updatedItems.findIndex(
-            //               (item) => item.student?.id === record.student?.id
-            //             );
-            //             if (index !== -1) {
-            //               updatedItems[index] = {
-            //                 ...updatedItems[index],
-            //                 status: key as "validated" | "pending",
-            //               };
-            //               setNewGradeClassItems(updatedItems);
-            //             }
-            //           },
-            //         }}
-            //         arrow
-            //         // disabled={isPending}
-            //       >
-            //         <Tag
-            //           color={
-            //             record.status === "validated" ? "success" : "warning"
-            //           }
-            //           bordered={false}
-            //           style={{ width: "100%", padding: "4px 8px" }}
-            //           icon={
-            //             record.status === "validated" ? (
-            //               <CheckCircleOutlined
-            //                 style={{ color: colorSuccess }}
-            //               />
-            //             ) : (
-            //               <HourglassOutlined />
-            //             )
-            //           }
-            //         >
-            //           {record.status === "validated" ? "Validée" : "En attente"}
-            //         </Tag>
-            //       </Dropdown>
-            //     ),
-            //     width: 128,
-            //   },
-              {
-                key: "actions",
-                dataIndex: "actions",
-                title: "",
-                render: (_, record) => (
-                  <ButtonRemoveGrade
-                    onDelete={() => {
-                      const updatedItems = [...(newGradeClassItems ?? [])];
-                      const index = updatedItems.findIndex(
-                        (item) => item.student?.id === record.student?.id
-                      );
-                      if (index !== -1) {
-                        updatedItems.splice(index, 1);
-                        setNewGradeClassItems(updatedItems);
-                      }
-                    }}
-                    // disabled={isPending}
-                  />
-                ),
-                width: 48,
-              },
-            ]}
-            size="small"
-            pagination={false}
-            scroll={{ y: "calc(100vh - 280px)" }}
-          />
-        </Form>
+        <Table
+          title={() => (
+            <header className="flex pb-1 px-0">
+              <Space>
+                <Typography.Title
+                  type="secondary"
+                  level={5}
+                  style={{
+                    marginBottom: 0,
+                    marginTop: 0,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Sélection les étudiants concernés
+                </Typography.Title>
+              </Space>
+              <div className="flex-1" />
+              <Space>
+                <Typography.Text>{selectedRows.length} séléctions</Typography.Text>
+              </Space>
+            </header>
+          )}
+          dataSource={enrollments}
+          columns={[
+            {
+              key: "matricule",
+              dataIndex: "matricule",
+              title: "Matricule",
+              render: (_, record) =>
+                `${record.student?.year_enrollment.user.matricule.padStart(
+                  6,
+                  "0"
+                )}`,
+              width: 96,
+              align: "center",
+            },
+            {
+              key: "names",
+              dataIndex: "names",
+              title: "Noms",
+              render: (_, record) =>
+                `${record.student?.year_enrollment.user.first_name} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.surname}`,
+            },
+            {
+              key: "promotion",
+              dataIndex: "promotion",
+              title: "Promotion",
+              render: (_, record) =>
+                `${record.student?.year_enrollment.class_year.acronym || ""} ${
+                  record.student?.year_enrollment.departement.name || ""
+                }`,
+            },
+          ]}
+          size="small"
+          pagination={false}
+          scroll={{ y: "calc(100vh - 280px)" }}
+          rowSelection={{
+            type: "checkbox",
+            selectedRowKeys: selectedRows.map((item) => item.id),
+            onChange: (_, selectedRows) => {
+              setSelectedRows(selectedRows);
+            },
+          }}
+          onRow={(record) => ({
+            onClick: () => {
+              const exist = selectedRows.some((item) => item.id === record.id);
+              if (exist) {
+                setSelectedRows((prev) =>
+                  prev.filter((item) => item.id !== record.id)
+                );
+              } else {
+                setSelectedRows((prev) => [...prev, record]);
+              }
+            },
+          })}
+          rowKey="id"
+        />
       </Drawer>
     </>
   );

@@ -148,8 +148,6 @@ export default function Page() {
     enabled: !!yid && !!facultyId && !!courseId,
   });
 
-  console.log("Enrollments", courseEnrollments)
-
   const printEmptyGradeList = useReactToPrint({
     contentRef: emptyGradeRef,
     documentTitle: `${course?.available_course.code}-fiche-de-notes-${course?.available_course.name}`,
@@ -284,11 +282,11 @@ export default function Page() {
                   children: [
                     {
                       key: "export_all",
-                      label: "Tous inscrits au cours",
+                      label: "Tous les étudiants",
                     },
                     {
                       key: "export_some",
-                      label: "Séléction d'abord",
+                      label: "Quelques étudiants...",
                     },
                   ],
                   // disabled: courseEnrollments?.length === 0,
@@ -596,7 +594,7 @@ export default function Page() {
                       {record.earned_credits}
                     </Typography.Text>
                   ),
-                  width: 64,
+                  width: 68,
                   align: "center",
                 },
                 {
@@ -621,7 +619,7 @@ export default function Page() {
                       }}
                     />
                   ),
-                  width: 68,
+                  width: 70,
                   align: "center",
                 },
                 {

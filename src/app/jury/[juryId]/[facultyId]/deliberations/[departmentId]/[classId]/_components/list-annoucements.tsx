@@ -149,6 +149,12 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
             //   width: 64,
             //   ellipsis: true,
             // },
+            // {
+            //   key: "mode",
+            //   dataIndex: "mode",
+            //   title: "Mode",
+            //   render: (_, record) => record.mode === "all-students" ? "Tous les étudiants" : "Quelques étudiants",
+            // },
             {
               key: "session",
               dataIndex: "session",
