@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  exportEmptyGradesToCSV,
   exportEmptyGradesToExcel,
   getCourseEnrollments,
   getGradeByTaughtCourse,
@@ -23,7 +22,6 @@ import {
   LoadingOutlined,
   MoreOutlined,
   PrinterOutlined,
-  ReloadOutlined,
   TeamOutlined,
   UploadOutlined,
   UserOutlined,
@@ -58,11 +56,11 @@ import { ButtonMultiUpdateFormReject } from "./_components/reject-multi-update-f
 import { DeleteMultiGradesButton } from "./_components/delete-multi-grades";
 import { DataFetchErrorResult } from "@/components/errorResult";
 import { useGradeClassArraysDifferent } from "@/hooks/use-grade-class-arrays-different";
-import { ButtonRemoveGrade } from "./_components/button-remove-grade-list";
 import { useReactToPrint } from "react-to-print";
 import { EmptyListGradesToPrint } from "./_components/printable/empty-list-grades";
 import { ButtonDeleteSingleGrade } from "./_components/delete-single-grade";
 import { useYid } from "@/hooks/use-yid";
+import { ExportSomeStudentsToExcelForm } from "./_components/export-some-students-to-excel";
 
 export default function Page() {
   const {
@@ -77,9 +75,11 @@ export default function Page() {
     useState<boolean>(false);
   const [openRejectUpdates, setOpenRejectUpdates] = useState<boolean>(false);
   const [openDeleteGrades, setOpenDeleteGrades] = useState<boolean>(false);
+  const [openExportSomeStudentsToExcel, setOpenExportSomeStudentsToExcel] =
+    useState<boolean>(false);
 
   const { juryId, facultyId, courseId } = useParams();
-  const {yid}=useYid()
+  const { yid } = useYid();
 
   const emptyGradeRef = useRef<HTMLDivElement>(null);
 
@@ -147,8 +147,8 @@ export default function Page() {
       }),
     enabled: !!yid && !!facultyId && !!courseId,
   });
-  console.log("Enrollments", courseEnrollments);
-  console.log(yid, facultyId, courseId);
+
+  console.log("Enrollments", courseEnrollments)
 
   const printEmptyGradeList = useReactToPrint({
     contentRef: emptyGradeRef,
@@ -319,7 +319,7 @@ export default function Page() {
                   ) {
                     exportEmptyGradesToExcel(courseEnrollments, course, {
                       sheetName: `Notes - ${course?.available_course.name}`,
-                      fileName: `${course?.available_course.name}-notes-vide-${course.available_course.code}.xlsx`,
+                      fileName: `${course?.available_course.name}-notes-${course.available_course.code}.xlsx`,
                     });
 
                     messageApi.success(
@@ -330,6 +330,8 @@ export default function Page() {
                       "Aucun étudiant trouvé pour exporter les notes vides."
                     );
                   }
+                } else if (key === "export_some") {
+                  setOpenExportSomeStudentsToExcel(true);
                 } else if (key === "print") {
                   if (
                     emptyGradeRef.current &&
@@ -823,6 +825,12 @@ export default function Page() {
           setSession={setSession}
           setMoment={setMoment}
           juryId={Number(juryId)}
+        />
+        <ExportSomeStudentsToExcelForm
+          open={openExportSomeStudentsToExcel}
+          setOpen={setOpenExportSomeStudentsToExcel}
+          course={course}
+          enrollments={courseEnrollments}
         />
 
         <EmptyListGradesToPrint
