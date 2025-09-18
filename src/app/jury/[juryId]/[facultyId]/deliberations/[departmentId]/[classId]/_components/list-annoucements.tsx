@@ -185,26 +185,26 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
               render: (_, record) =>
                 `${record.period.acronym} (${record.period.name})`,
             },
-            // {
-            //   key: "total_students",
-            //   dataIndex: "total_students",
-            //   title: "Total",
-            //   width: 64,
-            // },
-            // {
-            //   key: "graduated_students",
-            //   dataIndex: "graduated_students",
-            //   title: "Proclamés",
-            //   width: 64,
-            //   ellipsis: true,
-            // },
-            // {
-            //   key: "non_graduated_students",
-            //   dataIndex: "non_graduated_students",
-            //   title: "Non proclamés",
-            //   width: 64,
-            //   ellipsis: true,
-            // },
+            {
+              key: "total_students",
+              dataIndex: "total_students",
+              title: "Total",
+              width: 64,
+            },
+            {
+              key: "graduated_students",
+              dataIndex: "graduated_students",
+              title: "Proclamés",
+              width: 64,
+              ellipsis: true,
+            },
+            {
+              key: "non_graduated_students",
+              dataIndex: "non_graduated_students",
+              title: "Non proclamés",
+              width: 64,
+              ellipsis: true,
+            },
             // {
             //   key: "mode",
             //   dataIndex: "mode",
@@ -251,13 +251,13 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
               render: (_, record) =>
                 dayjs(record.date_created).format("DD/MM/YYYY HH:mm"),
             },
-            {
-              key: "date_updated",
-              dataIndex: "date_updated",
-              title: "Mise à jour ",
-              render: (_, record) =>
-                dayjs(record.date_updated).format("DD/MM/YYYY HH:mm"),
-            },
+            // {
+            //   key: "date_updated",
+            //   dataIndex: "date_updated",
+            //   title: "Mise à jour ",
+            //   render: (_, record) =>
+            //     dayjs(record.date_updated).format("DD/MM/YYYY HH:mm"),
+            // },
             {
               key: "actions",
               dataIndex: "view",
