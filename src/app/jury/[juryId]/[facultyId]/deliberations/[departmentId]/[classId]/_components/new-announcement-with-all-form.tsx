@@ -75,7 +75,6 @@ export const NewAnnoucementWithAllForm: FC<NewAnnoucementWithAllFormProps> = ({
         department_id: Number(departmentId),
         class_id: Number(classId),
         year_id: Number(yearId),
-        mode: "ALL-STUDENTS",
       },
       {
         onSuccess: () => {

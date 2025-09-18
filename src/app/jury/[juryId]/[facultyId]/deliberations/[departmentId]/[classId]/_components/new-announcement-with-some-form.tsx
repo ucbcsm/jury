@@ -1,11 +1,13 @@
 "use client";
 
-import { getCurrentPeriodsAsOptions } from "@/lib/api";
+import { getCurrentPeriodsAsOptions, getPeriodEnrollments } from "@/lib/api";
 import { createAnnoucementWithSome } from "@/lib/api";
-import { Class, Department, Period } from "@/types";
+import { getHSLColor } from "@/lib/utils";
+import { Class, Department, Period, PeriodEnrollment } from "@/types";
 import { CloseOutlined, LoadingOutlined } from "@ant-design/icons";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  Avatar,
   Button,
   Card,
   Col,
@@ -23,8 +25,8 @@ import {
   Typography,
 } from "antd";
 import { useParams } from "next/navigation";
-import { Options } from "nuqs";
-import { FC } from "react";
+import { Options, parseAsInteger, useQueryState } from "nuqs";
+import { FC, useState } from "react";
 
 type NewAnnoucementWithSomeFormProps = {
   department?: Department;
@@ -54,6 +56,8 @@ export const NewAnnoucementWithSomeForm: FC<
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const { juryId, facultyId, departmentId, classId } = useParams();
+  const [periodId, setPeriodId] = useQueryState("period");
+  const [selectedRows, setSelectedRows] = useState<PeriodEnrollment[]>([]);
 
   const queryClient = useQueryClient();
 
@@ -66,32 +70,81 @@ export const NewAnnoucementWithSomeForm: FC<
     form.resetFields();
   };
 
+  const {
+    data: DataPeriodEnrollments,
+    isPending: isPendingPeriodEnrollments,
+    isError: isErrorPeriodEnrollments,
+  } = useQuery({
+    queryKey: [
+      "period_enrollments",
+      yearId,
+      facultyId,
+      departmentId,
+      classId,
+      periodId
+      // periodId,
+      // page,
+      // pageSize,
+      // search,
+    ],
+    queryFn: ({ queryKey }) =>
+      getPeriodEnrollments({
+        yearId: Number(queryKey[1]),
+        facultyId: Number(queryKey[2]),
+        periodId: Number(queryKey[3]),
+        departmentId: Number(departmentId),
+        classId: Number(classId),
+        status: "validated",
+      }),
+    enabled: !!yearId && !!facultyId && !!departmentId && !!classId && !!periodId,
+  });
+
   const onFinish = (values: FormDataType) => {
-    mutateAsync(
-      {
-        // ...values,
-        // jury_id: Number(juryId),
-        // faculty_id: Number(facultyId),
-        // department_id: Number(departmentId),
-        // class_id: Number(classId),
-        // year_id: Number(yearId),
-        mode: "ALL-STUDENTS",
-        selectedRegisteredStudentsList: [],
-      },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["annoucements"] });
-          messageApi.success("Publication Créée avec succès !");
-          setOpen(false);
+    if (selectedRows.length === 0) {
+      messageApi.error("Veuillez sélectionner au moins un étudiant.");
+    }else{
+      const selectedRegisteredStudentsList = selectedRows.map((item) => ({
+        id: item.id,
+        period: item.period.id,
+        academic_year: Number(yearId),
+        faculty: Number(facultyId),
+        departement: Number(departmentId),
+        class_year: Number(classId),
+        session: values.session,
+        moment: values.moment,
+        jury:Number(juryId)
+      }));
+      mutateAsync(
+        {
+          // ...values,
+          // jury_id: Number(juryId),
+          // faculty_id: Number(facultyId),
+          // department_id: Number(departmentId),
+          // class_id: Number(classId),
+          // year_id: Number(yearId),
+          selectedRegisteredStudentsList: selectedRegisteredStudentsList,
+          // {
+          //     period: values.period_id,
+          //     id:PeriodEnrollment.id,
+         
+
+          // }
         },
-        onError: (error: Error) => {
-          messageApi.error(
-            error.message ||
-              "Une erreur s'est produite lors de la création de la publication."
-          );
-        },
-      }
-    );
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["annoucements"] });
+            messageApi.success("Publication Créée avec succès !");
+            setOpen(false);
+          },
+          onError: (error: Error) => {
+            messageApi.error(
+              error.message ||
+                "Une erreur s'est produite lors de la création de la publication."
+            );
+          },
+        }
+      );
+    }
   };
 
   return (
@@ -112,25 +165,34 @@ export const NewAnnoucementWithSomeForm: FC<
         closable={false}
         maskClosable={false}
         footer={
-          <Flex justify="end" gap={8}>
-            <Button
-              onClick={onClose}
-              style={{ boxShadow: "none" }}
-              disabled={isPending}
+          <Flex justify="space-between" gap={8}>
+            <Typography.Title
+              type="secondary"
+              level={5}
+              style={{ marginBottom: 0 }}
             >
-              Annuler
-            </Button>
-            <Button
-              type="primary"
-              disabled={isPending}
-              loading={isPending}
-              onClick={() => {
-                form.submit();
-              }}
-              style={{ boxShadow: "none" }}
-            >
-              Démarrer
-            </Button>
+              {selectedRows.length} étudiant(s) sélectionné(s)
+            </Typography.Title>
+            <Space>
+              <Button
+                onClick={onClose}
+                style={{ boxShadow: "none" }}
+                disabled={isPending}
+              >
+                Annuler
+              </Button>
+              <Button
+                type="primary"
+                disabled={isPending || selectedRows.length === 0}
+                loading={isPending}
+                onClick={() => {
+                  form.submit();
+                }}
+                style={{ boxShadow: "none" }}
+              >
+                Démarrer
+              </Button>
+            </Space>
           </Flex>
         }
         styles={{ header: { background: colorPrimary, color: "#fff" } }}
@@ -155,9 +217,96 @@ export const NewAnnoucementWithSomeForm: FC<
                         </Typography.Title>
                       </Space>
                       <div className="flex-1" />
-                      <Space></Space>
+                      <Space>
+                        <Typography.Text>Période:</Typography.Text>
+                        <Select
+                          placeholder="Sélectionnner une période"
+                          variant="filled"
+                          options={getCurrentPeriodsAsOptions(periods)}
+                          onChange={(value) => {
+                            setSelectedRows([]);
+                            setPeriodId(value);
+                          }}
+                        />
+                      </Space>
                     </header>
                   )}
+                  dataSource={DataPeriodEnrollments?.results}
+                  loading={isPendingPeriodEnrollments}
+                  pagination={false}
+                  columns={[
+                    {
+                      title: "Photo",
+                      dataIndex: "avatar",
+                      key: "avatar",
+                      render: (_, record) => (
+                        <Avatar
+                          src={record.year_enrollment.user.avatar || null}
+                          style={{
+                            backgroundColor: getHSLColor(
+                              `${record.year_enrollment.user.first_name} ${record.year_enrollment.user.last_name} ${record.year_enrollment.user.surname}`
+                            ),
+                          }}
+                        >
+                          {record.year_enrollment.user.first_name
+                            ?.charAt(0)
+                            .toUpperCase()}
+                          {record.year_enrollment.user.last_name
+                            ?.charAt(0)
+                            .toUpperCase()}
+                        </Avatar>
+                      ),
+                      width: 56,
+                    },
+                    {
+                      title: "Matricule",
+                      dataIndex: "matricule",
+                      key: "matricule",
+                      render: (_, record) =>
+                        `${record.year_enrollment.user.matricule}`,
+                      width: 80,
+                      align: "center",
+                    },
+                    {
+                      title: "Noms",
+                      dataIndex: "name",
+                      key: "name",
+                      render: (_, record) =>
+                        `${record.year_enrollment.user.first_name} ${record.year_enrollment.user.last_name} ${record.year_enrollment.user.surname}`,
+                    },
+                    {
+                      title: "Promotion",
+                      dataIndex: "promotion",
+                      render: (_, record, __) =>
+                        `${record.year_enrollment.class_year.acronym} ${record.year_enrollment.departement.name}`,
+                      key: "class",
+                    },
+                  ]}
+                  size="small"
+                  rowKey="id"
+                  scroll={{ y: "calc(100vh - 312px)" }}
+                  rootClassName="hover:cursor-pointer"
+                  rowSelection={{
+                    type: "checkbox",
+                    selectedRowKeys: selectedRows.map((item) => item.id),
+                    onChange: (_, selectedRows) => {
+                      setSelectedRows(selectedRows);
+                    },
+                  }}
+                  onRow={(record) => ({
+                    onClick: () => {
+                      const exist = selectedRows.some(
+                        (item) => item.id === record.id
+                      );
+                      if (exist) {
+                        setSelectedRows((prev) =>
+                          prev.filter((item) => item.id !== record.id)
+                        );
+                      } else {
+                        setSelectedRows((prev) => [...prev, record]);
+                      }
+                    },
+                  })}
                 />
               </Card>
             </Col>
@@ -188,18 +337,6 @@ export const NewAnnoucementWithSomeForm: FC<
                 />
 
                 <div className="mt-6">
-                  <Form.Item
-                    name="period_id"
-                    label="Période"
-                    rules={[{ required: true }]}
-                  >
-                    <Select
-                      placeholder="Sélectionnner une période"
-                      variant="filled"
-                      // style={{ width: "100%" }}
-                      options={getCurrentPeriodsAsOptions(periods)}
-                    />
-                  </Form.Item>
                   <Form.Item
                     name="session"
                     label="Session"

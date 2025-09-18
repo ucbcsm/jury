@@ -3,9 +3,11 @@
 import { getMomentText, getSessionText } from "@/lib/api";
 import { getAnnoucements } from "@/lib/api/annoucement";
 import {
+  CheckSquareOutlined,
   DeleteOutlined,
   EyeOutlined,
   LockOutlined,
+  MinusSquareOutlined,
   MoreOutlined,
   PlusOutlined,
   UnlockOutlined,
@@ -114,10 +116,9 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
   return (
     <Layout>
       <Layout.Content
-        style={{ height: `calc(100vh - 213px)`, padding: 28, overflow: "auto" }}
+        style={{ height: `calc(100vh - 165px)`, padding: 28, overflow: "auto" }}
       >
         <Table
-          //   size="small"
           loading={isPending}
           title={() => (
             <header className="flex">
@@ -133,11 +134,13 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
                     items: [
                       {
                         key: "all",
-                        label: "Avec tous les étudiants",
+                        label: "Tous les étudiants",
+                        icon: <CheckSquareOutlined />,
                       },
                       {
                         key: "some",
-                        label: "Avec quelques étudiants",
+                        label: "Quelques étudiants",
+                        icon: <MinusSquareOutlined />,
                       },
                     ],
                     onClick: ({ key }) => {
@@ -184,12 +187,9 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
               title: "Période",
               render: (_, record) =>
                 `${record.period.acronym} (${record.period.name})`,
-            },
-            {
-              key: "total_students",
-              dataIndex: "total_students",
-              title: "Total",
-              width: 64,
+              minWidth:100,
+              fixed: "left",
+              ellipsis:true,
             },
             {
               key: "graduated_students",
@@ -197,6 +197,7 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
               title: "Proclamés",
               width: 64,
               ellipsis: true,
+              align: "center",
             },
             {
               key: "non_graduated_students",
@@ -204,7 +205,16 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
               title: "Non proclamés",
               width: 64,
               ellipsis: true,
+              align: "center",
             },
+            {
+              key: "total_students",
+              dataIndex: "total_students",
+              title: "Total",
+              width: 64,
+              align: "center",
+            },
+
             // {
             //   key: "mode",
             //   dataIndex: "mode",
@@ -216,12 +226,14 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
               dataIndex: "session",
               title: "Session",
               render: (_, record) => getSessionText(record.session),
+              width: 136,
             },
             {
               key: "moment",
               dataIndex: "moment",
               title: "Moment",
               render: (_, record) => getMomentText(record.moment),
+              width: 144,
             },
             {
               key: "status",
@@ -243,13 +255,15 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
                   {record.status === "locked" ? "Verrouillé" : "Ouvert"}
                 </Tag>
               ),
+              width: 120,
             },
             {
               key: "date_date_created",
               dataIndex: "date_created",
               title: "Création",
               render: (_, record) =>
-                dayjs(record.date_created).format("DD/MM/YYYY HH:mm"),
+                dayjs(record.date_created).format("DD/MM/YYYY"),
+              width: 96,
             },
             // {
             //   key: "date_updated",
@@ -262,10 +276,14 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
               key: "actions",
               dataIndex: "view",
               render: (_, record) => <ActionsBar announcement={record} />,
-              width: 120,
+              width: 188,
+              fixed: "right",
             },
           ]}
           dataSource={data}
+          rowKey="id"
+          scroll={{ y: "calc(100vh - 320px)" }}
+          size="small"
         />
       </Layout.Content>
     </Layout>

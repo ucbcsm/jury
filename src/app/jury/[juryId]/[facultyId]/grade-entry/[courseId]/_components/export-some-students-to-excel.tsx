@@ -216,6 +216,7 @@ export const ExportSomeStudentsToExcelForm: FC<
           size="small"
           pagination={false}
           scroll={{ y: "calc(100vh - 280px)" }}
+          rootClassName="hover:cursor-pointer"
           rowSelection={{
             type: "checkbox",
             selectedRowKeys: selectedRows.map((item) => item.id),

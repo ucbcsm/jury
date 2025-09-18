@@ -36,16 +36,15 @@ export async function createAnnoucementWithAll(data: {
   period_id: number;
   faculty_id: number;
   department_id: number;
-  jury_id:number;
+  jury_id: number;
   class_id: number;
   session: "main_session" | "retake_session";
   moment: "before_appeal" | "after_appeal";
   status: "locked" | "unlocked";
-  mode: "ALL-STUDENTS" | "SOME-STUDENTS";
 }) {
   const res = await api.post(`/jury/announcement/`, {
     academic_year: data.year_id,
-    jury:data.jury_id,
+    jury: data.jury_id,
     period: data.period_id,
     faculty: data.faculty_id,
     departement: data.department_id,
@@ -53,21 +52,27 @@ export async function createAnnoucementWithAll(data: {
     session: data.session,
     moment: data.moment,
     status: data.status,
-    mode: data.mode,
+    mode: "ALL-STUDENTS",
   });
   return res.data;
 }
 
-
-
 export async function createAnnoucementWithSome(data: {
-  mode: "ALL-STUDENTS" | "SOME-STUDENTS";
-  selectedRegisteredStudentsList?: number[];
+  selectedRegisteredStudentsList: {
+    id: number;
+    period: number;
+    academic_year: number;
+    faculty: number;
+    departement: number;
+    class_year: number;
+    session: "main_session" | "retake_session";
+    moment: "before_appeal" | "after_appeal";
+    jury: number;
+  }[];
 }) {
   const res = await api.post(`/jury/announcement/`, {
-    mode: data.mode,
+    mode: "SOME-STUDENTS",
     selectedRegisteredStudentsList: data.selectedRegisteredStudentsList,
   });
   return res.data;
 }
-
