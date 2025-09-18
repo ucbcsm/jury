@@ -29,7 +29,7 @@ export default function Page() {
   const [yearId, setYearId] = useState<number | undefined>();
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoadingLogout, setIsLoadingLogout] = useState<boolean>(false);
-  const { removeYid } = useYid();
+  const { setYid,removeYid } = useYid();
 
   const {
     data: years,
@@ -53,7 +53,8 @@ export default function Page() {
     refetchOnWindowFocus:false
   });
 
-  if (jury) {
+  if (jury && yearId) {
+    setYid(yearId);
     redirect(`/jury/${jury.id}`);
   }
 
@@ -78,11 +79,17 @@ export default function Page() {
   }
 
   useEffect(() => {
-    if (isErrorJury && error?.status === 404) {
-      messageApi.error("Vous n'êtes associé(e) à aucun jury dans le système.");
+    if (
+      isErrorJury &&
+      typeof error === "object" &&
+      error !== null &&
+      "status" in error &&
+      (error as any).status === 404
+    ) {
+      messageApi.error("Vous n'êtes associé(e) à aucun jury!");
     } else if (isErrorJury) {
       messageApi.error("Erreur inconnue. Merci de réessayer.");
-       setYearId(undefined)
+      setYearId(undefined);
     }
   }, [error]);
 
@@ -101,7 +108,7 @@ export default function Page() {
         }}
       >
         <div style={{ width: 400, margin: "auto" }}>
-          {isErrorJury && error?.status === 404 && (
+          {isErrorJury && (error as any).status === 404 && (
             <Alert
               type="error"
               message="Accès non autorisé"
@@ -119,11 +126,6 @@ export default function Page() {
                         window.location.href = "/auth/login";
                       })
                       .catch((error) => {
-                        console.log(
-                          "Error",
-                          error.response?.status,
-                          error.message
-                        );
                         messageApi.error(
                           "Ouf, une erreur est survenue, Veuillez réessayer!"
                         );
@@ -136,7 +138,7 @@ export default function Page() {
               }
             />
           )}
-          <Card loading={isPending} >
+          <Card loading={isPending}>
             <Typography.Title level={4}>Année</Typography.Title>
             <List
               dataSource={years}

@@ -62,6 +62,7 @@ import { ButtonRemoveGrade } from "./_components/button-remove-grade-list";
 import { useReactToPrint } from "react-to-print";
 import { EmptyListGradesToPrint } from "./_components/printable/empty-list-grades";
 import { ButtonDeleteSingleGrade } from "./_components/delete-single-grade";
+import { useYid } from "@/hooks/use-yid";
 
 export default function Page() {
   const {
@@ -78,6 +79,7 @@ export default function Page() {
   const [openDeleteGrades, setOpenDeleteGrades] = useState<boolean>(false);
 
   const { juryId, facultyId, courseId } = useParams();
+  const {yid}=useYid()
 
   const emptyGradeRef = useRef<HTMLDivElement>(null);
 
@@ -136,10 +138,17 @@ export default function Page() {
     isPending: isPendingCourseEnrollments,
     isError: isErrorCourseEnrollments,
   } = useQuery({
-    queryKey: ["course_enrollments", courseId],
-    queryFn: ({ queryKey }) => getCourseEnrollments(Number(queryKey[1])),
-    enabled: !!courseId,
+    queryKey: ["course_enrollments", yid, facultyId, courseId],
+    queryFn: ({ queryKey }) =>
+      getCourseEnrollments({
+        academicYearId: Number(1),
+        facultyId: Number(queryKey[2]),
+        courseId: Number(queryKey[3]),
+      }),
+    enabled: !!yid && !!facultyId && !!courseId,
   });
+  console.log("Enrollments", courseEnrollments);
+  console.log(yid, facultyId, courseId);
 
   const printEmptyGradeList = useReactToPrint({
     contentRef: emptyGradeRef,
@@ -173,8 +182,6 @@ export default function Page() {
     gradeClasses,
     editedGradeClassItems
   );
-
-  console.log("",editedGradeClassItems);
 
   return (
     <Layout>
@@ -212,11 +219,17 @@ export default function Page() {
                   key: "individualGradeEntry",
                   label: "Saisie individuelle",
                   icon: <UserOutlined />,
+                  disabled: isPendingCourseEnrollments,
                 },
                 {
                   key: "bulkGradeSubmission",
                   label: "Saisie collective",
-                  icon: <TeamOutlined />,
+                  icon: isPendingCourseEnrollments ? (
+                    <LoadingOutlined />
+                  ) : (
+                    <TeamOutlined />
+                  ),
+                  disabled: isPendingCourseEnrollments,
                 },
               ],
               onClick: ({ key }) => {
@@ -267,12 +280,24 @@ export default function Page() {
                   key: "export",
                   label: "Exporter le fichier .xlsx",
                   icon: <DownloadOutlined />,
+                  disabled: isPendingCourseEnrollments,
+                  children: [
+                    {
+                      key: "export_all",
+                      label: "Tous inscrits au cours",
+                    },
+                    {
+                      key: "export_some",
+                      label: "Séléction d'abord",
+                    },
+                  ],
                   // disabled: courseEnrollments?.length === 0,
                 },
                 {
                   key: "print",
                   label: "Imprimer la liste vide",
                   icon: <PrinterOutlined />,
+                  disabled: isPendingCourseEnrollments,
                   // disabled: courseEnrollments?.length === 0,
                 },
                 {
@@ -286,7 +311,7 @@ export default function Page() {
                 },
               ],
               onClick: ({ key }) => {
-                if (key === "export") {
+                if (key === "export_all") {
                   if (
                     courseEnrollments &&
                     courseEnrollments.length > 0 &&
@@ -454,6 +479,7 @@ export default function Page() {
                     )}`,
                   width: 96,
                   align: "center",
+                  fixed: "left",
                 },
                 {
                   key: "names",
@@ -462,6 +488,7 @@ export default function Page() {
                   render: (_, record) =>
                     `${record.student?.year_enrollment.user.first_name} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.surname}`,
                   ellipsis: true,
+                  fixed: "left",
                 },
                 {
                   key: "cc",
@@ -487,6 +514,7 @@ export default function Page() {
                     />
                   ),
                   width: 90,
+                  fixed: "left",
                 },
                 {
                   key: "exam",
@@ -512,6 +540,7 @@ export default function Page() {
                     />
                   ),
                   width: 90,
+                  fixed: "left",
                 },
                 {
                   key: "total",
@@ -760,6 +789,7 @@ export default function Page() {
                     />
                   ),
                   width: 48,
+                  fixed: "right",
                 },
               ]}
               size="small"

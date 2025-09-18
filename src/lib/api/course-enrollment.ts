@@ -2,12 +2,35 @@ import { CourseEnrollment } from "@/types";
 import api from "../fetcher";
 import dayjs from "dayjs";
 
-export async function getCourseEnrollments(courseId: number) {
+
+export async function getCourseEnrollments(searchParams: {
+  academicYearId: number;
+  facultyId: number;
+  courseId: number;
+  status?: "pending" | "validated" | "rejected";
+}) {
+  const { academicYearId, facultyId, courseId, status } = searchParams;
+  const query = new URLSearchParams();
+  query.append("academic_year__id", academicYearId.toString());
+  query.append("faculty__id", facultyId.toString());
+  query.append("course__id", courseId.toString());
+
+  if (status !== undefined) {
+    query.append("status", status);
+  }
   const res = await api.get(
-    `/faculty/course-enrollment-from-faculty/?course__id=${courseId}`
+    `/faculty/course-enrollment-from-faculty/?${query.toString()}`
   );
   return res.data as CourseEnrollment[];
+   
 }
+
+// export async function getCourseEnrollments(courseId: number) {
+//   const res = await api.get(
+//     `/faculty/course-enrollment-from-faculty/?course__id=${courseId}`
+//   );
+//   return res.data as CourseEnrollment[];
+// }
 
 export async function createCourseEnrollment(data: {
   payload: {
