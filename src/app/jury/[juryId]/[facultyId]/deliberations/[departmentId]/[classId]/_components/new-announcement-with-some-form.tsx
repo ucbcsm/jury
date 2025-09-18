@@ -4,9 +4,10 @@ import { getCurrentPeriodsAsOptions, getPeriodEnrollments } from "@/lib/api";
 import { createAnnoucementWithSome } from "@/lib/api";
 import { getHSLColor } from "@/lib/utils";
 import { Class, Department, Period, PeriodEnrollment } from "@/types";
-import { CloseOutlined, LoadingOutlined } from "@ant-design/icons";
+import { BulbOutlined, CloseOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  Alert,
   Avatar,
   Button,
   Card,
@@ -27,6 +28,7 @@ import {
 import { useParams } from "next/navigation";
 import { Options, parseAsInteger, useQueryState } from "nuqs";
 import { FC, useState } from "react";
+import { set } from "zod";
 
 type NewAnnoucementWithSomeFormProps = {
   department?: Department;
@@ -67,6 +69,8 @@ export const NewAnnoucementWithSomeForm: FC<
 
   const onClose = () => {
     setOpen(false);
+    setSelectedRows([]);
+    setPeriodId(null);
     form.resetFields();
   };
 
@@ -81,11 +85,8 @@ export const NewAnnoucementWithSomeForm: FC<
       facultyId,
       departmentId,
       classId,
-      periodId
-      // periodId,
-      // page,
-      // pageSize,
-      // search,
+      periodId,
+      "validated",
     ],
     queryFn: ({ queryKey }) =>
       getPeriodEnrollments({
@@ -96,7 +97,13 @@ export const NewAnnoucementWithSomeForm: FC<
         classId: Number(classId),
         status: "validated",
       }),
-    enabled: !!yearId && !!facultyId && !!departmentId && !!classId && !!periodId,
+    enabled:
+      !!yearId &&
+      !!facultyId &&
+      !!departmentId &&
+      !!classId &&
+      // !!periodId &&
+      !!(periodId !== null),
   });
 
   const onFinish = (values: FormDataType) => {
@@ -167,7 +174,7 @@ export const NewAnnoucementWithSomeForm: FC<
         footer={
           <Flex justify="space-between" gap={8}>
             <Typography.Title
-              type="secondary"
+              type="success"
               level={5}
               style={{ marginBottom: 0 }}
             >
@@ -206,7 +213,26 @@ export const NewAnnoucementWithSomeForm: FC<
           }}
         >
           <Row gutter={[24, 24]}>
-            <Col span={16}>
+            <Col span={6}>
+              <Alert
+                type="info"
+                icon={<BulbOutlined />}
+                message="Instructions"
+                description={
+                  <>
+                    <div>
+                      Commencez par sélectionner la période pour charger les
+                      étudiants, puis sélectionnez les étudiants concernés.
+                      Enfin, cliquez sur "Démarrer".
+                    </div>
+                  </>
+                }
+                showIcon
+                // closable
+                style={{ marginBottom: 24 }}
+              />
+            </Col>
+            <Col span={12}>
               <Card>
                 <Table
                   title={() => (
@@ -225,14 +251,17 @@ export const NewAnnoucementWithSomeForm: FC<
                           options={getCurrentPeriodsAsOptions(periods)}
                           onChange={(value) => {
                             setSelectedRows([]);
-                            setPeriodId(value);
+                            setPeriodId(value.toString());
                           }}
+                          value={
+                            periodId !== null ? Number(periodId) : undefined
+                          }
                         />
                       </Space>
                     </header>
                   )}
                   dataSource={DataPeriodEnrollments?.results}
-                  loading={isPendingPeriodEnrollments}
+                  loading={isPendingPeriodEnrollments && periodId !== null}
                   pagination={false}
                   columns={[
                     {
@@ -265,7 +294,7 @@ export const NewAnnoucementWithSomeForm: FC<
                       render: (_, record) =>
                         `${record.year_enrollment.user.matricule}`,
                       width: 80,
-                      align: "center",
+                      align: "right",
                     },
                     {
                       title: "Noms",
@@ -285,7 +314,7 @@ export const NewAnnoucementWithSomeForm: FC<
                   size="small"
                   rowKey="id"
                   scroll={{ y: "calc(100vh - 312px)" }}
-                  rootClassName="hover:cursor-pointer"
+                  rowClassName="hover:cursor-pointer"
                   rowSelection={{
                     type: "checkbox",
                     selectedRowKeys: selectedRows.map((item) => item.id),
@@ -310,8 +339,8 @@ export const NewAnnoucementWithSomeForm: FC<
                 />
               </Card>
             </Col>
-            <Col span={8}>
-              <Form form={form} layout="vertical" onFinish={onFinish}>
+            <Col span={6}>
+              <Form form={form} onFinish={onFinish}>
                 <Descriptions
                   title="Détails"
                   bordered
@@ -332,6 +361,11 @@ export const NewAnnoucementWithSomeForm: FC<
                       key: "class",
                       label: "Promotion",
                       children: classYear?.acronym,
+                    },
+                    {
+                      key: "selected_students",
+                      label: "Étudiants sélectionnés",
+                      children: selectedRows.length,
                     },
                   ]}
                 />
