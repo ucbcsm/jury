@@ -31,7 +31,7 @@ export async function deleteAnnoucement(id: number | string) {
   return res.data;
 }
 
-export async function createAnnoucement(data: {
+export async function createAnnoucementWithAll(data: {
   year_id: number;
   period_id: number;
   faculty_id: number;
@@ -57,3 +57,17 @@ export async function createAnnoucement(data: {
   });
   return res.data;
 }
+
+
+
+export async function createAnnoucementWithSome(data: {
+  mode: "ALL-STUDENTS" | "SOME-STUDENTS";
+  selectedRegisteredStudentsList?: number[];
+}) {
+  const res = await api.post(`/jury/announcement/`, {
+    mode: data.mode,
+    selectedRegisteredStudentsList: data.selectedRegisteredStudentsList,
+  });
+  return res.data;
+}
+

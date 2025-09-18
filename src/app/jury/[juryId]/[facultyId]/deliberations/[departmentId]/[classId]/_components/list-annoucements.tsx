@@ -2,17 +2,25 @@
 
 import { getMomentText, getSessionText } from "@/lib/api";
 import { getAnnoucements } from "@/lib/api/annoucement";
-import { DeleteOutlined, EyeOutlined, LockOutlined, MoreOutlined, UnlockOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EyeOutlined,
+  LockOutlined,
+  MoreOutlined,
+  PlusOutlined,
+  UnlockOutlined,
+} from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Button, Dropdown, Layout, Space, Table, Tag, Typography } from "antd";
 import dayjs from "dayjs";
 import { useParams } from "next/navigation";
 import { FC, useState } from "react";
-import { NewAnnoucementForm } from "./new-announcement-form";
+import { NewAnnoucementWithAllForm } from "./new-announcement-with-all-form";
 import { Announcement, Class, Department, Period } from "@/types";
-import { parseAsInteger, useQueryState } from "nuqs";
+import { parseAsBoolean, parseAsInteger, useQueryState } from "nuqs";
 import { ListGrades } from "./list-grades";
 import { DeleteAnnouncementForm } from "./delete-announcement-form";
+import { NewAnnoucementWithSomeForm } from "./new-announcement-with-some-form";
 
 type ActionsBarProps = {
   announcement: Announcement;
@@ -82,6 +90,14 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
   periods,
 }) => {
   const { facultyId, departmentId, classId } = useParams();
+  const [openNewWithAll, setOpenNewWithAll] = useQueryState(
+    "new-with-all",
+    parseAsBoolean.withDefault(false)
+  );
+  const [openNewWithSome, setOpenNewWithSome] = useQueryState(
+    "new-with-some",
+    parseAsBoolean.withDefault(false)
+  );
 
   const { data, isPending, isError } = useQuery({
     queryKey: ["annoucements", facultyId, departmentId, classId],
@@ -112,11 +128,51 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
               </Space>
               <div className="flex-1" />
               <Space>
-                <NewAnnoucementForm
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: "all",
+                        label: "Avec tous les étudiants",
+                      },
+                      {
+                        key: "some",
+                        label: "Avec quelques étudiants",
+                      },
+                    ],
+                    onClick: ({ key }) => {
+                      if (key === "all") {
+                        setOpenNewWithAll(true);
+                      } else if (key === "some") {
+                        setOpenNewWithSome(true);
+                      }
+                    },
+                  }}
+                >
+                  <Button
+                    icon={<PlusOutlined />}
+                    color="primary"
+                    variant="solid"
+                    style={{ boxShadow: "none" }}
+                  >
+                    Nouvelle publication
+                  </Button>
+                </Dropdown>
+                <NewAnnoucementWithAllForm
                   department={department}
                   classYear={classYear}
                   yearId={yearId}
                   periods={periods}
+                  open={openNewWithAll}
+                  setOpen={setOpenNewWithAll}
+                />
+                <NewAnnoucementWithSomeForm
+                  department={department}
+                  classYear={classYear}
+                  yearId={yearId}
+                  periods={periods}
+                  open={openNewWithSome}
+                  setOpen={setOpenNewWithSome}
                 />
               </Space>
             </header>
@@ -206,7 +262,7 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
               key: "actions",
               dataIndex: "view",
               render: (_, record) => <ActionsBar announcement={record} />,
-              width:120
+              width: 120,
             },
           ]}
           dataSource={data}

@@ -1,9 +1,9 @@
 "use client";
 
 import { getCurrentPeriodsAsOptions } from "@/lib/api";
-import { createAnnoucement } from "@/lib/api/annoucement";
+import { createAnnoucementWithAll } from "@/lib/api";
 import { Class, Department, Period } from "@/types";
-import { CloseOutlined, LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { CloseOutlined, LoadingOutlined, } from "@ant-design/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
@@ -18,14 +18,19 @@ import {
   Typography,
 } from "antd";
 import { useParams } from "next/navigation";
-import { parseAsBoolean, useQueryState } from "nuqs";
+import { Options } from "nuqs";
 import { FC } from "react";
 
-type NewAnnoucementFormProps = {
+type NewAnnoucementWithAllFormProps = {
   department?: Department;
   classYear?: Class;
   yearId?: number;
   periods?: Period[];
+  open: boolean;
+  setOpen: (
+    value: boolean | ((old: boolean) => boolean | null) | null,
+    options?: Options
+  ) => Promise<URLSearchParams>;
 };
 
 type FormDataType = {
@@ -35,11 +40,13 @@ type FormDataType = {
   period_id: number;
 };
 
-export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
+export const NewAnnoucementWithAllForm: FC<NewAnnoucementWithAllFormProps> = ({
   department,
   classYear,
   yearId,
   periods,
+  open,
+  setOpen
 }) => {
   const {
     token: { colorPrimary },
@@ -47,15 +54,11 @@ export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const {juryId, facultyId, departmentId, classId } = useParams();
-  const [open, setOpen] = useQueryState(
-    "new",
-    parseAsBoolean.withDefault(false)
-  );
 
   const queryClient = useQueryClient();
 
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: createAnnoucement,
+    mutationFn: createAnnoucementWithAll,
   });
 
   const onClose = () => {
@@ -93,15 +96,6 @@ export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
   return (
     <>
       {contextHolder}
-      <Button
-        icon={<PlusOutlined />}
-        color="primary"
-        variant="solid"
-        style={{ boxShadow: "none" }}
-        onClick={() => setOpen(true)}
-      >
-        Nouvelle publication
-      </Button>
       <Drawer
         title="Nouvelle publication"
         extra={
@@ -244,9 +238,9 @@ export const NewAnnoucementForm: FC<NewAnnoucementFormProps> = ({
           >
             Calcul en cours ...
           </Typography.Title>
-          <Typography.Text type="secondary">
-            Cette opération peut prendre jusqu&apos;à 1min selon le cas.
-          </Typography.Text>
+            <Typography.Text type="secondary">
+              Cette opération peut prendre plus de temps selon les cas.
+            </Typography.Text>
           <Typography.Text type="secondary">
             Veuillez donc patienter!
           </Typography.Text>
