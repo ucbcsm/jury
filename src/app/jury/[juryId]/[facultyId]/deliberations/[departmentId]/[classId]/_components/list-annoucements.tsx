@@ -23,6 +23,7 @@ import { parseAsBoolean, parseAsInteger, useQueryState } from "nuqs";
 import { ListGrades } from "./list-grades";
 import { DeleteAnnouncementForm } from "./delete-announcement-form";
 import { NewAnnoucementWithSomeForm } from "./new-announcement-with-some-form";
+import { MultiPeriodsListGrades } from "./multi-periods-list-grades";
 
 type ActionsBarProps = {
   announcement: Announcement;
@@ -177,6 +178,7 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
                   open={openNewWithSome}
                   setOpen={setOpenNewWithSome}
                 />
+                <MultiPeriodsListGrades />
               </Space>
             </header>
           )}
@@ -187,9 +189,9 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
               title: "Période",
               render: (_, record) =>
                 `${record.period.acronym} (${record.period.name})`,
-              minWidth:100,
+              minWidth: 100,
               fixed: "left",
-              ellipsis:true,
+              ellipsis: true,
             },
             {
               key: "graduated_students",
@@ -284,13 +286,6 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
           rowKey="id"
           scroll={{ y: "calc(100vh - 320px)" }}
           size="small"
-           rowSelection={{
-                    type: "checkbox",
-                    // selectedRowKeys: selectedRows.map((item) => item.id),
-                    // onChange: (_, selectedRows) => {
-                    //   setSelectedRows(selectedRows);
-                    // },
-                  }}
         />
       </Layout.Content>
     </Layout>

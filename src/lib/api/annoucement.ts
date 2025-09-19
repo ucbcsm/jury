@@ -59,20 +59,18 @@ export async function createAnnoucementWithAll(data: {
 
 export async function createAnnoucementWithSome(data: {
   jury: number;
-  selectedRegisteredStudentsList: {
-    id: number;
-    period: number;
-    academic_year: number;
-    faculty: number;
-    departement: number;
-    class_year: number;
-    session: "main_session" | "retake_session";
-    moment: "before_appeal" | "after_appeal";
-  }[];
+  period: number;
+  academic_year: number;
+  faculty: number;
+  departement: number;
+  class_year: number;
+  session: "main_session" | "retake_session";
+  moment: "before_appeal" | "after_appeal";
+  selectedPeriodEnrollmentIds: number[];
 }) {
   const res = await api.post(`/jury/announcement/`, {
     mode: "SOME-STUDENTS",
-    selectedRegisteredStudentsList: data.selectedRegisteredStudentsList,
+    selectedRegisteredStudentsList: data.selectedPeriodEnrollmentIds,
     jury: data.jury,
   });
   return res.data;

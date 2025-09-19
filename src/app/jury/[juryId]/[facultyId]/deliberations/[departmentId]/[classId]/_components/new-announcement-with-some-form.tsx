@@ -36,7 +36,6 @@ import {
 import { useParams } from "next/navigation";
 import { Options, useQueryState } from "nuqs";
 import { FC, useState } from "react";
-import { record, set } from "zod";
 
 type NewAnnoucementWithSomeFormProps = {
   department?: Department;
@@ -76,10 +75,10 @@ export const NewAnnoucementWithSomeForm: FC<
   });
 
   const onClose = () => {
-    setOpen(false);
     setSelectedRows([]);
     setPeriodId(null);
     form.resetFields();
+    setOpen(false);
   };
 
   const {
@@ -117,21 +116,18 @@ export const NewAnnoucementWithSomeForm: FC<
     if (selectedRows.length === 0) {
       messageApi.error("Veuillez sélectionner au moins un étudiant.");
     } else {
-      const selectedRegisteredStudentsList = selectedRows.map((item) => ({
-        id: item.id,
-        period: item.period.id,
-        academic_year: Number(yearId),
-        faculty: Number(facultyId),
-        departement: Number(departmentId),
-        class_year: Number(classId),
-        session: values.session,
-        moment: values.moment,
-        
-      }));
+      const selectedPeriodEnrollmentIds = selectedRows.map((item) => item.id);
       mutateAsync(
         {
-          selectedRegisteredStudentsList: selectedRegisteredStudentsList,
+          selectedPeriodEnrollmentIds: selectedPeriodEnrollmentIds,
           jury: Number(juryId),
+          period: Number(periodId),
+          academic_year: Number(yearId),
+          faculty: Number(facultyId),
+          departement: Number(departmentId),
+          class_year: Number(classId),
+          session: values.session,
+          moment: values.moment,
         },
         {
           onSuccess: () => {
@@ -190,6 +186,7 @@ export const NewAnnoucementWithSomeForm: FC<
         onClose={onClose}
         closable={false}
         maskClosable={false}
+        destroyOnHidden
         footer={
           <Flex justify="space-between" gap={8}>
             <Typography.Title

@@ -8,7 +8,7 @@ export async function getResultGrid(searchParams: {
   facultyId: number;
   departmentId: number;
   classId: number;
-  periodId: number;
+  periodIds: string; // hyphen-separated list of period IDs
   moment: "before_appeal" | "after_appeal";
   session: "main_session" | "retake_session";
 }) {
@@ -17,7 +17,7 @@ export async function getResultGrid(searchParams: {
     facultyId,
     departmentId,
     classId,
-    periodId,
+    periodIds,
     moment,
     session,
   } = searchParams;
@@ -27,7 +27,7 @@ export async function getResultGrid(searchParams: {
   queryParams.append("faculty__id", facultyId.toString());
   queryParams.append("departement__id", departmentId.toString());
   queryParams.append("class_year__id", classId.toString());
-  queryParams.append("period__ids", periodId.toString());
+  queryParams.append("period__ids", periodIds.toString());
   queryParams.append("session", session.toString());
   queryParams.append("moment", moment.toString());
 

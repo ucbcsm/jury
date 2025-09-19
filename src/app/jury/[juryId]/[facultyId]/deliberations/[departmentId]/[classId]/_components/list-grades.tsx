@@ -11,7 +11,6 @@ import {
 import { Announcement } from "@/types";
 import {
   CloseOutlined,
-  DeleteOutlined,
   DownloadOutlined,
   PrinterOutlined,
 } from "@ant-design/icons";
@@ -67,7 +66,7 @@ export const ListGrades: FC<ListGradesProps> = ({
         facultyId: Number(facultyId),
         departmentId: Number(departmentId),
         classId: Number(classId),
-        periodId: annoucement.period.id,
+        periodIds: `${annoucement.period.id}`, // Pass period ID as a hyphen-separated string
         session: annoucement.session,
         moment: annoucement.moment,
       }),
