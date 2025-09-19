@@ -4,7 +4,7 @@ import ExcelJS from "exceljs";
 import { getShortGradeValidationText } from "./grade-class";
 
 export async function getResultGrid(searchParams: {
-  yearId: number;
+  yearId?: number;
   facultyId: number;
   departmentId: number;
   classId: number;
@@ -22,8 +22,9 @@ export async function getResultGrid(searchParams: {
     session,
   } = searchParams;
   const queryParams = new URLSearchParams();
-
-  queryParams.append("academic_year__id", yearId.toString());
+  if(yearId!==undefined){
+    queryParams.append("academic_year__id", yearId.toString());
+  }
   queryParams.append("faculty__id", facultyId.toString());
   queryParams.append("departement__id", departmentId.toString());
   queryParams.append("class_year__id", classId.toString());

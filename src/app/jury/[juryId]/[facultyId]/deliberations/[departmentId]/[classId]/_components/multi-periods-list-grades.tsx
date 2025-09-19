@@ -12,6 +12,7 @@ import { Announcement } from "@/types";
 import {
   CloseOutlined,
   DownloadOutlined,
+  EyeOutlined,
   PrinterOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
@@ -91,8 +92,11 @@ export const MultiPeriodsListGrades: FC<MultiPeriodsListGradesProps> = ({
         onClick={() => {
           setOpen(true);
         }}
+        icon={<EyeOutlined />}
+        variant="dashed"
+        color="lime"
       >
-        Multi-grilles
+        Résultats annuels
       </Button>
       <Drawer
         width="100%"
