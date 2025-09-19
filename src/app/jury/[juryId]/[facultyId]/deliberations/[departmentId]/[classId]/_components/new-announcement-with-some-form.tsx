@@ -125,11 +125,12 @@ export const NewAnnoucementWithSomeForm: FC<
         class_year: Number(classId),
         session: values.session,
         moment: values.moment,
-        jury: Number(juryId),
+        
       }));
       mutateAsync(
         {
           selectedRegisteredStudentsList: selectedRegisteredStudentsList,
+          jury: Number(juryId),
         },
         {
           onSuccess: () => {

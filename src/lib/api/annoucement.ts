@@ -58,6 +58,7 @@ export async function createAnnoucementWithAll(data: {
 }
 
 export async function createAnnoucementWithSome(data: {
+  jury: number;
   selectedRegisteredStudentsList: {
     id: number;
     period: number;
@@ -67,12 +68,12 @@ export async function createAnnoucementWithSome(data: {
     class_year: number;
     session: "main_session" | "retake_session";
     moment: "before_appeal" | "after_appeal";
-    jury: number;
   }[];
 }) {
   const res = await api.post(`/jury/announcement/`, {
     mode: "SOME-STUDENTS",
     selectedRegisteredStudentsList: data.selectedRegisteredStudentsList,
+    jury: data.jury,
   });
   return res.data;
 }
