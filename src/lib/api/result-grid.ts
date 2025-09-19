@@ -21,6 +21,7 @@ export async function getResultGrid(searchParams: {
     periodId,
     moment,
     session,
+    mode
   } = searchParams;
   const queryParams = new URLSearchParams();
 
@@ -34,6 +35,7 @@ export async function getResultGrid(searchParams: {
   }
   queryParams.append("session", session.toString());
   queryParams.append("moment", moment.toString());
+  queryParams.append("mode", mode.toString());
 
   const res = await api.get(
     `/jury/student-results-grid?${queryParams.toString()}`
