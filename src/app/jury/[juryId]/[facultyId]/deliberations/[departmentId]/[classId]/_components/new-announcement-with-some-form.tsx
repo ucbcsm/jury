@@ -21,6 +21,7 @@ import {
   Col,
   Descriptions,
   Drawer,
+  Empty,
   Flex,
   Form,
   message,
@@ -35,7 +36,7 @@ import {
 import { useParams } from "next/navigation";
 import { Options, useQueryState } from "nuqs";
 import { FC, useState } from "react";
-import { set } from "zod";
+import { record, set } from "zod";
 
 type NewAnnoucementWithSomeFormProps = {
   department?: Department;
@@ -149,6 +150,29 @@ export const NewAnnoucementWithSomeForm: FC<
     }
   };
 
+  const SelectedPeriod = ({
+    variant,
+  }: {
+    variant?: "filled" | "outlined" | "borderless";
+  }) => {
+    return (
+      <Select
+        placeholder="Sélectionnner une période"
+        variant={variant || "filled"}
+        options={getCurrentPeriodsAsOptions(periods)}
+        onChange={(value) => {
+          setSelectedRows([]);
+          setPeriodId(value.toString());
+        }}
+        value={periodId !== null ? Number(periodId) : undefined}
+        allowClear
+        onClear={() => {
+          setPeriodId(null);
+        }}
+      />
+    );
+  };
+
   return (
     <>
       {contextHolder}
@@ -240,18 +264,7 @@ export const NewAnnoucementWithSomeForm: FC<
                       <div className="flex-1" />
                       <Space>
                         <Typography.Text>Période:</Typography.Text>
-                        <Select
-                          placeholder="Sélectionnner une période"
-                          variant="filled"
-                          options={getCurrentPeriodsAsOptions(periods)}
-                          onChange={(value) => {
-                            setSelectedRows([]);
-                            setPeriodId(value.toString());
-                          }}
-                          value={
-                            periodId !== null ? Number(periodId) : undefined
-                          }
-                        />
+                        <SelectedPeriod />
                       </Space>
                     </header>
                   )}
@@ -297,6 +310,7 @@ export const NewAnnoucementWithSomeForm: FC<
                       key: "name",
                       render: (_, record) =>
                         `${record.year_enrollment.user.first_name} ${record.year_enrollment.user.last_name} ${record.year_enrollment.user.surname}`,
+                      ellipsis: true,
                     },
                     {
                       title: "Promotion",
@@ -304,6 +318,14 @@ export const NewAnnoucementWithSomeForm: FC<
                       render: (_, record, __) =>
                         `${record.year_enrollment.class_year.acronym} ${record.year_enrollment.departement.name}`,
                       key: "class",
+                    },
+                    {
+                      title: "Période",
+                      dataIndex: "period",
+                      key: "period",
+                      render: (_, record, __) =>
+                        `${record.period.acronym} (${record.period.name})`,
+                      ellipsis: true,
                     },
                   ]}
                   size="small"
@@ -331,6 +353,20 @@ export const NewAnnoucementWithSomeForm: FC<
                       }
                     },
                   })}
+                  locale={{
+                    emptyText:
+                      periodId === null ? (
+                        <div className="px-7 py-20">
+                          <SelectedPeriod variant="filled" />
+                        </div>
+                      ) : isErrorPeriodEnrollments ? (
+                        <div className="px-7 py-20">
+                          <Typography.Text>
+                            Erreur de chargement des étudiants.
+                          </Typography.Text>
+                        </div>
+                      ) : undefined,
+                  }}
                 />
               </Card>
             </Col>
