@@ -11,6 +11,7 @@ import {
 import { Announcement } from "@/types";
 import {
   CloseOutlined,
+  DeleteOutlined,
   DownloadOutlined,
   PrinterOutlined,
 } from "@ant-design/icons";
@@ -22,6 +23,7 @@ import { Options } from "nuqs";
 import React, { FC, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { PrintableListGrades } from "./printable/print-list-grades";
+import { ButtonDeleteGradeFromGrid } from "./delete-grade-item";
 
 type ListGradesProps = {
   annoucement: Announcement;
@@ -583,6 +585,9 @@ export const ListGrades: FC<ListGradesProps> = ({
                   }}
                 >
                   {getDecisionText(record.decision)}
+                </td>
+                <td className="px-2">
+                  <ButtonDeleteGradeFromGrid periodEnrollmentId={record.id} />
                 </td>
               </tr>
               <tr>

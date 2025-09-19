@@ -47,6 +47,11 @@ export function getDecisionText(decision: "passed" | "postponed") {
   return "";
 }
 
+export async function deleteGradeFromGrid(periodEnrollmentId: number) {
+  const res = await api.delete(`/jury/period-grades/${periodEnrollmentId}/`);
+  return res.data;
+}
+
 /**
  * Exporte les données ResultGrid dans un fichier Excel (.xlsx)
  * @param data Les données du tableau de type ResultGrid
