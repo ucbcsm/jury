@@ -72,6 +72,7 @@ export const MultiPeriodsListGrades: FC<MultiPeriodsListGradesProps> = ({
         classId: Number(classId),
         session: "main_session",
         moment: "before_appeal",
+        mode:"YEAR-GRADE"
       }),
     enabled:
       !!yid &&

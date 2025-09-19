@@ -11,6 +11,7 @@ export async function getResultGrid(searchParams: {
   periodId?: number;
   moment: "before_appeal" | "after_appeal";
   session: "main_session" | "retake_session";
+  mode: "PERIOD-GRADE" | "YEAR-GRADE";
 }) {
   const {
     yearId,
@@ -22,7 +23,7 @@ export async function getResultGrid(searchParams: {
     session,
   } = searchParams;
   const queryParams = new URLSearchParams();
-  if(yearId!==undefined){
+  if (yearId !== undefined) {
     queryParams.append("academic_year__id", yearId.toString());
   }
   queryParams.append("faculty__id", facultyId.toString());

@@ -62,13 +62,14 @@ export const ListGrades: FC<ListGradesProps> = ({
     ],
     queryFn: () =>
       getResultGrid({
-        // yearId: annoucement.academic_year.id,
+        yearId: annoucement.academic_year.id,
         facultyId: Number(facultyId),
         departmentId: Number(departmentId),
         classId: Number(classId),
         periodId: annoucement.period.id,
         session: annoucement.session,
         moment: annoucement.moment,
+        mode:"PERIOD-GRADE"
       }),
     enabled:
       !!annoucement.academic_year.id &&
