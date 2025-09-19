@@ -9,9 +9,10 @@ import {
   getTaughtCours,
   multiUpdateGradeClasses,
 } from "@/lib/api";
-import { GradeClass } from "@/types";
+import { CourseEnrollment, GradeClass } from "@/types";
 import {
   CheckCircleOutlined,
+  CheckSquareOutlined,
   CloseCircleOutlined,
   CloseOutlined,
   DeleteOutlined,
@@ -20,6 +21,7 @@ import {
   HourglassOutlined,
   InfoOutlined,
   LoadingOutlined,
+  MinusSquareOutlined,
   MoreOutlined,
   PrinterOutlined,
   TeamOutlined,
@@ -61,6 +63,7 @@ import { EmptyListGradesToPrint } from "./_components/printable/empty-list-grade
 import { ButtonDeleteSingleGrade } from "./_components/delete-single-grade";
 import { useYid } from "@/hooks/use-yid";
 import { ExportSomeStudentsToExcelForm } from "./_components/export-some-students-to-excel";
+import { PrintSomeStudentsForm } from "./_components/print-some-students";
 
 export default function Page() {
   const {
@@ -77,11 +80,13 @@ export default function Page() {
   const [openDeleteGrades, setOpenDeleteGrades] = useState<boolean>(false);
   const [openExportSomeStudentsToExcel, setOpenExportSomeStudentsToExcel] =
     useState<boolean>(false);
+  const [openPrintSome, setOpenPrintSome] = useState<boolean>(false);
 
   const { juryId, facultyId, courseId } = useParams();
   const { yid } = useYid();
 
-  const emptyGradeRef = useRef<HTMLDivElement>(null);
+  const emptyAllGradeRef = useRef<HTMLDivElement>(null);
+  const emptySomeGradeRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
 
@@ -101,6 +106,10 @@ export default function Page() {
       "before_appeal"
     )
   );
+
+  const [selectedRowsForPrint, setSelectedRowsForPrint] = useState<
+    CourseEnrollment[]
+  >([]);
 
   const queryClient = useQueryClient();
   const { mutateAsync: mutateMultiGrades, isPending: isPendingMultiupdate } =
@@ -144,13 +153,29 @@ export default function Page() {
         academicYearId: Number(1),
         facultyId: Number(queryKey[2]),
         courseId: Number(queryKey[3]),
+        status:"validated"
       }),
     enabled: !!yid && !!facultyId && !!courseId,
   });
 
-  const printEmptyGradeList = useReactToPrint({
-    contentRef: emptyGradeRef,
+  // console.log(courseEnrollments);
+
+  const printAllEmptyGradeList = useReactToPrint({
+    contentRef: emptyAllGradeRef,
     documentTitle: `${course?.available_course.code}-fiche-de-notes-${course?.available_course.name}`,
+  });
+
+  const printSomeEmptyGradeList = useReactToPrint({
+    contentRef: emptySomeGradeRef,
+    documentTitle: `${course?.available_course.code}-fiche-de-notes-${course?.available_course.name}`,
+    onAfterPrint:()=>{
+      setOpenPrintSome(false)
+      setSelectedRowsForPrint([])
+    },
+    onPrintError:()=>{
+      setOpenPrintSome(false);
+      setSelectedRowsForPrint([]);
+    }
   });
 
   const onFinishMultiUpdateGrades = () => {
@@ -276,26 +301,40 @@ export default function Page() {
               items: [
                 {
                   key: "export",
-                  label: "Exporter le fichier .xlsx",
+                  label: "Exporter vers Excel",
                   icon: <DownloadOutlined />,
                   disabled: isPendingCourseEnrollments,
                   children: [
                     {
                       key: "export_all",
                       label: "Tous les étudiants",
+                      icon: <CheckSquareOutlined />,
                     },
                     {
                       key: "export_some",
-                      label: "Quelques étudiants...",
+                      label: "Quelques étudiants",
+                      icon: <MinusSquareOutlined />,
                     },
                   ],
                   // disabled: courseEnrollments?.length === 0,
                 },
                 {
                   key: "print",
-                  label: "Imprimer la liste vide",
+                  label: "Imprimer",
                   icon: <PrinterOutlined />,
                   disabled: isPendingCourseEnrollments,
+                  children: [
+                    {
+                      key: "print_all",
+                      label: "Tous les étudiants",
+                      icon: <CheckSquareOutlined />,
+                    },
+                    {
+                      key: "print_some",
+                      label: "Quelques étudiants",
+                      icon: <MinusSquareOutlined />,
+                    },
+                  ],
                   // disabled: courseEnrollments?.length === 0,
                 },
                 {
@@ -330,18 +369,20 @@ export default function Page() {
                   }
                 } else if (key === "export_some") {
                   setOpenExportSomeStudentsToExcel(true);
-                } else if (key === "print") {
+                } else if (key === "print_all") {
                   if (
-                    emptyGradeRef.current &&
+                    emptyAllGradeRef.current &&
                     courseEnrollments &&
                     courseEnrollments.length > 0
                   ) {
-                    printEmptyGradeList();
+                    printAllEmptyGradeList();
                   } else {
                     messageApi.info(
                       "Aucun étudiant trouvé pour imprimer les notes vides."
                     );
                   }
+                } else if (key === "print_some") {
+                  setOpenPrintSome(true);
                 } else if (key === "close") {
                   router.push(`/jury/${juryId}/${facultyId}/grade-entry`);
                 }
@@ -830,11 +871,25 @@ export default function Page() {
           course={course}
           enrollments={courseEnrollments}
         />
+        <PrintSomeStudentsForm
+          open={openPrintSome}
+          setOpen={setOpenPrintSome}
+          course={course}
+          enrollments={courseEnrollments}
+          selectedRows={selectedRowsForPrint}
+          setSelectedRows={setSelectedRowsForPrint}
+          onPrint={printSomeEmptyGradeList}
+        />
 
         <EmptyListGradesToPrint
           courseEnrollments={courseEnrollments}
           course={course}
-          ref={emptyGradeRef}
+          ref={emptyAllGradeRef}
+        />
+        <EmptyListGradesToPrint
+          courseEnrollments={selectedRowsForPrint}
+          course={course}
+          ref={emptySomeGradeRef}
         />
       </Layout.Content>
       <Layout.Footer

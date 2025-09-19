@@ -1,10 +1,17 @@
 "use client";
 
-import { getCurrentPeriodsAsOptions, getPeriodEnrollments } from "@/lib/api";
+import {
+  getCurrentPeriodsAsOptions,
+  getPeriodEnrollmentsWithAll,
+} from "@/lib/api";
 import { createAnnoucementWithSome } from "@/lib/api";
 import { getHSLColor } from "@/lib/utils";
 import { Class, Department, Period, PeriodEnrollment } from "@/types";
-import { BulbOutlined, CloseOutlined, LoadingOutlined } from "@ant-design/icons";
+import {
+  BulbOutlined,
+  CloseOutlined,
+  LoadingOutlined,
+} from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Alert,
@@ -26,7 +33,7 @@ import {
   Typography,
 } from "antd";
 import { useParams } from "next/navigation";
-import { Options, parseAsInteger, useQueryState } from "nuqs";
+import { Options, useQueryState } from "nuqs";
 import { FC, useState } from "react";
 import { set } from "zod";
 
@@ -75,7 +82,7 @@ export const NewAnnoucementWithSomeForm: FC<
   };
 
   const {
-    data: DataPeriodEnrollments,
+    data: periodEnrollments,
     isPending: isPendingPeriodEnrollments,
     isError: isErrorPeriodEnrollments,
   } = useQuery({
@@ -89,10 +96,10 @@ export const NewAnnoucementWithSomeForm: FC<
       "validated",
     ],
     queryFn: ({ queryKey }) =>
-      getPeriodEnrollments({
-        yearId: Number(queryKey[1]),
-        facultyId: Number(queryKey[2]),
-        periodId: Number(queryKey[3]),
+      getPeriodEnrollmentsWithAll({
+        yearId: Number(yearId),
+        facultyId: Number(facultyId),
+        periodId: Number(periodId),
         departmentId: Number(departmentId),
         classId: Number(classId),
         status: "validated",
@@ -102,14 +109,13 @@ export const NewAnnoucementWithSomeForm: FC<
       !!facultyId &&
       !!departmentId &&
       !!classId &&
-      // !!periodId &&
       !!(periodId !== null),
   });
 
   const onFinish = (values: FormDataType) => {
     if (selectedRows.length === 0) {
       messageApi.error("Veuillez sélectionner au moins un étudiant.");
-    }else{
+    } else {
       const selectedRegisteredStudentsList = selectedRows.map((item) => ({
         id: item.id,
         period: item.period.id,
@@ -119,23 +125,11 @@ export const NewAnnoucementWithSomeForm: FC<
         class_year: Number(classId),
         session: values.session,
         moment: values.moment,
-        jury:Number(juryId)
+        jury: Number(juryId),
       }));
       mutateAsync(
         {
-          // ...values,
-          // jury_id: Number(juryId),
-          // faculty_id: Number(facultyId),
-          // department_id: Number(departmentId),
-          // class_id: Number(classId),
-          // year_id: Number(yearId),
           selectedRegisteredStudentsList: selectedRegisteredStudentsList,
-          // {
-          //     period: values.period_id,
-          //     id:PeriodEnrollment.id,
-         
-
-          // }
         },
         {
           onSuccess: () => {
@@ -260,7 +254,7 @@ export const NewAnnoucementWithSomeForm: FC<
                       </Space>
                     </header>
                   )}
-                  dataSource={DataPeriodEnrollments?.results}
+                  dataSource={periodEnrollments}
                   loading={isPendingPeriodEnrollments && periodId !== null}
                   pagination={false}
                   columns={[
@@ -383,7 +377,6 @@ export const NewAnnoucementWithSomeForm: FC<
                         { value: "main_session", label: "Principale" },
                         { value: "retake_session", label: "Rattrapage" },
                       ]}
-                      // style={{ width: "100%" }}
                     />
                   </Form.Item>
                   <Form.Item
@@ -398,7 +391,6 @@ export const NewAnnoucementWithSomeForm: FC<
                         { value: "before_appeal", label: "Avant recours" },
                         { value: "after_appeal", label: "Après recours" },
                       ]}
-                      // style={{ width: "100%" }}
                     />
                   </Form.Item>
                   <Form.Item
@@ -414,7 +406,6 @@ export const NewAnnoucementWithSomeForm: FC<
                         { value: "locked", label: "Verrouillé" },
                         { value: "unlocked", label: "Ouvert" },
                       ]}
-                      // style={{ width: "100%" }}
                     />
                   </Form.Item>
                 </div>

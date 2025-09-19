@@ -11,6 +11,7 @@ export async function getPeriodEnrollments(searchParams: {
   pageSize?: number;
   search?: string;
   status?: "pending" | "validated" | "rejected";
+  get_all?: boolean;
 }) {
   const {
     yearId,
@@ -22,6 +23,7 @@ export async function getPeriodEnrollments(searchParams: {
     pageSize,
     search,
     status,
+    get_all
   } = searchParams;
   const query = new URLSearchParams();
   query.append("academic_year__id", yearId.toString());
@@ -48,12 +50,68 @@ export async function getPeriodEnrollments(searchParams: {
   const res = await api.get(
     `/apparitorat/period-enrollment?${query.toString()}`
   );
+  if(get_all){
+    return res.data as PeriodEnrollment[];
+  }
   return res.data as {
     results: PeriodEnrollment[];
     count: number;
     next: string | null;
     previous: string | null;
   };
+}
+
+export async function getPeriodEnrollmentsWithAll(searchParams: {
+  yearId: number;
+  facultyId: number;
+  periodId: number;
+  departmentId?: number;
+  classId?: number;
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: "pending" | "validated" | "rejected";
+}) {
+  const {
+    yearId,
+    facultyId,
+    periodId,
+    departmentId,
+    classId,
+    page,
+    pageSize,
+    search,
+    status,
+  } = searchParams;
+  const query = new URLSearchParams();
+  query.append("academic_year__id", yearId.toString());
+  query.append("faculty__id", facultyId.toString());
+  query.append("period__id", periodId.toString());
+  if (departmentId !== undefined) {
+    query.append("departement__id", departmentId.toString());
+  }
+  if (classId !== undefined) {
+    query.append("class_year__id", classId.toString());
+  }
+  if (page !== undefined) {
+    query.append("page", page.toString());
+  }
+  if (pageSize !== undefined) {
+    query.append("page_size", pageSize.toString());
+  }
+  if (search !== undefined && search.trim() !== "") {
+    query.append("search", search.trim());
+  }
+  if (status !== undefined) {
+    query.append("status", status);
+  }
+  query.append("get_all", "true");
+  
+  const res = await api.get(
+    `/apparitorat/period-enrollment?${query.toString()}`
+  );
+
+  return res.data as PeriodEnrollment[];
 }
 
 export async function getPeriodEnrollmentsbyFaculty(

@@ -284,6 +284,13 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
           rowKey="id"
           scroll={{ y: "calc(100vh - 320px)" }}
           size="small"
+           rowSelection={{
+                    type: "checkbox",
+                    // selectedRowKeys: selectedRows.map((item) => item.id),
+                    // onChange: (_, selectedRows) => {
+                    //   setSelectedRows(selectedRows);
+                    // },
+                  }}
         />
       </Layout.Content>
     </Layout>
