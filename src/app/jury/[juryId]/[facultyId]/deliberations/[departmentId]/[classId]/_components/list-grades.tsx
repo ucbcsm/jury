@@ -53,6 +53,7 @@ export const ListGrades: FC<ListGradesProps> = ({
   const { data, isPending, isError } = useQuery({
     queryKey: [
       "grid_grades",
+      annoucement.academic_year.id,
       facultyId,
       departmentId,
       classId,

@@ -57,9 +57,11 @@ export const MultiPeriodsListGrades: FC<MultiPeriodsListGradesProps> = ({
   const { data, isPending, isError } = useQuery({
     queryKey: [
       "grid_grades",
+      Number(yid),
       facultyId,
       departmentId,
       classId,
+      "YEAR-GRADE"
       // annoucement.period.id,
       // annoucement.session,
       // annoucement.moment,
@@ -72,15 +74,11 @@ export const MultiPeriodsListGrades: FC<MultiPeriodsListGradesProps> = ({
         classId: Number(classId),
         session: "main_session",
         moment: "before_appeal",
-        mode:"YEAR-GRADE"
+        mode: "YEAR-GRADE",
       }),
-    enabled:
-      !!yid &&
-      !!facultyId &&
-      !!departmentId &&
-      !!classId 
-      // !!annoucement.period.id &&
-      // !!anouncementId,
+    enabled: !!yid && !!facultyId && !!departmentId && !!classId,
+    // !!annoucement.period.id &&
+    // !!anouncementId,
   });
 
   const onClose = () => {
@@ -97,7 +95,7 @@ export const MultiPeriodsListGrades: FC<MultiPeriodsListGradesProps> = ({
         variant="dashed"
         color="lime"
       >
-        Résultats annuels
+       Voir résultats annuels
       </Button>
       <Drawer
         width="100%"
