@@ -127,9 +127,10 @@ periodEnrollmentId
       >
         <Button
           icon={!isPending ? <DeleteOutlined /> : <LoadingOutlined />}
-          color="danger"
-          variant="filled"
+          type="text"
+          danger
           size="small"
+          title="Supprimer l'étudiant de la grille"
           disabled={isPending}
         />
       </Popover>

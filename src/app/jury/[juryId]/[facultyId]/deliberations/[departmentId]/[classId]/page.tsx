@@ -2,27 +2,15 @@
 
 import {
   getClassById,
-  getCurrentPeriodsAsOptions,
   getDepartment,
   getJury,
   getPeriodsByYear,
 } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Card,
-  Form,
-  Layout,
-  Select,
-  Skeleton,
-  Space,
-  Switch,
-  theme,
-  Typography,
-} from "antd";
+import { Card, Form, Skeleton, theme, Typography } from "antd";
 import { useParams } from "next/navigation";
-import { parseAsInteger, parseAsStringEnum, useQueryState } from "nuqs";
-import { NoSelectedPeriodToview } from "./_components/no-selected-period";
-import { ListGrades } from "./_components/list-grades";
+import { useQueryState } from "nuqs";
+
 import { ListAnnouncements } from "./_components/list-annoucements";
 
 export default function Page() {
@@ -32,19 +20,6 @@ export default function Page() {
   const { juryId, departmentId, classId } = useParams();
 
   const [period, setPeriod] = useQueryState("period");
-
-  // const [session, setSession] = useQueryState(
-  //   "session",
-  //   parseAsStringEnum(["main_session", "retake_session"]).withDefault(
-  //     "main_session"
-  //   )
-  // );
-  // const [moment, setMoment] = useQueryState(
-  //   "moment",
-  //   parseAsStringEnum(["before_appeal", "after_appeal"]).withDefault(
-  //     "before_appeal"
-  //   )
-  // );
 
   const {
     data: department,
@@ -86,16 +61,8 @@ export default function Page() {
     enabled: !!juryId,
   });
 
-  // const getPeriodsAsTabs = () => {
-  //   return periods?.map((period) => ({
-  //     key: `${period.id}`,
-  //     label: `${period.name} (${period.acronym})`,
-  //   }));
-  // };
-
   return (
     <Card
-      // loading={isPendingClass || isPendingDepartment || isPendingJury}
       variant="borderless"
       style={{ boxShadow: "none", borderRadius: 0 }}
       styles={{ body: { padding: 0 } }}
@@ -119,20 +86,12 @@ export default function Page() {
         setPeriod(key);
       }}
     >
-      {/* {period && period.length !== 0 ? ( */}
       <ListAnnouncements
         yearId={jury?.academic_year.id}
         department={department}
         classYear={classe}
         periods={periods}
       />
-      {/* ) : (
-        <NoSelectedPeriodToview
-          period={period}
-          setPeriod={setPeriod}
-          periods={periods}
-        />
-      )} */}
     </Card>
   );
 }

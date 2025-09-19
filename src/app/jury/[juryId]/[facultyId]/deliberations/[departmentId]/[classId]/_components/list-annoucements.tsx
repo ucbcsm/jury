@@ -20,10 +20,10 @@ import { FC, useState } from "react";
 import { NewAnnoucementWithAllForm } from "./new-announcement-with-all-form";
 import { Announcement, Class, Department, Period } from "@/types";
 import { parseAsBoolean, parseAsInteger, useQueryState } from "nuqs";
-import { ListGrades } from "./list-grades";
+import { ListPeriodGrades } from "./list-period-grades";
 import { DeleteAnnouncementForm } from "./delete-announcement-form";
 import { NewAnnoucementWithSomeForm } from "./new-announcement-with-some-form";
-import { MultiPeriodsListGrades } from "./multi-periods-list-grades";
+import { ListYearGrades } from "./list-year-grades";
 
 type ActionsBarProps = {
   announcement: Announcement;
@@ -66,7 +66,7 @@ const ActionsBar: FC<ActionsBarProps> = ({ announcement }) => {
           <Button type="text" icon={<MoreOutlined />} />
         </Dropdown>
       </Space>
-      <ListGrades
+      <ListPeriodGrades
         annoucement={announcement}
         anouncementId={anouncementId}
         setAnnoucementId={setAnnoucementId}
@@ -178,7 +178,7 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
                   open={openNewWithSome}
                   setOpen={setOpenNewWithSome}
                 />
-                <MultiPeriodsListGrades />
+                <ListYearGrades />
               </Space>
             </header>
           )}
