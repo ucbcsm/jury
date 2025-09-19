@@ -69,7 +69,6 @@ export const MultiPeriodsListGrades: FC<MultiPeriodsListGradesProps> = ({
         facultyId: Number(facultyId),
         departmentId: Number(departmentId),
         classId: Number(classId),
-        periodIds: `${1-2}`, // Pass period IDs as a hyphen-separated string
         session: "main_session",
         moment: "before_appeal",
       }),

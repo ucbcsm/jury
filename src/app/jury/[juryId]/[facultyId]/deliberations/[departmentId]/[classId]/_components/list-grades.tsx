@@ -66,7 +66,7 @@ export const ListGrades: FC<ListGradesProps> = ({
         facultyId: Number(facultyId),
         departmentId: Number(departmentId),
         classId: Number(classId),
-        periodIds: `${annoucement.period.id}`, // Pass period ID as a hyphen-separated string
+        periodId: annoucement.period.id,
         session: annoucement.session,
         moment: annoucement.moment,
       }),
