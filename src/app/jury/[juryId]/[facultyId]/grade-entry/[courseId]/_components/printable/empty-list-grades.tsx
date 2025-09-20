@@ -1,5 +1,6 @@
 "use client";
 
+import { DocHeader } from "@/components/doc-header";
 import { CourseEnrollment, TaughtCourse } from "@/types";
 import { Card, Descriptions, Table, Typography, Watermark } from "antd";
 import { FC, RefObject } from "react";
@@ -19,6 +20,7 @@ export const EmptyListGradesToPrint: FC<EmptyListGradesToPrintProps> = ({
       <div ref={ref}>
         {/* <Watermark content="UCBC"> */}
         <div>
+          <DocHeader/>
           <Typography.Title style={{}}>Fiche de notes</Typography.Title>
           <Card>
             <Descriptions

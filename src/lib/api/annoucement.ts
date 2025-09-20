@@ -82,3 +82,33 @@ export async function createAnnoucementWithSome(data: {
   });
   return res.data;
 }
+
+export async function updateAnnouncement(
+  data: Omit<
+    Announcement,
+    "academic_year" | "period" | "faculty" | "departement" | "class_year" | "date_updated"
+  > & {
+    yearId: number;
+    periodId: number;
+    facultyId: number;
+    departmentId: number;
+    classId: number;
+  }
+) {
+  const res = await api.put(`/jury/announcement/${data.id}/`, {
+    academic_year: data.yearId,
+    period: data.periodId,
+    status: data.status,
+    faculty: data.facultyId,
+    departement: data.departmentId,
+    class_year: data.classId,
+    total_students: data.total_students,
+    graduated_students: data.graduated_students,
+    non_graduated_students: data.non_graduated_students,
+    moment: data.moment,
+    session: data.session,
+    date_created: data.date_created,
+    mode: data.mode,
+  });
+  return res.data;
+}

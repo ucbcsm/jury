@@ -5,6 +5,7 @@ import { getAnnoucements } from "@/lib/api/annoucement";
 import {
   CheckSquareOutlined,
   DeleteOutlined,
+  EditOutlined,
   EyeOutlined,
   LockOutlined,
   MinusSquareOutlined,
@@ -24,19 +25,39 @@ import { ListPeriodGrades } from "./list-period-grades";
 import { DeleteAnnouncementForm } from "./delete-announcement-form";
 import { NewAnnoucementWithSomeForm } from "./new-announcement-with-some-form";
 import { ListYearGrades } from "./list-year-grades";
+import { EditAnnouncementForm } from "./edit-anouncement-form";
 
 type ActionsBarProps = {
   announcement: Announcement;
+  periods?: Period[];
 };
-const ActionsBar: FC<ActionsBarProps> = ({ announcement }) => {
+const ActionsBar: FC<ActionsBarProps> = ({ announcement, periods }) => {
   const [anouncementId, setAnnoucementId] = useQueryState(
     "grid",
     parseAsInteger
   );
   const [openDeleteAnnouncement, setOpenDeleteAnnouncement] =
     useState<boolean>(false);
+  const [openEditAnnouncement, setOpenEditAnnouncement] =
+    useState<boolean>(false);
   return (
     <>
+      <ListPeriodGrades
+        annoucement={announcement}
+        anouncementId={anouncementId}
+        setAnnoucementId={setAnnoucementId}
+      />
+      <EditAnnouncementForm
+        open={openEditAnnouncement}
+        setOpen={setOpenEditAnnouncement}
+        announcement={announcement}
+        periods={periods}
+      />
+      <DeleteAnnouncementForm
+        open={openDeleteAnnouncement}
+        setOpen={setOpenDeleteAnnouncement}
+        announcement={announcement}
+      />
       <Space>
         <Button
           icon={<EyeOutlined />}
@@ -54,8 +75,16 @@ const ActionsBar: FC<ActionsBarProps> = ({ announcement }) => {
           menu={{
             items: [
               {
+                key: "edit",
+                label: "Modifier",
+                icon: <EditOutlined />,
+                onClick: () => {
+                  setOpenEditAnnouncement(true);
+                },
+              },
+              {
                 key: "delete",
-                label: "Supprimer la publication",
+                label: "Supprimer",
                 icon: <DeleteOutlined />,
                 danger: true,
                 onClick: () => setOpenDeleteAnnouncement(true),
@@ -66,16 +95,6 @@ const ActionsBar: FC<ActionsBarProps> = ({ announcement }) => {
           <Button type="text" icon={<MoreOutlined />} />
         </Dropdown>
       </Space>
-      <ListPeriodGrades
-        annoucement={announcement}
-        anouncementId={anouncementId}
-        setAnnoucementId={setAnnoucementId}
-      />
-      <DeleteAnnouncementForm
-        open={openDeleteAnnouncement}
-        setOpen={setOpenDeleteAnnouncement}
-        announcement={announcement}
-      />
     </>
   );
 };
@@ -277,7 +296,9 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
             {
               key: "actions",
               dataIndex: "view",
-              render: (_, record) => <ActionsBar announcement={record} />,
+              render: (_, record) => (
+                <ActionsBar announcement={record} periods={periods} />
+              ),
               width: 188,
               fixed: "right",
             },

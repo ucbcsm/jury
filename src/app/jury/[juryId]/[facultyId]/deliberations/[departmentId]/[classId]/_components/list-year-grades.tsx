@@ -32,10 +32,7 @@ type ListYearGradesProps = {
   classYear?: Class;
 };
 
-export const ListYearGrades: FC<ListYearGradesProps> = ({
-  department,
-  classYear,
-}) => {
+export const ListYearGrades: FC<ListYearGradesProps> = ({ department, classYear }) => {
   const { yid, year } = useYid();
   const { facultyId, departmentId, classId } = useParams();
   const [open, setOpen] = useQueryState(

@@ -1,5 +1,6 @@
 "use client";
 
+import { DocHeader } from "@/components/doc-header";
 import {
   getDecisionText,
   getMomentText,
@@ -31,11 +32,11 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
   return (
     <div className="hidden">
       <div ref={ref}>
+        <DocHeader />
         {annoucement && (
-          <Card style={{ marginBottom: 16 }} variant="borderless">
+          <Card style={{ marginBottom: 28 }}>
             <Descriptions
               title="Résultats"
-              // bordered
               size="small"
               column={2}
               items={[
@@ -64,7 +65,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   label: "Promotion",
                   children: `${annoucement.class_year?.acronym} (${annoucement.class_year.name})`,
                 },
-                
+
                 {
                   key: "session",
                   label: "Session",
@@ -81,16 +82,15 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
         )}
 
         {forYearResult && (
-          <Card style={{ marginBottom: 16 }} variant="borderless">
+          <Card style={{ marginBottom: 28 }}>
             <Descriptions
               title="Résultats"
-              // size="small"
               column={2}
               items={[
                 {
                   key: "year",
                   label: "Année académique",
-                  children: `${forYearResult?.year?.name}`,
+                  children: `${forYearResult?.year?.name || ""}`,
                 },
                 {
                   key: "faculty",
@@ -122,7 +122,6 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
           </Card>
         )}
 
-
         <table className="min-w-fit divide-y divide-gray-200  overflow-hidden ">
           <thead className="bg-gray-50">
             <tr className=" uppercase">
@@ -140,7 +139,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   {period.period.acronym}
                 </th>
               ))}
-              <th colSpan={7} className="bg-white border border-gray-300"></th>
+              <th colSpan={6} className="bg-white border border-gray-300"></th>
             </tr>
             <tr>
               <th
@@ -209,7 +208,6 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               >
                 Décision
               </th>
-              <th rowSpan={6} className="bg-white border border-gray-300"></th>
             </tr>
             <tr>
               <th
@@ -332,7 +330,6 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               <th className="px-2 py-1 w-8 text-xs  border-b border border-gray-300  font-bold">
                 NV
               </th>
-              <th className=" border border-gray-300"></th>
               <th className=" border border-gray-300"></th>
             </tr>
           </thead>
