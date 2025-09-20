@@ -15,7 +15,7 @@ import {
   PrinterOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Card, Descriptions, Drawer, Skeleton, Space } from "antd";
+import { Button, Card, Descriptions, Divider, Drawer, Skeleton, Space, Typography } from "antd";
 import { useParams } from "next/navigation";
 import { Options } from "nuqs";
 
@@ -89,10 +89,23 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
   return (
     <Drawer
       width="100%"
-      title={`Résultats: ${annoucement.class_year.acronym} ${annoucement.departement.name}`}
+      title={
+        <Space>
+          <Typography.Title
+            level={5}
+            style={{ marginBottom: 0, textTransform: "uppercase" }}
+            type="secondary"
+          >
+            Résultats:
+          </Typography.Title>
+          <Typography.Title level={5} style={{ marginBottom: 0 }}>
+            {annoucement.class_year.acronym} {annoucement.departement.name}
+          </Typography.Title>
+        </Space>
+      }
       styles={{
-        header: { textTransform: "uppercase", borderBottom: 0 },
-        body: { paddingTop: 0, paddingBottom: 0 },
+        header: {},
+        body: { paddingTop: 0, paddingBottom: 0, overflow: "hidden" },
       }}
       style={{ padding: 0 }}
       loading={isPending}
@@ -102,59 +115,29 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
       closable={false}
       extra={
         <Space>
-          {/* {!isPending ? (
-            <Button
-              style={{ boxShadow: "none" }}
-              icon={<DownloadOutlined />}
-              color="primary"
-              variant="dashed"
-              onClick={() => {
-                if (data) {
-                  exportGridToExcel(data, {
-                    sheetName: `${
-                      annoucement.class_year.acronym
-                    } ${annoucement.departement.name.replace(
-                      " ",
-                      "-"
-                    )}-${getSessionText(annoucement.session).replace(
-                      " ",
-                      "-"
-                    )}-${getMomentText(annoucement.moment).replace(" ", "-")}`,
-                    fileName: `${
-                      annoucement.class_year.acronym
-                    }-${annoucement.departement.name.replace(
-                      " ",
-                      "-"
-                    )}-${getSessionText(annoucement.session).replace(
-                      " ",
-                      "-"
-                    )}-${getMomentText(annoucement.moment).replace(
-                      " ",
-                      "-"
-                    )}.xlsx`,
-                  });
-                }
-              }}
-              disabled={!data}
-            >
-              Exporter .xlsx
-            </Button>
-          ) : (
-            <Skeleton.Button active />
-          )} */}
-          {!isPending ? (
-            <Button
-              style={{ boxShadow: "none" }}
-              icon={<PrinterOutlined />}
-              color="default"
-              variant="dashed"
-              onClick={printListGrades}
-            >
-              Imprimer
-            </Button>
-          ) : (
-            <Skeleton.Button active />
-          )}
+          <Typography.Text type="secondary">Session: </Typography.Text>
+          <Typography.Text strong>
+            {getSessionText(annoucement.session)}
+          </Typography.Text>
+          <Divider type="vertical" />
+          <Typography.Text type="secondary">Moment: </Typography.Text>
+          <Typography.Text strong>
+            {getMomentText(annoucement.moment)}
+          </Typography.Text>
+          <Divider type="vertical" />
+          <Button
+            style={{
+              boxShadow: "none",
+            }}
+            icon={<PrinterOutlined />}
+            color="primary"
+            variant="dashed"
+            onClick={printListGrades}
+            disabled={data?.BodyDataList?.length === 0}
+          >
+            Imprimer
+          </Button>
+
           <Button
             type="text"
             icon={<CloseOutlined />}
@@ -164,70 +147,29 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
         </Space>
       }
     >
-      <Card style={{ marginBottom: 16 }} variant="borderless">
-        <Descriptions
-          // title="Détails"
-          // bordered
-          size="small"
-          column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 3, xxl: 3 }}
-          items={[
-            {
-              key: "faculty",
-              label: "Filière",
-              children: annoucement?.faculty.name || "",
-            },
-            {
-              key: "department",
-              label: "Mention",
-              children: annoucement.departement?.name || "",
-            },
-            {
-              key: "class",
-              label: "Promotion",
-              children: `${annoucement.class_year?.acronym} (${annoucement.class_year.name})`,
-            },
-            {
-              key: "year",
-              label: "Année académique",
-              children: `${annoucement.academic_year.name}`,
-            },
-            {
-              key: "period",
-              label: "Période",
-              children: `${annoucement.period.acronym} (${annoucement.period.name})`,
-            },
-            {
-              key: "session",
-              label: "Session",
-              children: getSessionText(annoucement.session),
-            },
-            {
-              key: "moment",
-              label: "Moment",
-              children: getMomentText(annoucement.moment),
-            },
-          ]}
-        />
-      </Card>
-      <div className="h-[calc(100vh-210px)] overflow-y-auto ">
+      <div className="h-[calc(100vh-65px)] overflow-y-auto ">
         <div className="min-w-fit overflow-x-auto pb-10">
-          <table className="min-w-fit divide-y rounded-lg divide-gray-200  border border-red-300 overflow-hidden ">
-            <thead className="bg-gray-50 ">
+          <table className="min-w-fit divide-y divide-gray-200 overflow-hidden ">
+            <thead className="bg-gray-50">
               <tr>
                 <th
                   colSpan={4}
-                  className="px-4 py-2 text-left text-lg font-semibold bg-white border-b  border border-gray-300"
+                  className="px-4 py-2 text-center text-lg font-semibold bg-white border-b  border border-gray-300"
                 >
                   Semestre
                 </th>
-                {data?.HeaderData.no_retaken.period_list.map((period) => (
+                {data?.HeaderData?.no_retaken?.period_list?.map((period) => (
                   <th
                     colSpan={period.course_counter}
-                    className="px-4 py-2 text-left text-lg font-semibold bg-white border-b  border border-gray-300"
+                    className="px-4 py-2 text-center text-lg font-semibold bg-white border-b  border border-gray-300"
                   >
-                    {period.period.name}
+                    {period.period.acronym}
                   </th>
                 ))}
+                <th
+                  colSpan={7}
+                  className="bg-white border border-gray-300"
+                ></th>
               </tr>
               <tr>
                 <th
@@ -236,7 +178,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                 >
                   Unités d&apos;Enseignement
                 </th>
-                {data?.HeaderData?.no_retaken?.teaching_unit_list.map((TU) => (
+                {data?.HeaderData?.no_retaken?.teaching_unit_list?.map((TU) => (
                   <th
                     key={TU.teaching_unit.code}
                     colSpan={TU.course_counter}
@@ -296,6 +238,10 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                 >
                   Décision
                 </th>
+                <th
+                  rowSpan={6}
+                  className="bg-white border border-gray-300"
+                ></th>
               </tr>
               <tr>
                 <th
@@ -304,7 +250,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                 >
                   Éléments Constitutifs
                 </th>
-                {data?.HeaderData?.no_retaken?.course_list.map((course) => (
+                {data?.HeaderData?.no_retaken?.course_list?.map((course) => (
                   <th
                     key={course.id}
                     style={{
@@ -322,7 +268,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                   colSpan={4}
                   className="bg-white border border-gray-300"
                 ></th>
-                {data?.HeaderData.no_retaken.course_list.map((_, index) => (
+                {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
                   <th
                     key={index}
                     className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
@@ -341,7 +287,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                 >
                   Crédits
                 </th>
-                {data?.HeaderData.no_retaken.credits.map((credit, idx) => (
+                {data?.HeaderData?.no_retaken?.credits?.map((credit, idx) => (
                   <th
                     key={idx}
                     className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300 text-center"
@@ -350,7 +296,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                   </th>
                 ))}
                 <th className="px-2 py-1  text-xs bg-gray-50 border-b border border-gray-300 text-center font-bold">
-                  {data?.HeaderData.no_retaken.credits.reduce(
+                  {data?.HeaderData?.no_retaken?.credits?.reduce(
                     (prevValue, currenValue) => currenValue + prevValue
                   )}
                 </th>
@@ -364,7 +310,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                 >
                   CC
                 </th>
-                {data?.HeaderData.no_retaken.course_list.map((_, index) => (
+                {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
                   <th
                     key={index}
                     className="px-2 py-1 w-8 text-xs bg-white border-b  border border-gray-300 text-center"
@@ -383,7 +329,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                 >
                   Examen
                 </th>
-                {data?.HeaderData.no_retaken.course_list.map((_, index) => (
+                {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
                   <th
                     key={index}
                     className="px-2 py-1 w-8 text-xs bg-gray-50 border-b  border border-gray-300 text-center"
@@ -395,14 +341,14 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                 <th className="bg-gray-50 border border-gray-300"></th>
                 <th className="bg-gray-50 border border-gray-300"></th>
               </tr>
-              <tr>
+              <tr className="bg-white">
                 <th
                   colSpan={4}
-                  className="bg-white text-xs font-medium border border-gray-300"
+                  className=" text-xs font-medium border border-gray-300"
                 >
                   TOTAL
                 </th>
-                {data?.HeaderData.no_retaken.course_list.map((_, index) => (
+                {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
                   <th
                     key={index}
                     className="px-2 py-1 w-8 text-xs border-b border border-gray-300 text-center"
@@ -410,18 +356,19 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                     20
                   </th>
                 ))}
-                <th className="px-2 py-1 text-xs bg-white border-b border border-gray-300 text-center font-bold">
+                <th className="px-2 py-1 text-xs  border-b border border-gray-300 text-center font-bold">
                   20
                 </th>
-                <th className="bg-white border border-gray-300"></th>
-                <th className="bg-white border border-gray-300"></th>
-                <th className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300  font-bold">
+                <th className=" border border-gray-300"></th>
+                <th className=" border border-gray-300"></th>
+                <th className="px-2 py-1 w-8 text-xs  border-b border border-gray-300  font-bold">
                   V
                 </th>
-                <th className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300  font-bold">
+                <th className="px-2 py-1 w-8 text-xs  border-b border border-gray-300  font-bold">
                   NV
                 </th>
-                <th className="bg-gray-50 border border-gray-300"></th>
+                <th className=" border border-gray-300"></th>
+                <th className=" border border-gray-300"></th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">

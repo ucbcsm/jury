@@ -21,6 +21,7 @@ import {
   Card,
   Descriptions,
   Drawer,
+  Empty,
   Result,
   Select,
   Skeleton,
@@ -83,7 +84,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
     documentTitle: `Resultat-${yid}`,
   });
 
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, error } = useQuery({
     queryKey: [
       "year_grid_grades",
       Number(yid),
@@ -131,7 +132,26 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
         width="100%"
         title={
           <Space>
-            <Typography.Title level={5}>Résultats</Typography.Title>
+            <Typography.Title
+              level={5}
+              style={{ marginBottom: 0, textTransform: "uppercase" }}
+            >
+              Résultats
+            </Typography.Title>
+          </Space>
+        }
+        styles={{
+          header: { },
+          body: { paddingTop: 0, paddingBottom: 0 },
+        }}
+        loading={isPending}
+        open={open}
+        onClose={onClose}
+        footer={false}
+        closable={false}
+        extra={
+          <Space>
+            <Typography.Text type="secondary">Session: </Typography.Text>
             <Select
               variant="filled"
               placeholder="Session"
@@ -159,29 +179,15 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
                 setMoment(value as "before_appeal" | "after_appeal");
               }}
             />
-          </Space>
-        }
-        styles={{
-          header: { borderBottom: 0 },
-          body: { paddingTop: 0, paddingBottom: 0 },
-        }}
-        loading={isPending}
-        open={open}
-        onClose={onClose}
-        footer={false}
-        closable={false}
-        extra={
-          <Space>
             <Button
               style={{
                 boxShadow: "none",
-                display:
-                  data && data.BodyDataList.length > 0 ? "block" : "none",
               }}
               icon={<PrinterOutlined />}
-              color="default"
+              color="primary"
               variant="dashed"
               onClick={printListGrades}
+              disabled={data?.BodyDataList?.length === 0}
             >
               Imprimer
             </Button>
@@ -196,29 +202,31 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
         }
       >
         <div
-          className="h-[calc(100vh-64px)] overflow-y-auto"
+          className="h-[calc(100vh-65px)] overflow-y-auto"
           style={{
             display: data && data.BodyDataList.length > 0 ? "block" : "none",
           }}
         >
-          <div className="min-w-fit overflow-x-auto pb-10">
-            <table className="min-w-fit divide-y rounded-lg divide-gray-200  border border-red-300 overflow-hidden ">
+          <div className="min-w-fit overflow-x-auto  pb-10">
+            <table className="min-w-fit divide-y divide-gray-200 border-0   overflow-hidden ">
               <thead className="bg-gray-50">
                 <tr>
                   <th
                     colSpan={4}
-                    className="px-4 py-2 text-left text-lg font-semibold bg-white border-b  border border-gray-300"
+                    className="px-4 py-2 text-center text-lg font-semibold bg-white border-b  border border-gray-300"
                   >
                     Semestre
                   </th>
                   {data?.HeaderData?.no_retaken?.period_list?.map((period) => (
                     <th
                       colSpan={period.course_counter}
-                      className="px-4 py-2 text-left text-lg font-semibold bg-white border-b  border border-gray-300"
+                      className="px-4 py-2 text-center text-lg font-semibold bg-white border-b  border border-gray-300"
                     >
                       {period.period.acronym}
                     </th>
                   ))}
+                  <th colSpan={7} className="bg-white border border-gray-300"></th>
+                  
                 </tr>
                 <tr>
                   <th
@@ -289,6 +297,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
                   >
                     Décision
                   </th>
+                  <th rowSpan={6} className="bg-white border border-gray-300"></th>
                 </tr>
                 <tr>
                   <th
@@ -394,10 +403,10 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
                   <th className="bg-gray-50 border border-gray-300"></th>
                   <th className="bg-gray-50 border border-gray-300"></th>
                 </tr>
-                <tr>
+                <tr className="bg-white">
                   <th
                     colSpan={4}
-                    className="bg-white text-xs font-medium border border-gray-300"
+                    className=" text-xs font-medium border border-gray-300"
                   >
                     TOTAL
                   </th>
@@ -411,18 +420,19 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
                       </th>
                     )
                   )}
-                  <th className="px-2 py-1 text-xs bg-white border-b border border-gray-300 text-center font-bold">
+                  <th className="px-2 py-1 text-xs  border-b border border-gray-300 text-center font-bold">
                     20
                   </th>
-                  <th className="bg-white border border-gray-300"></th>
-                  <th className="bg-white border border-gray-300"></th>
-                  <th className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300  font-bold">
+                  <th className=" border border-gray-300"></th>
+                  <th className=" border border-gray-300"></th>
+                  <th className="px-2 py-1 w-8 text-xs  border-b border border-gray-300  font-bold">
                     V
                   </th>
-                  <th className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300  font-bold">
+                  <th className="px-2 py-1 w-8 text-xs  border-b border border-gray-300  font-bold">
                     NV
                   </th>
-                  <th className="bg-gray-50 border border-gray-300"></th>
+                  <th className=" border border-gray-300"></th>
+                  <th className=" border border-gray-300"></th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
@@ -723,22 +733,15 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
             </table>
           </div>
         </div>
-
-        <Result
-          title="Erreur de récupération des données"
-          subTitle="Une erreur est survenue lors de la tentative de récupération des données depuis le serveur. Veuillez réessayer."
-          status={"error"}
-          extra={
-            <Button
-              type="link"
-              onClick={() => {
-                window.location.reload();
-              }}
-            >
-              Réessayer
-            </Button>
-          }
-        />
+        {data?.BodyDataList.length === 0 && (
+          <div className="py-32">
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="Aucun résultat trouvé"
+              children="Veuillez peut-être sélectionner une autre session ou un autre moment."
+            />
+          </div>
+        )}
 
         <PrintableListGrades
           ref={refToPrint}
