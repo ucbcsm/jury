@@ -141,8 +141,8 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
           </Space>
         }
         styles={{
-          header: { },
-          body: { paddingTop: 0, paddingBottom: 0 },
+          header: {},
+          body: { paddingTop: 0, paddingBottom: 0, overflow: "hidden" },
         }}
         loading={isPending}
         open={open}
@@ -225,8 +225,10 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
                       {period.period.acronym}
                     </th>
                   ))}
-                  <th colSpan={7} className="bg-white border border-gray-300"></th>
-                  
+                  <th
+                    colSpan={7}
+                    className="bg-white border border-gray-300"
+                  ></th>
                 </tr>
                 <tr>
                   <th
@@ -297,7 +299,10 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
                   >
                     Décision
                   </th>
-                  <th rowSpan={6} className="bg-white border border-gray-300"></th>
+                  <th
+                    rowSpan={6}
+                    className="bg-white border border-gray-300"
+                  ></th>
                 </tr>
                 <tr>
                   <th

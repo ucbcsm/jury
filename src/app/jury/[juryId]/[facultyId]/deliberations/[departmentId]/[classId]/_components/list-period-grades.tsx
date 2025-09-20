@@ -105,7 +105,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
       }
       styles={{
         header: {},
-        body: { paddingTop: 0, paddingBottom: 0, overflow: "hidden" },
+        body: { paddingTop: 0, paddingBottom: 0, overflow:"hidden"},
       }}
       style={{ padding: 0 }}
       loading={isPending}
@@ -115,6 +115,11 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
       closable={false}
       extra={
         <Space>
+          <Typography.Text type="secondary">Année: </Typography.Text>
+          <Typography.Text strong>
+            {annoucement.academic_year.name}
+          </Typography.Text>
+          <Divider type="vertical" />
           <Typography.Text type="secondary">Session: </Typography.Text>
           <Typography.Text strong>
             {getSessionText(annoucement.session)}
