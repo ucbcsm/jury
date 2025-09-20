@@ -21,7 +21,7 @@ export const EmptyListGradesToPrint: FC<EmptyListGradesToPrintProps> = ({
         {/* <Watermark content="UCBC"> */}
         <div>
           <DocHeader/>
-          <Typography.Title style={{}}>Fiche de notes</Typography.Title>
+          <Typography.Title level={3} style={{}}>Fiche de notes</Typography.Title>
           <Card>
             <Descriptions
               size="small"

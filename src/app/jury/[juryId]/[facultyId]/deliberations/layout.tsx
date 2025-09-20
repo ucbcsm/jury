@@ -16,6 +16,7 @@ import {
 } from "antd";
 import { useParams } from "next/navigation";
 import { ListClasses } from "./_components/list-classes";
+import { TreeClasses } from "./_components/tree-classes";
 
 export default function DeliberationsLayout({
   children,
@@ -57,7 +58,8 @@ export default function DeliberationsLayout({
         icon: <SubnodeOutlined />,
         children: (
           <div className="pl-8">
-            <ListClasses classes={classes} department={dep}/>
+            <TreeClasses classes={classes} department={dep} />{" "}
+            {/* <ListClasses classes={classes} department={dep}/> */}
           </div>
         ),
         styles: {

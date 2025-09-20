@@ -14,6 +14,7 @@ import { useParams } from "next/navigation";
 import { ListCourse } from "./_components/list-course";
 import { DataFetchPendingSkeleton } from "@/components/loadingSkeleton";
 import { DataFetchErrorResult } from "@/components/errorResult";
+import { TreeCourses } from "./_components/tree-courses";
 
 export default function GradeEntryLayout({
   children,
@@ -49,7 +50,7 @@ export default function GradeEntryLayout({
     const items = periods?.map((period) => ({
       key: `${period.id}`,
       label: `${period.acronym} (${period.name})`,
-      children: <ListCourse period={period} />,
+      children: <TreeCourses period={period} />, //<ListCourse period={period} />
       styles: {
         header: {
           background: "#fff",
