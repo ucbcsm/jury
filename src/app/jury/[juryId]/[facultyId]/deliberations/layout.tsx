@@ -58,15 +58,14 @@ export default function DeliberationsLayout({
         icon: <SubnodeOutlined />,
         children: (
           <div className="pl-8">
-            <TreeClasses classes={classes} department={dep} />{" "}
+            <TreeClasses classes={classes} department={dep} />
             {/* <ListClasses classes={classes} department={dep}/> */}
           </div>
         ),
         styles: {
           header: {
             background: "#fff",
-            textTransform: "uppercase",
-            fontWeight: "bold",
+            fontWeight: 700,
           },
           body: { background: "#fff" },
         },

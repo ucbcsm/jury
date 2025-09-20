@@ -54,8 +54,7 @@ export default function GradeEntryLayout({
       styles: {
         header: {
           background: "#fff",
-          textTransform: "uppercase",
-          fontWeight: "bold",
+          fontWeight: 700
         },
         body: { background: "#fff" },
       },
