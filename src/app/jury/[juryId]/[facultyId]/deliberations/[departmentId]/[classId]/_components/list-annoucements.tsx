@@ -178,7 +178,7 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
                   open={openNewWithSome}
                   setOpen={setOpenNewWithSome}
                 />
-                <ListYearGrades />
+                <ListYearGrades department={department} classYear={classYear} />
               </Space>
             </header>
           )}

@@ -104,8 +104,8 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
         </Space>
       }
       styles={{
-        header: {},
-        body: { paddingTop: 0, paddingBottom: 0, overflow:"hidden"},
+        header: { borderColor: "#d1d5dc" },
+        body: { padding: 0, overflow: "hidden" },
       }}
       style={{ padding: 0 }}
       loading={isPending}

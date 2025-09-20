@@ -8,7 +8,7 @@ import {
   getSessionText,
   getShortGradeValidationText,
 } from "@/lib/api";
-import { Announcement } from "@/types";
+import { Announcement, Class, Department } from "@/types";
 import {
   CloseOutlined,
   DownloadOutlined,
@@ -20,6 +20,7 @@ import {
   Button,
   Card,
   Descriptions,
+  Divider,
   Drawer,
   Empty,
   Result,
@@ -43,19 +44,14 @@ import { ButtonDeleteGradeFromGrid } from "./delete-grade-item";
 import { useYid } from "@/hooks/use-yid";
 
 type ListYearGradesProps = {
-  //   annoucement: Announcement;
-  //   anouncementId: number | null;
-  //   setAnnoucementId: (
-  //     value: number | ((old: number | null) => number | null) | null,
-  //     options?: Options
-  //   ) => Promise<URLSearchParams>;
+  department?: Department;
+  classYear?: Class;
 };
 
 export const ListYearGrades: FC<ListYearGradesProps> = (
   {
-    //   annoucement,
-    //   anouncementId,
-    //   setAnnoucementId,
+    department,
+    classYear
   }
 ) => {
   const { yid } = useYid();
@@ -135,14 +131,18 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
             <Typography.Title
               level={5}
               style={{ marginBottom: 0, textTransform: "uppercase" }}
+              type="secondary"
             >
-              Résultats
+              Résultats:
+            </Typography.Title>
+            <Typography.Title level={5} style={{ marginBottom: 0 }}>
+              {classYear?.acronym} {department?.name}
             </Typography.Title>
           </Space>
         }
         styles={{
-          header: {},
-          body: { paddingTop: 0, paddingBottom: 0, overflow: "hidden" },
+          header: {borderColor:"#d1d5dc"},
+          body: { padding:0, overflow: "hidden",  },
         }}
         loading={isPending}
         open={open}
@@ -151,6 +151,9 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
         closable={false}
         extra={
           <Space>
+            <Typography.Text type="secondary">Année: </Typography.Text>
+            <Typography.Text strong></Typography.Text>
+            <Divider type="vertical" />
             <Typography.Text type="secondary">Session: </Typography.Text>
             <Select
               variant="filled"
