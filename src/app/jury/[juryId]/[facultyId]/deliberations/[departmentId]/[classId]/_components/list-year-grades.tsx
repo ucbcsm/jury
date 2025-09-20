@@ -1,41 +1,25 @@
 "use client";
 
 import {
-  exportGridToExcel,
   getDecisionText,
-  getMomentText,
   getResultGrid,
-  getSessionText,
   getShortGradeValidationText,
 } from "@/lib/api";
-import { Announcement, Class, Department } from "@/types";
-import {
-  CloseOutlined,
-  DownloadOutlined,
-  EyeOutlined,
-  PrinterOutlined,
-} from "@ant-design/icons";
+import { Class, Department } from "@/types";
+import { CloseOutlined, EyeOutlined, PrinterOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
   Button,
-  Card,
-  Descriptions,
   Divider,
   Drawer,
   Empty,
   Result,
   Select,
-  Skeleton,
   Space,
   Typography,
 } from "antd";
 import { useParams } from "next/navigation";
-import {
-  Options,
-  parseAsBoolean,
-  parseAsStringEnum,
-  useQueryState,
-} from "nuqs";
+import { parseAsBoolean, parseAsStringEnum, useQueryState } from "nuqs";
 
 import React, { FC, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
@@ -48,13 +32,11 @@ type ListYearGradesProps = {
   classYear?: Class;
 };
 
-export const ListYearGrades: FC<ListYearGradesProps> = (
-  {
-    department,
-    classYear
-  }
-) => {
-  const { yid } = useYid();
+export const ListYearGrades: FC<ListYearGradesProps> = ({
+  department,
+  classYear,
+}) => {
+  const { yid, year } = useYid();
   const { facultyId, departmentId, classId } = useParams();
   const [open, setOpen] = useQueryState(
     "year-grid",
@@ -102,8 +84,6 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
         mode: "YEAR-GRADE",
       }),
     enabled: !!yid && !!facultyId && !!departmentId && !!classId,
-    // !!annoucement.period.id &&
-    // !!anouncementId,
   });
 
   const onClose = () => {
@@ -141,8 +121,8 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
           </Space>
         }
         styles={{
-          header: {borderColor:"#d1d5dc"},
-          body: { padding:0, overflow: "hidden",  },
+          header: { borderColor: "#d1d5dc" },
+          body: { padding: 0, overflow: "hidden" },
         }}
         loading={isPending}
         open={open}
@@ -151,8 +131,8 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
         closable={false}
         extra={
           <Space>
-            <Typography.Text type="secondary">Année: </Typography.Text>
-            <Typography.Text strong></Typography.Text>
+            <Typography.Text type="secondary">Année:</Typography.Text>
+            <Typography.Text strong>{year?.name}</Typography.Text>
             <Divider type="vertical" />
             <Typography.Text type="secondary">Session: </Typography.Text>
             <Select
@@ -213,17 +193,17 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
           <div className="min-w-fit overflow-x-auto  pb-10">
             <table className="min-w-fit divide-y divide-gray-200 border-0   overflow-hidden ">
               <thead className="bg-gray-50">
-                <tr>
+                <tr className=" uppercase">
                   <th
                     colSpan={4}
-                    className="px-4 py-2 text-center text-lg font-semibold bg-white border-b  border border-gray-300"
+                    className="px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
                   >
                     Semestre
                   </th>
                   {data?.HeaderData?.no_retaken?.period_list?.map((period) => (
                     <th
                       colSpan={period.course_counter}
-                      className="px-4 py-2 text-center text-lg font-semibold bg-white border-b  border border-gray-300"
+                      className="px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
                     >
                       {period.period.acronym}
                     </th>
@@ -750,11 +730,37 @@ export const ListYearGrades: FC<ListYearGradesProps> = (
             />
           </div>
         )}
-
+        {isError && (
+          <Result
+            title="Erreur de récupération des données"
+            subTitle={
+              error
+                ? error.message
+                : "Une erreur est survenue lors de la tentative de récupération des données depuis le serveur. Veuillez réessayer."
+            }
+            status={"error"}
+            extra={
+              <Button
+                type="link"
+                onClick={() => {
+                  window.location.reload();
+                }}
+              >
+                Réessayer
+              </Button>
+            }
+          />
+        )}
         <PrintableListGrades
           ref={refToPrint}
-          // annoucement={annoucement}
           data={data}
+          forYearResult={{
+            department,
+            classYear,
+            year,
+            session,
+            moment,
+          }}
         />
       </Drawer>
     </>

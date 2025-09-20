@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  exportGridToExcel,
   getDecisionText,
   getMomentText,
   getResultGrid,
@@ -11,11 +10,10 @@ import {
 import { Announcement } from "@/types";
 import {
   CloseOutlined,
-  DownloadOutlined,
   PrinterOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Card, Descriptions, Divider, Drawer, Skeleton, Space, Typography } from "antd";
+import { Button, Divider, Drawer, Result, Space, Typography } from "antd";
 import { useParams } from "next/navigation";
 import { Options } from "nuqs";
 
@@ -50,7 +48,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
     )}`,
   });
 
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, error } = useQuery({
     queryKey: [
       "grid_grades",
       annoucement.academic_year.id,
@@ -80,7 +78,6 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
       !!annoucement.period.id &&
       !!anouncementId,
   });
-  console.log(data);
 
   const onClose = () => {
     setAnnoucementId(null);
@@ -156,17 +153,17 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
         <div className="min-w-fit overflow-x-auto pb-10">
           <table className="min-w-fit divide-y divide-gray-200 overflow-hidden ">
             <thead className="bg-gray-50">
-              <tr>
+              <tr className=" uppercase">
                 <th
                   colSpan={4}
-                  className="px-4 py-2 text-center text-lg font-semibold bg-white border-b  border border-gray-300"
+                  className="px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
                 >
                   Semestre
                 </th>
                 {data?.HeaderData?.no_retaken?.period_list?.map((period) => (
                   <th
                     colSpan={period.course_counter}
-                    className="px-4 py-2 text-center text-lg font-semibold bg-white border-b  border border-gray-300"
+                    className="px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
                   >
                     {period.period.acronym}
                   </th>
@@ -645,6 +642,27 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
           </table>
         </div>
       </div>
+      {isError && (
+        <Result
+          title="Erreur de récupération des données"
+          subTitle={
+            error
+              ? error.message
+              : "Une erreur est survenue lors de la tentative de récupération des données depuis le serveur. Veuillez réessayer."
+          }
+          status={"error"}
+          extra={
+            <Button
+              type="link"
+              onClick={() => {
+                window.location.reload();
+              }}
+            >
+              Réessayer
+            </Button>
+          }
+        />
+      )}
       <PrintableListGrades
         ref={refToPrint}
         annoucement={annoucement}

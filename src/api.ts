@@ -164,3 +164,5 @@
         // session
         // moment
         // search_matricule
+
+        // https://ciucbc.pythonanywhere.com/api/v01/faculty/attendance-list/?course__id=&attendance_reached

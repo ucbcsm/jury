@@ -6,7 +6,7 @@ import {
   getSessionText,
   getShortGradeValidationText,
 } from "@/lib/api";
-import { Announcement, ResultGrid } from "@/types";
+import { Announcement, Class, Department, ResultGrid, Year } from "@/types";
 import { Card, Descriptions, Watermark } from "antd";
 import React, { FC, RefObject } from "react";
 
@@ -14,11 +14,19 @@ type PrintableListGradesProps = {
   ref: RefObject<HTMLDivElement | null>;
   annoucement?: Announcement;
   data?: ResultGrid;
+  forYearResult?: {
+    year?: Year;
+    department?: Department;
+    classYear?: Class;
+    session: "main_session" | "retake_session";
+    moment: "before_appeal" | "after_appeal";
+  };
 };
 export const PrintableListGrades: FC<PrintableListGradesProps> = ({
   ref,
   annoucement,
   data,
+  forYearResult
 }) => {
   return (
     <div className="hidden">
@@ -26,11 +34,21 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
         {annoucement && (
           <Card style={{ marginBottom: 16 }} variant="borderless">
             <Descriptions
-              // title="Détails"
+              title="Résultats"
               // bordered
               size="small"
               column={2}
               items={[
+                {
+                  key: "year",
+                  label: "Année académique",
+                  children: `${annoucement.academic_year.name}`,
+                },
+                {
+                  key: "period",
+                  label: "Période",
+                  children: `${annoucement.period.acronym} (${annoucement.period.name})`,
+                },
                 {
                   key: "faculty",
                   label: "Filière",
@@ -46,16 +64,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   label: "Promotion",
                   children: `${annoucement.class_year?.acronym} (${annoucement.class_year.name})`,
                 },
-                {
-                  key: "year",
-                  label: "Année académique",
-                  children: `${annoucement.academic_year.name}`,
-                },
-                {
-                  key: "period",
-                  label: "Période",
-                  children: `${annoucement.period.acronym} (${annoucement.period.name})`,
-                },
+                
                 {
                   key: "session",
                   label: "Session",
@@ -71,23 +80,67 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
           </Card>
         )}
 
-        <table className="min-w-fit divide-y rounded-lg divide-gray-200  border border-red-300 overflow-hidden ">
-          <thead className="bg-gray-50 ">
-            <tr>
+        {forYearResult && (
+          <Card style={{ marginBottom: 16 }} variant="borderless">
+            <Descriptions
+              title="Résultats"
+              // size="small"
+              column={2}
+              items={[
+                {
+                  key: "year",
+                  label: "Année académique",
+                  children: `${forYearResult?.year?.name}`,
+                },
+                {
+                  key: "faculty",
+                  label: "Filière",
+                  children: forYearResult.department?.faculty.name || "",
+                },
+                {
+                  key: "department",
+                  label: "Mention",
+                  children: forYearResult?.department?.name || "",
+                },
+                {
+                  key: "class",
+                  label: "Promotion",
+                  children: `${forYearResult.classYear?.acronym} (${forYearResult?.classYear?.name})`,
+                },
+                {
+                  key: "session",
+                  label: "Session",
+                  children: getSessionText(forYearResult.session),
+                },
+                {
+                  key: "moment",
+                  label: "Moment",
+                  children: getMomentText(forYearResult.moment),
+                },
+              ]}
+            />
+          </Card>
+        )}
+
+
+        <table className="min-w-fit divide-y divide-gray-200  overflow-hidden ">
+          <thead className="bg-gray-50">
+            <tr className=" uppercase">
               <th
                 colSpan={4}
-                className="px-4 py-2 text-left text-lg font-semibold bg-white border-b  border border-gray-300"
+                className="px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
               >
                 Semestre
               </th>
-              {data?.HeaderData?.no_retaken?.period_list.map((period) => (
+              {data?.HeaderData?.no_retaken?.period_list?.map((period) => (
                 <th
                   colSpan={period.course_counter}
-                  className="px-4 py-2 text-left text-lg font-semibold bg-white border-b  border border-gray-300"
+                  className="px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
                 >
-                  {period.period.name}
+                  {period.period.acronym}
                 </th>
               ))}
+              <th colSpan={7} className="bg-white border border-gray-300"></th>
             </tr>
             <tr>
               <th
@@ -96,7 +149,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               >
                 Unités d&apos;Enseignement
               </th>
-              {data?.HeaderData?.no_retaken?.teaching_unit_list.map((TU) => (
+              {data?.HeaderData?.no_retaken?.teaching_unit_list?.map((TU) => (
                 <th
                   key={TU.teaching_unit.code}
                   colSpan={TU.course_counter}
@@ -156,6 +209,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               >
                 Décision
               </th>
+              <th rowSpan={6} className="bg-white border border-gray-300"></th>
             </tr>
             <tr>
               <th
@@ -164,7 +218,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               >
                 Éléments Constitutifs
               </th>
-              {data?.HeaderData?.no_retaken?.course_list.map((course) => (
+              {data?.HeaderData?.no_retaken?.course_list?.map((course) => (
                 <th
                   key={course.id}
                   style={{
@@ -179,7 +233,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
             </tr>
             <tr>
               <th colSpan={4} className="bg-white border border-gray-300"></th>
-              {data?.HeaderData?.no_retaken?.course_list.map((_, index) => (
+              {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
                   className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
@@ -252,10 +306,10 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               <th className="bg-gray-50 border border-gray-300"></th>
               <th className="bg-gray-50 border border-gray-300"></th>
             </tr>
-            <tr>
+            <tr className="bg-white">
               <th
                 colSpan={4}
-                className="bg-white text-xs font-medium border border-gray-300"
+                className=" text-xs font-medium border border-gray-300"
               >
                 TOTAL
               </th>
@@ -267,18 +321,19 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   20
                 </th>
               ))}
-              <th className="px-2 py-1 text-xs bg-white border-b border border-gray-300 text-center font-bold">
+              <th className="px-2 py-1 text-xs  border-b border border-gray-300 text-center font-bold">
                 20
               </th>
-              <th className="bg-white border border-gray-300"></th>
-              <th className="bg-white border border-gray-300"></th>
-              <th className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300  font-bold">
+              <th className=" border border-gray-300"></th>
+              <th className=" border border-gray-300"></th>
+              <th className="px-2 py-1 w-8 text-xs  border-b border border-gray-300  font-bold">
                 V
               </th>
-              <th className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300  font-bold">
+              <th className="px-2 py-1 w-8 text-xs  border-b border border-gray-300  font-bold">
                 NV
               </th>
-              <th className="bg-gray-50 border border-gray-300"></th>
+              <th className=" border border-gray-300"></th>
+              <th className=" border border-gray-300"></th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
