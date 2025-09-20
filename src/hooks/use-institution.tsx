@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export const useInstitution = () => {
   const { data, isPending, isError, error } = useQuery({
-    queryKey: ["year"],
+    queryKey: ["institution"],
     queryFn: getInstitution,
   });
 

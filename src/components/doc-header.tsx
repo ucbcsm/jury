@@ -24,7 +24,7 @@ export const DocHeader: FC = () => {
             {data?.name || "Nom de l'institution"}
           </Typography.Title>
           <p className=" uppercase text-[#008367]">
-            Etre transformé, pour transformer{data?.motto}
+            {data?.motto || ""}
           </p>
         </div>
       </div>
