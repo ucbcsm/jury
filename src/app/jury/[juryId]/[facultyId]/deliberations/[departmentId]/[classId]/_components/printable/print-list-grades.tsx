@@ -72,7 +72,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
         )}
 
         <table className="min-w-fit divide-y rounded-lg divide-gray-200  border border-red-300 overflow-hidden ">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 ">
             <tr>
               <th
                 colSpan={4}
@@ -80,7 +80,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               >
                 Semestre
               </th>
-              {data?.HeaderData.no_retaken.period_list.map((period) => (
+              {data?.HeaderData?.no_retaken?.period_list.map((period) => (
                 <th
                   colSpan={period.course_counter}
                   className="px-4 py-2 text-left text-lg font-semibold bg-white border-b  border border-gray-300"
@@ -179,7 +179,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
             </tr>
             <tr>
               <th colSpan={4} className="bg-white border border-gray-300"></th>
-              {data?.HeaderData.no_retaken.course_list.map((_, index) => (
+              {data?.HeaderData?.no_retaken?.course_list.map((_, index) => (
                 <th
                   key={index}
                   className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
@@ -198,7 +198,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               >
                 Crédits
               </th>
-              {data?.HeaderData.no_retaken.credits.map((credit, idx) => (
+              {data?.HeaderData?.no_retaken?.credits?.map((credit, idx) => (
                 <th
                   key={idx}
                   className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300 text-center"
@@ -207,7 +207,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                 </th>
               ))}
               <th className="px-2 py-1  text-xs bg-gray-50 border-b border border-gray-300 text-center font-bold">
-                {data?.HeaderData.no_retaken.credits.reduce(
+                {data?.HeaderData?.no_retaken?.credits?.reduce(
                   (prevValue, currenValue) => currenValue + prevValue
                 )}
               </th>
@@ -221,7 +221,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               >
                 CC
               </th>
-              {data?.HeaderData.no_retaken.course_list.map((_, index) => (
+              {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
                   className="px-2 py-1 w-8 text-xs bg-white border-b  border border-gray-300 text-center"
@@ -240,7 +240,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               >
                 Examen
               </th>
-              {data?.HeaderData.no_retaken.course_list.map((_, index) => (
+              {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
                   className="px-2 py-1 w-8 text-xs bg-gray-50 border-b  border border-gray-300 text-center"
@@ -259,7 +259,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               >
                 TOTAL
               </th>
-              {data?.HeaderData.no_retaken.course_list.map((_, index) => (
+              {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
                   className="px-2 py-1 w-8 text-xs border-b border border-gray-300 text-center"
@@ -284,12 +284,35 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
           <tbody className="bg-white divide-y divide-gray-100">
             {data?.BodyDataList.map((record, indexRecord) => (
               <React.Fragment key={record.matricule}>
-                <tr className="hover:bg-blue-50 transition">
+                <tr className="bg-blue-100 transition">
                   <td
-                    colSpan={4}
-                    className="px-4 py-1 bg-white border border-gray-300"
-                  ></td>
-                  {record.no_retaken.continuous_assessments.map((cc, idx) => (
+                    rowSpan={7}
+                    className="px-2 py-2 w-8 text-right align-top text-xs font-semibold bg-white border border-gray-300"
+                  >
+                    {indexRecord + 1}
+                  </td>
+                  <td
+                    rowSpan={2}
+                    className="px-2 py-2 w-64 text-left align-top text-xs font-semibold border border-gray-300 "
+                  >{`${record.first_name} ${record.last_name} ${record.surname}`}</td>
+                  <td
+                    rowSpan={2}
+                    className="px-2 py-2 w-8 text-right align-top text-xs font-semibold border border-gray-300 "
+                  >
+                    {record.matricule}
+                  </td>
+                  <td
+                    rowSpan={2}
+                    className="px-2 py-2 w-8 text-center align-top text-xs font-semibold border border-gray-300 "
+                  >
+                    {record.gender}
+                  </td>
+                  {/* <td
+                                colSpan={3}
+                                rowSpan={2}
+                                className="px-4 py-1 bg-white border border-gray-300"
+                              ></td> */}
+                  {record?.no_retaken.continuous_assessments?.map((cc, idx) => (
                     <td
                       key={idx}
                       className="px-2 py-1 text-center text-xs border border-gray-300"
@@ -297,19 +320,15 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                       {cc}
                     </td>
                   ))}
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
                 </tr>
-                <tr className="hover:bg-blue-50 transition">
-                  <td
-                    colSpan={4}
-                    className="px-4 py-1 bg-white border border-gray-300"
-                  ></td>
-                  {record.no_retaken.exams.map((exam, idx) => (
+                <tr className="bg-blue-100 transition ">
+                  {record?.no_retaken?.exams?.map((exam, idx) => (
                     <td
                       key={idx}
                       className="px-2 py-1 text-center text-xs border border-gray-300"
@@ -317,34 +336,35 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                       {exam}
                     </td>
                   ))}
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
                 </tr>
-                <tr className="bg-blue-100 transition font-medium">
-                  <td className="px-2 py-2 w-8 text-right text-xs font-semibold border border-gray-300">
-                    {indexRecord + 1}
+                <tr className=" font-semibold">
+                  <td
+                    colSpan={3}
+                    className="px-2 py-2 text-xs border text-center border-gray-300"
+                  >
+                    Total
                   </td>
-                  <td className="px-2 py-2 w-64 text-left text-xs border border-gray-300">{`${record.first_name} ${record.last_name} ${record.surname}`}</td>
-                  <td className="px-2 py-2 w-8 text-right text-xs border border-gray-300">
-                    {record.matricule}
-                  </td>
-                  <td className="px-2 py-2 w-8 text-center text-xs border border-gray-300">
-                    {record.gender}
-                  </td>
-                  {record.no_retaken.totals.map((total, idx) => (
+
+                  {record?.no_retaken?.totals?.map((total, idx) => (
                     <td
                       key={idx}
                       className="px-2 py-2 text-center text-xs border border-gray-300"
+                      style={{
+                        backgroundColor: total >= 10 ? "#f0fdf4" : "#fef2f2",
+                        color: total >= 10 ? "#00a63e" : "#e7000b",
+                      }}
                     >
                       {total}
                     </td>
                   ))}
                   <td
-                    className="px-2 py-2 text-center text-re text-xs font-semibold border bg-r border-gray-300"
+                    className="px-2 py-2 text-center text-re text-xs border bg-r border-gray-300"
                     style={{
                       backgroundColor:
                         record.weighted_average >= 10 ? "#f0fdf4" : "#fef2f2",
@@ -354,20 +374,62 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   >
                     {record.weighted_average}
                   </td>
-                  <td className="px-2 py-2 text-center text-xs border border-gray-300">
+                  <td
+                    className="px-2 py-2 text-center text-xs border border-gray-300"
+                    style={{
+                      backgroundColor:
+                        record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
+                      color:
+                        record.decision === "passed" ? "#00a63e" : "#e7000b",
+                    }}
+                  >
                     {record.percentage}
                   </td>
-                  <td className="px-2 py-2 text-center text-xs font-bold border border-gray-300">
+                  <td
+                    className="px-2 py-2 text-center text-xs font-bold border border-gray-300"
+                    style={{
+                      backgroundColor:
+                        record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
+                      color:
+                        record.decision === "passed" ? "#00a63e" : "#e7000b",
+                    }}
+                  >
                     {record.grade_letter}
                   </td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                </tr>
-                <tr>
                   <td
-                    colSpan={4}
-                    className="px-4 py-1 bg-gray-50 text-xs font-medium border border-gray-300 text-center"
+                    className="bg-white border border-gray-300"
+                    style={{
+                      backgroundColor:
+                        record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
+                      color:
+                        record.decision === "passed" ? "#00a63e" : "#e7000b",
+                    }}
+                  ></td>
+                  <td
+                    className="bg-white border border-gray-300"
+                    style={{
+                      backgroundColor:
+                        record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
+                      color:
+                        record.decision === "passed" ? "#00a63e" : "#e7000b",
+                    }}
+                  ></td>
+                  <td
+                    className="px-2 py-1 w-24 text-center text-xs font-semibold border border-gray-300 "
+                    style={{
+                      backgroundColor:
+                        record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
+                      color:
+                        record.decision === "passed" ? "#00a63e" : "#e7000b",
+                    }}
+                  >
+                    {getDecisionText(record.decision)}
+                  </td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td
+                    colSpan={3}
+                    className="px-4 py-1  text-xs  border border-gray-300 text-center"
                   >
                     Grade
                   </td>
@@ -379,17 +441,17 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                       {letter}
                     </td>
                   ))}
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
-                  <td className="bg-white border border-gray-300"></td>
+                  <td className="border border-gray-300"></td>
+                  <td className="border border-gray-300"></td>
+                  <td className="border border-gray-300"></td>
+                  <td className="border border-gray-300"></td>
+                  <td className="border border-gray-300"></td>
+                  <td className="border border-gray-300"></td>
                 </tr>
                 <tr>
                   <td
-                    colSpan={4}
-                    className="px-4 py-1 bg-white text-xs font-medium border border-gray-300 text-center"
+                    colSpan={3}
+                    className="px-4 py-1 bg-white text-xs border border-gray-300 text-center"
                   >
                     Validation EC
                   </td>
@@ -405,27 +467,17 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   <td className="bg-white border border-gray-300"></td>
                   <td className="bg-white border border-gray-300"></td>
                   <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
-                    {
-                      record.validated_courses_count
-                      // record.no_retaken.course_decisions.filter(
-                      //   (dec) => dec === "validated"
-                      // ).length
-                    }
+                    {record.validated_courses_count}
                   </td>
                   <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
-                    {
-                      record.unvalidated_courses_count
-                      // record.no_retaken.course_decisions.filter(
-                      //   (dec) => dec === "no_validated"
-                      // ).length
-                    }
+                    {record.unvalidated_courses_count}
                   </td>
                   <td className="bg-white border border-gray-300"></td>
                 </tr>
-                <tr>
+                <tr className="bg-gray-50">
                   <td
-                    colSpan={4}
-                    className="px-4 py-1 bg-gray-50 text-xs font-medium border border-gray-300 text-center"
+                    colSpan={3}
+                    className="px-4 py-1  text-xs  border border-gray-300 text-center"
                   >
                     Crédits validés
                   </td>
@@ -437,31 +489,21 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                       {credits}
                     </td>
                   ))}
-                  <td className="bg-gray-50 border border-gray-300"></td>
-                  <td className="bg-gray-50 border border-gray-300"></td>
-                  <td className="bg-gray-50 border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
+                  <td className=" border border-gray-300"></td>
                   <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
                     {record.validated_credit_sum}
                   </td>
                   <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
                     {record.unvalidated_credit_sum}
                   </td>
-                  <td
-                    className="px-2 py-1 w-24 text-center text-xs font-semibold border border-gray-300"
-                    style={{
-                      backgroundColor:
-                        record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
-                      color:
-                        record.decision === "passed" ? "#00a63e" : "#e7000b",
-                    }}
-                  >
-                    {getDecisionText(record.decision)}
-                  </td>
+                  <td className=" border border-gray-300"></td>
                 </tr>
                 <tr>
                   <td
-                    colSpan={4}
-                    className="px-4 py-1 bg-white text-xs font-medium border border-gray-300 text-center"
+                    colSpan={3}
+                    className="px-4 py-1 bg-white text-xs  border border-gray-300 text-center"
                   >
                     Validation UE
                   </td>

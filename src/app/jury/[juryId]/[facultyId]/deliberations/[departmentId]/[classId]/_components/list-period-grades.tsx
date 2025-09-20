@@ -209,8 +209,8 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
           ]}
         />
       </Card>
-      <div className="h-[calc(100vh-210px)] overflow-y-auto">
-        <div className="min-w-fit overflow-x-auto">
+      <div className="h-[calc(100vh-210px)] overflow-y-auto ">
+        <div className="min-w-fit overflow-x-auto pb-10">
           <table className="min-w-fit divide-y rounded-lg divide-gray-200  border border-red-300 overflow-hidden ">
             <thead className="bg-gray-50 ">
               <tr>
@@ -427,11 +427,34 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
             <tbody className="bg-white divide-y divide-gray-100">
               {data?.BodyDataList.map((record, indexRecord) => (
                 <React.Fragment key={record.matricule}>
-                  <tr className="hover:bg-blue-50 transition">
+                  <tr className="bg-blue-100 transition">
                     <td
-                      colSpan={4}
+                      rowSpan={7}
+                      className="px-2 py-2 w-8 text-right align-top text-xs font-semibold bg-white border border-gray-300"
+                    >
+                      {indexRecord + 1}
+                    </td>
+                    <td
+                      rowSpan={2}
+                      className="px-2 py-2 w-64 text-left align-top text-xs font-semibold border border-gray-300 "
+                    >{`${record.first_name} ${record.last_name} ${record.surname}`}</td>
+                    <td
+                      rowSpan={2}
+                      className="px-2 py-2 w-8 text-right align-top text-xs font-semibold border border-gray-300 "
+                    >
+                      {record.matricule}
+                    </td>
+                    <td
+                      rowSpan={2}
+                      className="px-2 py-2 w-8 text-center align-top text-xs font-semibold border border-gray-300 "
+                    >
+                      {record.gender}
+                    </td>
+                    {/* <td
+                      colSpan={3}
+                      rowSpan={2}
                       className="px-4 py-1 bg-white border border-gray-300"
-                    ></td>
+                    ></td> */}
                     {record.no_retaken.continuous_assessments.map((cc, idx) => (
                       <td
                         key={idx}
@@ -440,18 +463,26 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                         {cc}
                       </td>
                     ))}
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                  </tr>
-                  <tr className="hover:bg-blue-50 transition">
+                    <td className=" border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
                     <td
-                      colSpan={4}
+                      rowSpan={7}
+                      className="px-2 py-1 bg-white align-top border border-gray-300 "
+                    >
+                      <ButtonDeleteGradeFromGrid
+                        periodEnrollmentId={record.id}
+                      />
+                    </td>
+                  </tr>
+                  <tr className="bg-blue-100 transition ">
+                    {/* <td
+                      colSpan={3}
                       className="px-4 py-1 bg-white border border-gray-300"
-                    ></td>
+                    ></td> */}
                     {record.no_retaken.exams.map((exam, idx) => (
                       <td
                         key={idx}
@@ -460,34 +491,38 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                         {exam}
                       </td>
                     ))}
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
                   </tr>
-                  <tr className="bg-blue-100 transition font-medium">
-                    <td className="px-2 py-2 w-8 text-right text-xs font-semibold border border-gray-300">
+                  <tr className=" font-semibold">
+                    {/* <td className="px-2 py-2 w-8 text-right text-xs font-semibold border border-gray-300">
                       {indexRecord + 1}
+                    </td> */}
+                    <td
+                      colSpan={3}
+                      className="px-2 py-2 text-xs border text-center border-gray-300"
+                    >
+                      Total
                     </td>
-                    <td className="px-2 py-2 w-64 text-left text-xs border border-gray-300">{`${record.first_name} ${record.last_name} ${record.surname}`}</td>
-                    <td className="px-2 py-2 w-8 text-right text-xs border border-gray-300">
-                      {record.matricule}
-                    </td>
-                    <td className="px-2 py-2 w-8 text-center text-xs border border-gray-300">
-                      {record.gender}
-                    </td>
+
                     {record.no_retaken.totals.map((total, idx) => (
                       <td
                         key={idx}
                         className="px-2 py-2 text-center text-xs border border-gray-300"
+                        style={{
+                          backgroundColor: total >= 10 ? "#f0fdf4" : "#fef2f2",
+                          color: total >= 10 ? "#00a63e" : "#e7000b",
+                        }}
                       >
                         {total}
                       </td>
                     ))}
                     <td
-                      className="px-2 py-2 text-center text-re text-xs font-semibold border bg-r border-gray-300"
+                      className="px-2 py-2 text-center text-re text-xs border bg-r border-gray-300"
                       style={{
                         backgroundColor:
                           record.weighted_average >= 10 ? "#f0fdf4" : "#fef2f2",
@@ -497,20 +532,62 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                     >
                       {record.weighted_average}
                     </td>
-                    <td className="px-2 py-2 text-center text-xs border border-gray-300">
+                    <td
+                      className="px-2 py-2 text-center text-xs border border-gray-300"
+                      style={{
+                        backgroundColor:
+                          record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
+                        color:
+                          record.decision === "passed" ? "#00a63e" : "#e7000b",
+                      }}
+                    >
                       {record.percentage}
                     </td>
-                    <td className="px-2 py-2 text-center text-xs font-bold border border-gray-300">
+                    <td
+                      className="px-2 py-2 text-center text-xs font-bold border border-gray-300"
+                      style={{
+                        backgroundColor:
+                          record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
+                        color:
+                          record.decision === "passed" ? "#00a63e" : "#e7000b",
+                      }}
+                    >
                       {record.grade_letter}
                     </td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                  </tr>
-                  <tr>
                     <td
-                      colSpan={4}
-                      className="px-4 py-1 bg-gray-50 text-xs font-medium border border-gray-300 text-center"
+                      className="bg-white border border-gray-300"
+                      style={{
+                        backgroundColor:
+                          record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
+                        color:
+                          record.decision === "passed" ? "#00a63e" : "#e7000b",
+                      }}
+                    ></td>
+                    <td
+                      className="bg-white border border-gray-300"
+                      style={{
+                        backgroundColor:
+                          record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
+                        color:
+                          record.decision === "passed" ? "#00a63e" : "#e7000b",
+                      }}
+                    ></td>
+                    <td
+                      className="px-2 py-1 w-24 text-center text-xs font-semibold border border-gray-300 "
+                      style={{
+                        backgroundColor:
+                          record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
+                        color:
+                          record.decision === "passed" ? "#00a63e" : "#e7000b",
+                      }}
+                    >
+                      {getDecisionText(record.decision)}
+                    </td>
+                  </tr>
+                  <tr className="bg-gray-50">
+                    <td
+                      colSpan={3}
+                      className="px-4 py-1  text-xs  border border-gray-300 text-center"
                     >
                       Grade
                     </td>
@@ -522,17 +599,17 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                         {letter}
                       </td>
                     ))}
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
-                    <td className="bg-white border border-gray-300"></td>
+                    <td className="border border-gray-300"></td>
+                    <td className="border border-gray-300"></td>
+                    <td className="border border-gray-300"></td>
+                    <td className="border border-gray-300"></td>
+                    <td className="border border-gray-300"></td>
+                    <td className="border border-gray-300"></td>
                   </tr>
                   <tr>
                     <td
-                      colSpan={4}
-                      className="px-4 py-1 bg-white text-xs font-medium border border-gray-300 text-center"
+                      colSpan={3}
+                      className="px-4 py-1 bg-white text-xs border border-gray-300 text-center"
                     >
                       Validation EC
                     </td>
@@ -555,10 +632,10 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                     </td>
                     <td className="bg-white border border-gray-300"></td>
                   </tr>
-                  <tr>
+                  <tr className="bg-gray-50">
                     <td
-                      colSpan={4}
-                      className="px-4 py-1 bg-gray-50 text-xs font-medium border border-gray-300 text-center"
+                      colSpan={3}
+                      className="px-4 py-1  text-xs  border border-gray-300 text-center"
                     >
                       Crédits validés
                     </td>
@@ -570,36 +647,21 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                         {credits}
                       </td>
                     ))}
-                    <td className="bg-gray-50 border border-gray-300"></td>
-                    <td className="bg-gray-50 border border-gray-300"></td>
-                    <td className="bg-gray-50 border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
+                    <td className=" border border-gray-300"></td>
                     <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
                       {record.validated_credit_sum}
                     </td>
                     <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
                       {record.unvalidated_credit_sum}
                     </td>
-                    <td
-                      className="px-2 py-1 w-24 text-center text-xs font-semibold border border-gray-300 "
-                      style={{
-                        backgroundColor:
-                          record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
-                        color:
-                          record.decision === "passed" ? "#00a63e" : "#e7000b",
-                      }}
-                    >
-                      {getDecisionText(record.decision)}
-                    </td>
-                    <td className="px-2 py-1 sticky ">
-                      <ButtonDeleteGradeFromGrid
-                        periodEnrollmentId={record.id}
-                      />
-                    </td>
+                    <td className=" border border-gray-300"></td>
                   </tr>
                   <tr>
                     <td
-                      colSpan={4}
-                      className="px-4 py-1 bg-white text-xs font-medium border border-gray-300 text-center"
+                      colSpan={3}
+                      className="px-4 py-1 bg-white text-xs  border border-gray-300 text-center"
                     >
                       Validation UE
                     </td>

@@ -16,9 +16,24 @@ import {
   PrinterOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Card, Descriptions, Drawer, Skeleton, Space } from "antd";
+import {
+  Button,
+  Card,
+  Descriptions,
+  Drawer,
+  Result,
+  Select,
+  Skeleton,
+  Space,
+  Typography,
+} from "antd";
 import { useParams } from "next/navigation";
-import { Options, parseAsBoolean, useQueryState } from "nuqs";
+import {
+  Options,
+  parseAsBoolean,
+  parseAsStringEnum,
+  useQueryState,
+} from "nuqs";
 
 import React, { FC, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
@@ -27,22 +42,40 @@ import { ButtonDeleteGradeFromGrid } from "./delete-grade-item";
 import { useYid } from "@/hooks/use-yid";
 
 type ListYearGradesProps = {
-//   annoucement: Announcement;
-//   anouncementId: number | null;
-//   setAnnoucementId: (
-//     value: number | ((old: number | null) => number | null) | null,
-//     options?: Options
-//   ) => Promise<URLSearchParams>;
+  //   annoucement: Announcement;
+  //   anouncementId: number | null;
+  //   setAnnoucementId: (
+  //     value: number | ((old: number | null) => number | null) | null,
+  //     options?: Options
+  //   ) => Promise<URLSearchParams>;
 };
 
-export const ListYearGrades: FC<ListYearGradesProps> = ({
-//   annoucement,
-//   anouncementId,
-//   setAnnoucementId,
-}) => {
-  const {yid}=useYid()
+export const ListYearGrades: FC<ListYearGradesProps> = (
+  {
+    //   annoucement,
+    //   anouncementId,
+    //   setAnnoucementId,
+  }
+) => {
+  const { yid } = useYid();
   const { facultyId, departmentId, classId } = useParams();
-  const [open, setOpen] = useQueryState("year-grid", parseAsBoolean.withDefault(false))
+  const [open, setOpen] = useQueryState(
+    "year-grid",
+    parseAsBoolean.withDefault(false)
+  );
+
+  const [session, setSession] = useQueryState(
+    "session",
+    parseAsStringEnum(["main_session", "retake_session"]).withDefault(
+      "main_session"
+    )
+  );
+  const [moment, setMoment] = useQueryState(
+    "moment",
+    parseAsStringEnum(["before_appeal", "after_appeal"]).withDefault(
+      "before_appeal"
+    )
+  );
 
   const refToPrint = useRef<HTMLDivElement | null>(null);
   const printListGrades = useReactToPrint({
@@ -52,15 +85,14 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
 
   const { data, isPending, isError } = useQuery({
     queryKey: [
-      "grid_grades",
+      "year_grid_grades",
       Number(yid),
       facultyId,
       departmentId,
       classId,
-      "YEAR-GRADE"
-      // annoucement.period.id,
-      // annoucement.session,
-      // annoucement.moment,
+      session,
+      moment,
+      "YEAR-GRADE",
     ],
     queryFn: () =>
       getResultGrid({
@@ -68,8 +100,8 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
         facultyId: Number(facultyId),
         departmentId: Number(departmentId),
         classId: Number(classId),
-        session: "main_session",
-        moment: "before_appeal",
+        session: session,
+        moment: moment,
         mode: "YEAR-GRADE",
       }),
     enabled: !!yid && !!facultyId && !!departmentId && !!classId,
@@ -77,9 +109,10 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
     // !!anouncementId,
   });
 
-
   const onClose = () => {
-   setOpen(false);
+    setOpen(false);
+    setSession("main_session");
+    setMoment("before_appeal");
   };
 
   return (
@@ -96,11 +129,40 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
       </Button>
       <Drawer
         width="100%"
-        title={`Résultats: 
-      
-        `}
+        title={
+          <Space>
+            <Typography.Title level={5}>Résultats</Typography.Title>
+            <Select
+              variant="filled"
+              placeholder="Session"
+              value={session}
+              options={[
+                { value: "main_session", label: "Principale" },
+                { value: "retake_session", label: "Rattrapage" },
+              ]}
+              style={{ width: 180 }}
+              onSelect={(value) => {
+                setSession(value as "main_session" | "retake_session");
+              }}
+            />
+            <Typography.Text type="secondary">Moment: </Typography.Text>
+            <Select
+              variant="filled"
+              placeholder="Moment"
+              value={moment}
+              options={[
+                { value: "before_appeal", label: "Avant recours" },
+                { value: "after_appeal", label: "Après recours" },
+              ]}
+              style={{ width: 150 }}
+              onSelect={(value) => {
+                setMoment(value as "before_appeal" | "after_appeal");
+              }}
+            />
+          </Space>
+        }
         styles={{
-          header: { textTransform: "uppercase", borderBottom: 0 },
+          header: { borderBottom: 0 },
           body: { paddingTop: 0, paddingBottom: 0 },
         }}
         loading={isPending}
@@ -110,59 +172,20 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
         closable={false}
         extra={
           <Space>
-            {/* {!isPending ? (
             <Button
-              style={{ boxShadow: "none" }}
-              icon={<DownloadOutlined />}
-              color="primary"
-              variant="dashed"
-              onClick={() => {
-                if (data) {
-                  exportGridToExcel(data, {
-                    sheetName: `${
-                      annoucement.class_year.acronym
-                    } ${annoucement.departement.name.replace(
-                      " ",
-                      "-"
-                    )}-${getSessionText(annoucement.session).replace(
-                      " ",
-                      "-"
-                    )}-${getMomentText(annoucement.moment).replace(" ", "-")}`,
-                    fileName: `${
-                      annoucement.class_year.acronym
-                    }-${annoucement.departement.name.replace(
-                      " ",
-                      "-"
-                    )}-${getSessionText(annoucement.session).replace(
-                      " ",
-                      "-"
-                    )}-${getMomentText(annoucement.moment).replace(
-                      " ",
-                      "-"
-                    )}.xlsx`,
-                  });
-                }
+              style={{
+                boxShadow: "none",
+                display:
+                  data && data.BodyDataList.length > 0 ? "block" : "none",
               }}
-              disabled={!data}
+              icon={<PrinterOutlined />}
+              color="default"
+              variant="dashed"
+              onClick={printListGrades}
             >
-              Exporter .xlsx
+              Imprimer
             </Button>
-          ) : (
-            <Skeleton.Button active />
-          )} */}
-            {!isPending ? (
-              <Button
-                style={{ boxShadow: "none" }}
-                icon={<PrinterOutlined />}
-                color="default"
-                variant="dashed"
-                onClick={printListGrades}
-              >
-                Imprimer
-              </Button>
-            ) : (
-              <Skeleton.Button active />
-            )}
+
             <Button
               type="text"
               icon={<CloseOutlined />}
@@ -172,8 +195,13 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
           </Space>
         }
       >
-        <div className="h-[calc(100vh-64px)] overflow-y-auto">
-          <div className="min-w-fit overflow-x-auto">
+        <div
+          className="h-[calc(100vh-64px)] overflow-y-auto"
+          style={{
+            display: data && data.BodyDataList.length > 0 ? "block" : "none",
+          }}
+        >
+          <div className="min-w-fit overflow-x-auto pb-10">
             <table className="min-w-fit divide-y rounded-lg divide-gray-200  border border-red-300 overflow-hidden ">
               <thead className="bg-gray-50">
                 <tr>
@@ -183,12 +211,12 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                   >
                     Semestre
                   </th>
-                  {data?.HeaderData.no_retaken.period_list.map((period) => (
+                  {data?.HeaderData?.no_retaken?.period_list?.map((period) => (
                     <th
                       colSpan={period.course_counter}
                       className="px-4 py-2 text-left text-lg font-semibold bg-white border-b  border border-gray-300"
                     >
-                      {period.period.name}
+                      {period.period.acronym}
                     </th>
                   ))}
                 </tr>
@@ -199,7 +227,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                   >
                     Unités d&apos;Enseignement
                   </th>
-                  {data?.HeaderData?.no_retaken?.teaching_unit_list.map(
+                  {data?.HeaderData?.no_retaken?.teaching_unit_list?.map(
                     (TU) => (
                       <th
                         key={TU.teaching_unit.code}
@@ -269,7 +297,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                   >
                     Éléments Constitutifs
                   </th>
-                  {data?.HeaderData?.no_retaken?.course_list.map((course) => (
+                  {data?.HeaderData?.no_retaken?.course_list?.map((course) => (
                     <th
                       key={course.id}
                       style={{
@@ -287,14 +315,16 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                     colSpan={4}
                     className="bg-white border border-gray-300"
                   ></th>
-                  {data?.HeaderData.no_retaken.course_list.map((_, index) => (
-                    <th
-                      key={index}
-                      className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
-                    >
-                      {index + 1}
-                    </th>
-                  ))}
+                  {data?.HeaderData?.no_retaken?.course_list?.map(
+                    (_, index) => (
+                      <th
+                        key={index}
+                        className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
+                      >
+                        {index + 1}
+                      </th>
+                    )
+                  )}
                   <th className="bg-white border border-gray-300"></th>
                   <th className="bg-white border border-gray-300"></th>
                   <th className="bg-white border border-gray-300"></th>
@@ -306,7 +336,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                   >
                     Crédits
                   </th>
-                  {data?.HeaderData.no_retaken.credits.map((credit, idx) => (
+                  {data?.HeaderData?.no_retaken?.credits?.map((credit, idx) => (
                     <th
                       key={idx}
                       className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300 text-center"
@@ -315,7 +345,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                     </th>
                   ))}
                   <th className="px-2 py-1  text-xs bg-gray-50 border-b border border-gray-300 text-center font-bold">
-                    {data?.HeaderData.no_retaken.credits.reduce(
+                    {data?.HeaderData?.no_retaken?.credits?.reduce(
                       (prevValue, currenValue) => currenValue + prevValue
                     )}
                   </th>
@@ -329,14 +359,16 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                   >
                     CC
                   </th>
-                  {data?.HeaderData.no_retaken.course_list.map((_, index) => (
-                    <th
-                      key={index}
-                      className="px-2 py-1 w-8 text-xs bg-white border-b  border border-gray-300 text-center"
-                    >
-                      10
-                    </th>
-                  ))}
+                  {data?.HeaderData?.no_retaken?.course_list?.map(
+                    (_, index) => (
+                      <th
+                        key={index}
+                        className="px-2 py-1 w-8 text-xs bg-white border-b  border border-gray-300 text-center"
+                      >
+                        10
+                      </th>
+                    )
+                  )}
                   <th className="bg-white border border-gray-300"></th>
                   <th className="bg-white border border-gray-300"></th>
                   <th className="bg-white border border-gray-300"></th>
@@ -348,14 +380,16 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                   >
                     Examen
                   </th>
-                  {data?.HeaderData.no_retaken.course_list.map((_, index) => (
-                    <th
-                      key={index}
-                      className="px-2 py-1 w-8 text-xs bg-gray-50 border-b  border border-gray-300 text-center"
-                    >
-                      10
-                    </th>
-                  ))}
+                  {data?.HeaderData?.no_retaken?.course_list?.map(
+                    (_, index) => (
+                      <th
+                        key={index}
+                        className="px-2 py-1 w-8 text-xs bg-gray-50 border-b  border border-gray-300 text-center"
+                      >
+                        10
+                      </th>
+                    )
+                  )}
                   <th className="bg-gray-50 border border-gray-300"></th>
                   <th className="bg-gray-50 border border-gray-300"></th>
                   <th className="bg-gray-50 border border-gray-300"></th>
@@ -367,14 +401,16 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                   >
                     TOTAL
                   </th>
-                  {data?.HeaderData.no_retaken.course_list.map((_, index) => (
-                    <th
-                      key={index}
-                      className="px-2 py-1 w-8 text-xs border-b border border-gray-300 text-center"
-                    >
-                      20
-                    </th>
-                  ))}
+                  {data?.HeaderData?.no_retaken?.course_list?.map(
+                    (_, index) => (
+                      <th
+                        key={index}
+                        className="px-2 py-1 w-8 text-xs border-b border border-gray-300 text-center"
+                      >
+                        20
+                      </th>
+                    )
+                  )}
                   <th className="px-2 py-1 text-xs bg-white border-b border border-gray-300 text-center font-bold">
                     20
                   </th>
@@ -392,11 +428,34 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
               <tbody className="bg-white divide-y divide-gray-100">
                 {data?.BodyDataList.map((record, indexRecord) => (
                   <React.Fragment key={record.matricule}>
-                    <tr className="hover:bg-blue-50 transition">
+                    <tr className="bg-blue-100 transition">
                       <td
-                        colSpan={4}
-                        className="px-4 py-1 bg-white border border-gray-300"
-                      ></td>
+                        rowSpan={7}
+                        className="px-2 py-2 w-8 text-right align-top text-xs font-semibold bg-white border border-gray-300"
+                      >
+                        {indexRecord + 1}
+                      </td>
+                      <td
+                        rowSpan={2}
+                        className="px-2 py-2 w-64 text-left align-top text-xs font-semibold border border-gray-300 "
+                      >{`${record.first_name} ${record.last_name} ${record.surname}`}</td>
+                      <td
+                        rowSpan={2}
+                        className="px-2 py-2 w-8 text-right align-top text-xs font-semibold border border-gray-300 "
+                      >
+                        {record.matricule}
+                      </td>
+                      <td
+                        rowSpan={2}
+                        className="px-2 py-2 w-8 text-center align-top text-xs font-semibold border border-gray-300 "
+                      >
+                        {record.gender}
+                      </td>
+                      {/* <td
+                                    colSpan={3}
+                                    rowSpan={2}
+                                    className="px-4 py-1 bg-white border border-gray-300"
+                                  ></td> */}
                       {record.no_retaken.continuous_assessments.map(
                         (cc, idx) => (
                           <td
@@ -407,18 +466,26 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                           </td>
                         )
                       )}
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                    </tr>
-                    <tr className="hover:bg-blue-50 transition">
+                      <td className=" border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
                       <td
-                        colSpan={4}
-                        className="px-4 py-1 bg-white border border-gray-300"
-                      ></td>
+                        rowSpan={7}
+                        className="px-2 py-1 bg-white align-top border border-gray-300 "
+                      >
+                        <ButtonDeleteGradeFromGrid
+                          periodEnrollmentId={record.id}
+                        />
+                      </td>
+                    </tr>
+                    <tr className="bg-blue-100 transition ">
+                      {/* <td
+                                    colSpan={3}
+                                    className="px-4 py-1 bg-white border border-gray-300"
+                                  ></td> */}
                       {record.no_retaken.exams.map((exam, idx) => (
                         <td
                           key={idx}
@@ -427,34 +494,39 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                           {exam}
                         </td>
                       ))}
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
                     </tr>
-                    <tr className="bg-blue-100 transition font-medium">
-                      <td className="px-2 py-2 w-8 text-right text-xs font-semibold border border-gray-300">
-                        {indexRecord + 1}
+                    <tr className=" font-semibold">
+                      {/* <td className="px-2 py-2 w-8 text-right text-xs font-semibold border border-gray-300">
+                                    {indexRecord + 1}
+                                  </td> */}
+                      <td
+                        colSpan={3}
+                        className="px-2 py-2 text-xs border text-center border-gray-300"
+                      >
+                        Total
                       </td>
-                      <td className="px-2 py-2 w-64 text-left text-xs border border-gray-300">{`${record.first_name} ${record.last_name} ${record.surname}`}</td>
-                      <td className="px-2 py-2 w-8 text-right text-xs border border-gray-300">
-                        {record.matricule}
-                      </td>
-                      <td className="px-2 py-2 w-8 text-center text-xs border border-gray-300">
-                        {record.gender}
-                      </td>
+
                       {record.no_retaken.totals.map((total, idx) => (
                         <td
                           key={idx}
                           className="px-2 py-2 text-center text-xs border border-gray-300"
+                          style={{
+                            backgroundColor:
+                              total >= 10 ? "#f0fdf4" : "#fef2f2",
+                            color: total >= 10 ? "#00a63e" : "#e7000b",
+                          }}
                         >
                           {total}
                         </td>
                       ))}
                       <td
-                        className="px-2 py-2 text-center text-re text-xs font-semibold border bg-r border-gray-300"
+                        className="px-2 py-2 text-center text-re text-xs border bg-r border-gray-300"
                         style={{
                           backgroundColor:
                             record.weighted_average >= 10
@@ -468,20 +540,82 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                       >
                         {record.weighted_average}
                       </td>
-                      <td className="px-2 py-2 text-center text-xs border border-gray-300">
+                      <td
+                        className="px-2 py-2 text-center text-xs border border-gray-300"
+                        style={{
+                          backgroundColor:
+                            record.decision === "passed"
+                              ? "#f0fdf4"
+                              : "#fef2f2",
+                          color:
+                            record.decision === "passed"
+                              ? "#00a63e"
+                              : "#e7000b",
+                        }}
+                      >
                         {record.percentage}
                       </td>
-                      <td className="px-2 py-2 text-center text-xs font-bold border border-gray-300">
+                      <td
+                        className="px-2 py-2 text-center text-xs font-bold border border-gray-300"
+                        style={{
+                          backgroundColor:
+                            record.decision === "passed"
+                              ? "#f0fdf4"
+                              : "#fef2f2",
+                          color:
+                            record.decision === "passed"
+                              ? "#00a63e"
+                              : "#e7000b",
+                        }}
+                      >
                         {record.grade_letter}
                       </td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                    </tr>
-                    <tr>
                       <td
-                        colSpan={4}
-                        className="px-4 py-1 bg-gray-50 text-xs font-medium border border-gray-300 text-center"
+                        className="bg-white border border-gray-300"
+                        style={{
+                          backgroundColor:
+                            record.decision === "passed"
+                              ? "#f0fdf4"
+                              : "#fef2f2",
+                          color:
+                            record.decision === "passed"
+                              ? "#00a63e"
+                              : "#e7000b",
+                        }}
+                      ></td>
+                      <td
+                        className="bg-white border border-gray-300"
+                        style={{
+                          backgroundColor:
+                            record.decision === "passed"
+                              ? "#f0fdf4"
+                              : "#fef2f2",
+                          color:
+                            record.decision === "passed"
+                              ? "#00a63e"
+                              : "#e7000b",
+                        }}
+                      ></td>
+                      <td
+                        className="px-2 py-1 w-24 text-center text-xs font-semibold border border-gray-300 "
+                        style={{
+                          backgroundColor:
+                            record.decision === "passed"
+                              ? "#f0fdf4"
+                              : "#fef2f2",
+                          color:
+                            record.decision === "passed"
+                              ? "#00a63e"
+                              : "#e7000b",
+                        }}
+                      >
+                        {getDecisionText(record.decision)}
+                      </td>
+                    </tr>
+                    <tr className="bg-gray-50">
+                      <td
+                        colSpan={3}
+                        className="px-4 py-1  text-xs  border border-gray-300 text-center"
                       >
                         Grade
                       </td>
@@ -493,17 +627,17 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                           {letter}
                         </td>
                       ))}
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
-                      <td className="bg-white border border-gray-300"></td>
+                      <td className="border border-gray-300"></td>
+                      <td className="border border-gray-300"></td>
+                      <td className="border border-gray-300"></td>
+                      <td className="border border-gray-300"></td>
+                      <td className="border border-gray-300"></td>
+                      <td className="border border-gray-300"></td>
                     </tr>
                     <tr>
                       <td
-                        colSpan={4}
-                        className="px-4 py-1 bg-white text-xs font-medium border border-gray-300 text-center"
+                        colSpan={3}
+                        className="px-4 py-1 bg-white text-xs border border-gray-300 text-center"
                       >
                         Validation EC
                       </td>
@@ -528,10 +662,10 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                       </td>
                       <td className="bg-white border border-gray-300"></td>
                     </tr>
-                    <tr>
+                    <tr className="bg-gray-50">
                       <td
-                        colSpan={4}
-                        className="px-4 py-1 bg-gray-50 text-xs font-medium border border-gray-300 text-center"
+                        colSpan={3}
+                        className="px-4 py-1  text-xs  border border-gray-300 text-center"
                       >
                         Crédits validés
                       </td>
@@ -543,40 +677,21 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                           {credits}
                         </td>
                       ))}
-                      <td className="bg-gray-50 border border-gray-300"></td>
-                      <td className="bg-gray-50 border border-gray-300"></td>
-                      <td className="bg-gray-50 border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
+                      <td className=" border border-gray-300"></td>
                       <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
                         {record.validated_credit_sum}
                       </td>
                       <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
                         {record.unvalidated_credit_sum}
                       </td>
-                      <td
-                        className="px-2 py-1 w-24 text-center text-xs font-semibold border border-gray-300"
-                        style={{
-                          backgroundColor:
-                            record.decision === "passed"
-                              ? "#f0fdf4"
-                              : "#fef2f2",
-                          color:
-                            record.decision === "passed"
-                              ? "#00a63e"
-                              : "#e7000b",
-                        }}
-                      >
-                        {getDecisionText(record.decision)}
-                      </td>
-                      <td className="px-2">
-                        <ButtonDeleteGradeFromGrid
-                          periodEnrollmentId={record.id}
-                        />
-                      </td>
+                      <td className=" border border-gray-300"></td>
                     </tr>
                     <tr>
                       <td
-                        colSpan={4}
-                        className="px-4 py-1 bg-white text-xs font-medium border border-gray-300 text-center"
+                        colSpan={3}
+                        className="px-4 py-1 bg-white text-xs  border border-gray-300 text-center"
                       >
                         Validation UE
                       </td>
@@ -608,6 +723,23 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
             </table>
           </div>
         </div>
+
+        <Result
+          title="Erreur de récupération des données"
+          subTitle="Une erreur est survenue lors de la tentative de récupération des données depuis le serveur. Veuillez réessayer."
+          status={"error"}
+          extra={
+            <Button
+              type="link"
+              onClick={() => {
+                window.location.reload();
+              }}
+            >
+              Réessayer
+            </Button>
+          }
+        />
+
         <PrintableListGrades
           ref={refToPrint}
           // annoucement={annoucement}

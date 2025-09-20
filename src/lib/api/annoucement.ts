@@ -70,8 +70,15 @@ export async function createAnnoucementWithSome(data: {
 }) {
   const res = await api.post(`/jury/announcement/`, {
     mode: "SOME-STUDENTS",
-    selectedRegisteredStudentsList: data.selectedPeriodEnrollmentIds,
+    selectedPeriodEnrollmentIds: data.selectedPeriodEnrollmentIds,
     jury: data.jury,
+    faculty: data.faculty,
+    departement: data.departement,
+    class_year: data.class_year,
+    session: data.session,
+    moment: data.moment,
+    period: data.period,
+    academic_year: data.academic_year,
   });
   return res.data;
 }
