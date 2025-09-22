@@ -1,7 +1,7 @@
 "use client";
 
-import { getMomentText, getSessionText } from "@/lib/api";
-import { getAnnoucements } from "@/lib/api/annoucement";
+import { getMomentText, getSessionText, switchAnnouncementStatus } from "@/lib/api";
+import { getAnnoucements } from "@/lib/api";
 import {
   CheckSquareOutlined,
   DeleteOutlined,
@@ -13,8 +13,8 @@ import {
   PlusOutlined,
   UnlockOutlined,
 } from "@ant-design/icons";
-import { useQuery } from "@tanstack/react-query";
-import { Button, Dropdown, Layout, Space, Table, Tag, Typography } from "antd";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button, Dropdown, Layout, message, Space, Switch, Table, Tag, Typography } from "antd";
 import dayjs from "dayjs";
 import { useParams } from "next/navigation";
 import { FC, useState } from "react";
@@ -98,6 +98,51 @@ const ActionsBar: FC<ActionsBarProps> = ({ announcement, periods }) => {
     </>
   );
 };
+
+type SwitchAnnouncementStatusProps={
+  announcement: Announcement;
+}
+const SwitchAnnouncementStatus: FC<SwitchAnnouncementStatusProps> = ({announcement}) => {
+  const [messageApi, contextHolder] = message.useMessage();
+   const queryClient = useQueryClient();
+
+    const { mutateAsync, isPending } = useMutation({
+        mutationFn: switchAnnouncementStatus,
+    });
+
+  return (
+    <>
+      {contextHolder}
+      <Switch
+        checkedChildren="Verrouillé"
+        unCheckedChildren="Ouvert"
+        onChange={(value) => {
+          mutateAsync(
+            {
+              id: announcement.id,
+              status: value,
+            },
+            {
+              onSuccess: () => {
+                queryClient.invalidateQueries({ queryKey: ["annoucements"] });
+                messageApi.success("Statut modifiée avec succès !");
+              },
+              onError: (error: Error) => {
+                messageApi.error(
+                  error.message ||
+                    "Une erreur s'est produite lors de la modification du statut."
+                );
+              },
+            }
+          );
+        }}
+        loading={isPending}
+        disabled={isPending}
+      />
+    </>
+  );
+};
+
 
 type ListAnnouncementsProps = {
   yearId?: number;
@@ -210,7 +255,20 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
                 `${record.period.acronym} (${record.period.name})`,
               minWidth: 100,
               fixed: "left",
-              ellipsis: true,
+            },
+            {
+              key: "session",
+              dataIndex: "session",
+              title: "Session",
+              render: (_, record) => getSessionText(record.session),
+              width: 120,
+            },
+            {
+              key: "moment",
+              dataIndex: "moment",
+              title: "Moment",
+              render: (_, record) => getMomentText(record.moment),
+              width: 120,
             },
             {
               key: "graduated_students",
@@ -242,39 +300,13 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
             //   title: "Mode",
             //   render: (_, record) => record.mode === "all-students" ? "Tous les étudiants" : "Quelques étudiants",
             // },
-            {
-              key: "session",
-              dataIndex: "session",
-              title: "Session",
-              render: (_, record) => getSessionText(record.session),
-              width: 136,
-            },
-            {
-              key: "moment",
-              dataIndex: "moment",
-              title: "Moment",
-              render: (_, record) => getMomentText(record.moment),
-              width: 144,
-            },
+
             {
               key: "status",
               dataIndex: "status",
               title: "Statut",
               render: (_, record) => (
-                <Tag
-                  bordered={false}
-                  color={record.status === "locked" ? "error" : "green"}
-                  style={{ marginRight: 0, width: "100%" }}
-                  icon={
-                    record.status === "locked" ? (
-                      <LockOutlined />
-                    ) : (
-                      <UnlockOutlined />
-                    )
-                  }
-                >
-                  {record.status === "locked" ? "Verrouillé" : "Ouvert"}
-                </Tag>
+                <SwitchAnnouncementStatus announcement={record} />
               ),
               width: 120,
             },

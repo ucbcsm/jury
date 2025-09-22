@@ -1,4 +1,4 @@
-import { Announcement } from "@/types";
+import { Announcement, Jury } from "@/types";
 import api from "../fetcher";
 
 export async function getAnnoucements(searchParams: {
@@ -86,13 +86,14 @@ export async function createAnnoucementWithSome(data: {
 export async function updateAnnouncement(
   data: Omit<
     Announcement,
-    "academic_year" | "period" | "faculty" | "departement" | "class_year" | "date_updated"
+    "academic_year" | "period" | "faculty" | "departement" | "class_year" | "date_updated" | "jury"
   > & {
     yearId: number;
     periodId: number;
     facultyId: number;
     departmentId: number;
     classId: number;
+    juryId:number;
   }
 ) {
   const res = await api.put(`/jury/announcement/${data.id}/`, {
@@ -108,7 +109,13 @@ export async function updateAnnouncement(
     moment: data.moment,
     session: data.session,
     date_created: data.date_created,
-    mode: data.mode,
+    mode: "ALL-STUDENTS",
+    jury:data.juryId
   });
   return res.data;
+}
+
+export async function switchAnnouncementStatus(data:{id:number, status:boolean}) {
+   const res = await api.post(`/jury/announcement/status-update/`, data)
+   return res.data;
 }

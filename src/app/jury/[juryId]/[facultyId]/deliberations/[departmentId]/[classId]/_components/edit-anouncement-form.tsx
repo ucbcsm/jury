@@ -3,7 +3,7 @@
 import { getCurrentPeriodsAsOptions, getMomentText, getSessionText } from "@/lib/api";
 import { updateAnnouncement } from "@/lib/api"; 
 import { Period, Announcement } from "@/types";
-import { CloseOutlined } from "@ant-design/icons";
+import { CloseOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     Button,
@@ -13,10 +13,12 @@ import {
     Form,
     message,
     Select,
+    Spin,
     theme,
+    Typography,
 } from "antd";
 import { useParams } from "next/navigation";
-import { Dispatch, FC, SetStateAction, useEffect } from "react";
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 
 type EditAnnouncementFormProps = {
     periods?: Period[];
@@ -26,7 +28,6 @@ type EditAnnouncementFormProps = {
 };
 
 type FormDataType = {
-    status: "locked" | "unlocked";
     periodId: number;
 };
 
@@ -42,6 +43,7 @@ export const EditAnnouncementForm: FC<EditAnnouncementFormProps> = ({
     const [messageApi, contextHolder] = message.useMessage();
     const [form] = Form.useForm();
     const { juryId, facultyId, departmentId, classId } = useParams();
+    const periodId = Form.useWatch('periodId', form);
 
     const queryClient = useQueryClient();
 
@@ -52,9 +54,9 @@ export const EditAnnouncementForm: FC<EditAnnouncementFormProps> = ({
     useEffect(() => {
       if (announcement) {
         form.setFieldsValue({
-          status: announcement.status,
           periodId: announcement.period.id,
         });
+       
       }
     }, [announcement, form]);
 
@@ -79,6 +81,8 @@ export const EditAnnouncementForm: FC<EditAnnouncementFormProps> = ({
             graduated_students: announcement.graduated_students,
             non_graduated_students: announcement.non_graduated_students,
             date_created: announcement.date_created,
+            status: announcement.status,
+            juryId:Number(juryId)
           },
           {
             onSuccess: () => {
@@ -124,7 +128,7 @@ export const EditAnnouncementForm: FC<EditAnnouncementFormProps> = ({
               </Button>
               <Button
                 type="primary"
-                disabled={isPending}
+                disabled={announcement.period.id === periodId || isPending}
                 loading={isPending}
                 onClick={() => {
                   form.submit();
@@ -136,6 +140,7 @@ export const EditAnnouncementForm: FC<EditAnnouncementFormProps> = ({
             </Flex>
           }
           styles={{ header: { background: colorPrimary, color: "#fff" } }}
+          width={isPending ? "100%" : "auto"}
         >
           <Form
             form={form}
@@ -146,6 +151,7 @@ export const EditAnnouncementForm: FC<EditAnnouncementFormProps> = ({
               periodId: announcement.period.id,
             }}
             disabled={isPending}
+             style={{ display: !isPending ? "block" : "none" }}
           >
             <Descriptions
               //   title="Détails"
@@ -156,7 +162,7 @@ export const EditAnnouncementForm: FC<EditAnnouncementFormProps> = ({
                 {
                   key: "year",
                   label: "Année académique",
-                  children: announcement?.faculty.name || "",
+                  children: announcement?.academic_year.name || "",
                 },
                 {
                   key: "faculty",
@@ -183,6 +189,12 @@ export const EditAnnouncementForm: FC<EditAnnouncementFormProps> = ({
                   label: "Moment",
                   children: getMomentText(announcement.moment),
                 },
+                {
+                  key: "status",
+                  label: "Statut",
+                  children:
+                    announcement.status === "locked" ? "Verrouillé" : "Ouvert",
+                },
               ]}
             />
 
@@ -199,23 +211,29 @@ export const EditAnnouncementForm: FC<EditAnnouncementFormProps> = ({
                   options={getCurrentPeriodsAsOptions(periods)}
                 />
               </Form.Item>
-              <Form.Item
-                name="status"
-                label="Statut"
-                rules={[{ required: true }]}
-              >
-                <Select
-                  variant="filled"
-                  placeholder="Statut"
-                  options={[
-                    { value: "locked", label: "Verrouillé" },
-                    { value: "unlocked", label: "Ouvert" },
-                  ]}
-                  style={{ width: "100%" }}
-                />
-              </Form.Item>
             </div>
           </Form>
+          <div
+            className="h-[calc(100vh-196px)] flex-col justify-center items-center"
+            style={{ display: !isPending ? "none" : "flex" }}
+          >
+            <Spin
+              indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />}
+            />
+            <Typography.Title
+              type="secondary"
+              level={3}
+              style={{ marginTop: 10 }}
+            >
+              Recalcul en cours ...
+            </Typography.Title>
+            <Typography.Text type="secondary">
+              Cette opération peut prendre plus de temps selon les cas.
+            </Typography.Text>
+            <Typography.Text type="secondary">
+              Veuillez donc patienter!
+            </Typography.Text>
+          </div>
         </Drawer>
       </>
     );
