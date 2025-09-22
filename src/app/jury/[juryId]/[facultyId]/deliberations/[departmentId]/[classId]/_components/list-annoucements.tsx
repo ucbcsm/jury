@@ -116,11 +116,12 @@ const SwitchAnnouncementStatus: FC<SwitchAnnouncementStatusProps> = ({announceme
       <Switch
         checkedChildren="Verrouillé"
         unCheckedChildren="Ouvert"
+        value={announcement.status ? true : false}
         onChange={(value) => {
           mutateAsync(
             {
               id: announcement.id,
-              status: value,
+              status: value ? "locked" : "unlocked",
             },
             {
               onSuccess: () => {

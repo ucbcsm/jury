@@ -115,7 +115,10 @@ export async function updateAnnouncement(
   return res.data;
 }
 
-export async function switchAnnouncementStatus(data:{id:number, status:boolean}) {
-   const res = await api.post(`/jury/announcement/status-update/`, data)
-   return res.data;
+export async function switchAnnouncementStatus(data: {
+  id: number;
+  status: "locked" | "unlocked";
+}) {
+  const res = await api.post(`/jury/announcement/status-update/`, data);
+  return res.data;
 }
