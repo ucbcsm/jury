@@ -86,7 +86,7 @@ export const EditAnnouncementForm: FC<EditAnnouncementFormProps> = ({
           },
           {
             onSuccess: () => {
-              queryClient.invalidateQueries({ queryKey: ["annoucements"] });
+              queryClient.invalidateQueries({ queryKey: ["announcements"] });
               messageApi.success("Publication modifiée avec succès !");
               setOpen(false);
             },

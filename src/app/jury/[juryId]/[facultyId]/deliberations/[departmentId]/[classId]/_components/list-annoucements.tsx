@@ -116,7 +116,7 @@ const SwitchAnnouncementStatus: FC<SwitchAnnouncementStatusProps> = ({announceme
       <Switch
         checkedChildren="Verrouillé"
         unCheckedChildren="Ouvert"
-        value={announcement.status ? true : false}
+        value={announcement.status==="locked" ? true : false}
         onChange={(value) => {
           mutateAsync(
             {
@@ -125,7 +125,7 @@ const SwitchAnnouncementStatus: FC<SwitchAnnouncementStatusProps> = ({announceme
             },
             {
               onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ["annoucements"] });
+                queryClient.invalidateQueries({ queryKey: ["announcements"] });
                 messageApi.success("Statut modifiée avec succès !");
               },
               onError: (error: Error) => {
@@ -168,7 +168,7 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
   );
 
   const { data, isPending, isError } = useQuery({
-    queryKey: ["annoucements", facultyId, departmentId, classId],
+    queryKey: ["announcements", facultyId, departmentId, classId],
     queryFn: () =>
       getAnnoucements({
         yearId: Number(yearId),

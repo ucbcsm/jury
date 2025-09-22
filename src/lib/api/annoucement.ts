@@ -119,6 +119,9 @@ export async function switchAnnouncementStatus(data: {
   id: number;
   status: "locked" | "unlocked";
 }) {
-  const res = await api.post(`/jury/announcement/status-update/`, data);
+  const res = await api.post(`/jury/announcement/status-update/`, {
+    announcement__id: data.id,
+    status: data.status,
+  });
   return res.data;
 }
