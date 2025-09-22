@@ -31,7 +31,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
 }) => {
   return (
     <div className="hidden">
-      <div ref={ref}>
+      <div ref={ref} className=" ">
         <DocHeader />
         {annoucement && (
           <Card style={{ marginBottom: 28 }}>

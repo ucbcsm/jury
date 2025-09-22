@@ -155,10 +155,10 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
         </Space>
       }
     >
-      <div className="h-[calc(100vh-65px)] overflow-y-auto ">
-        <div className="min-w-fit overflow-x-auto pb-10">
-          <table className="min-w-fit divide-y divide-gray-200 overflow-hidden ">
-            <thead className="bg-gray-50">
+      <div className="h-[calc(100vh-65px)]  overflow-y-auto relative  ">
+        <div className="min-w-fit h-[calc(100vh-65px)] overflow-x-auto pb-10">
+          <table className="min-w-fit divide-y divide-gray-200   ">
+            <thead className="">
               <tr className=" uppercase">
                 <th
                   colSpan={4}
@@ -190,7 +190,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                   className="bg-white border border-gray-300"
                 ></th>
               </tr>
-              <tr>
+              <tr className="">
                 <th
                   colSpan={4}
                   className="px-4 py-2 bg-gray-100 text-sm font-medium border-b border border-gray-300"
@@ -271,7 +271,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                   className="bg-white border border-gray-300"
                 ></th>
               </tr>
-              <tr>
+              <tr className="">
                 <th
                   colSpan={4}
                   className="px-4 py-2 bg-gray-50 text-xs font-medium border-b  border border-gray-300"
