@@ -8,10 +8,7 @@ import {
   getShortGradeValidationText,
 } from "@/lib/api";
 import { Announcement } from "@/types";
-import {
-  CloseOutlined,
-  PrinterOutlined,
-} from "@ant-design/icons";
+import { CloseOutlined, PrinterOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Button, Divider, Drawer, Result, Space, Typography } from "antd";
 import { useParams } from "next/navigation";
@@ -24,7 +21,7 @@ import { ButtonDeleteGradeFromGrid } from "./delete-grade-item";
 
 type ListPeriodGradesProps = {
   annoucement: Announcement;
-  anouncementId: number | null;
+  announcementId: number | null;
   setAnnoucementId: (
     value: number | ((old: number | null) => number | null) | null,
     options?: Options
@@ -33,7 +30,7 @@ type ListPeriodGradesProps = {
 
 export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
   annoucement,
-  anouncementId,
+  announcementId,
   setAnnoucementId,
 }) => {
   const { facultyId, departmentId, classId } = useParams();
@@ -76,12 +73,21 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
       !!departmentId &&
       !!classId &&
       !!annoucement.period.id &&
-      !!anouncementId,
+      !!announcementId,
   });
 
   const onClose = () => {
     setAnnoucementId(null);
   };
+
+  // console.log(
+  //   "Annonce",
+  //   annoucement.id,
+  //   "Courses:",
+  //   data?.HeaderData?.retaken?.course_list,
+  //   data?.HeaderData
+  // );
+  console.log(data?.BodyDataList);
 
   return (
     <Drawer
@@ -106,7 +112,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
       }}
       style={{ padding: 0 }}
       loading={isPending}
-      open={annoucement.id === anouncementId}
+      open={annoucement.id === announcementId}
       onClose={onClose}
       footer={false}
       closable={false}
@@ -135,7 +141,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
             color="primary"
             variant="dashed"
             onClick={printListGrades}
-            disabled={data?.BodyDataList?.length === 0}
+            disabled={isPending || data?.BodyDataList?.length === 0}
           >
             Imprimer
           </Button>
@@ -168,6 +174,17 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                     {period.period.acronym}
                   </th>
                 ))}
+
+                {data?.HeaderData?.retaken?.course_list &&
+                  data?.HeaderData?.retaken.course_list.length > 0 &&
+                  data?.HeaderData?.retaken?.header?.map((header) => (
+                    <th
+                      colSpan={header.course_counter}
+                      className="px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
+                    >
+                      Cours repassés {/* {header.retake_title} */}
+                    </th>
+                  ))}
                 <th
                   colSpan={7}
                   className="bg-white border border-gray-300"
@@ -181,6 +198,15 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                   Unités d&apos;Enseignement
                 </th>
                 {data?.HeaderData?.no_retaken?.teaching_unit_list?.map((TU) => (
+                  <th
+                    key={TU.teaching_unit.code}
+                    colSpan={TU.course_counter}
+                    className="px-4 py-2 uppercase bg-gray-100 text-xs font-semibold border-b border border-gray-300 text-center"
+                  >
+                    {TU.teaching_unit.code}
+                  </th>
+                ))}
+                {data?.HeaderData?.retaken?.teaching_unit_list?.map((TU) => (
                   <th
                     key={TU.teaching_unit.code}
                     colSpan={TU.course_counter}
@@ -264,6 +290,18 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                     {course.available_course.name}
                   </th>
                 ))}
+                {data?.HeaderData?.retaken?.course_list?.map((course) => (
+                  <th
+                    key={course.id}
+                    style={{
+                      writingMode: "sideways-lr",
+                      textOrientation: "mixed",
+                    }}
+                    className="px-2 py-2 w-8 text-xs font-normal bg-gray-50 border-b  border border-gray-300 text-left"
+                  >
+                    {course.available_course.name}
+                  </th>
+                ))}
               </tr>
               <tr>
                 <th
@@ -278,6 +316,16 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                     {index + 1}
                   </th>
                 ))}
+                {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
+                  <th
+                    key={index}
+                    className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
+                  >
+                    {data?.HeaderData?.no_retaken?.course_list.length +
+                      index +
+                      1}
+                  </th>
+                ))}
                 <th className="bg-white border border-gray-300"></th>
                 <th className="bg-white border border-gray-300"></th>
                 <th className="bg-white border border-gray-300"></th>
@@ -290,6 +338,14 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                   Crédits
                 </th>
                 {data?.HeaderData?.no_retaken?.credits?.map((credit, idx) => (
+                  <th
+                    key={idx}
+                    className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300 text-center"
+                  >
+                    {credit}
+                  </th>
+                ))}
+                {data?.HeaderData?.retaken?.credits?.map((credit, idx) => (
                   <th
                     key={idx}
                     className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300 text-center"
@@ -320,6 +376,14 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                     10
                   </th>
                 ))}
+                {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
+                  <th
+                    key={index}
+                    className="px-2 py-1 w-8 text-xs bg-white border-b  border border-gray-300 text-center"
+                  >
+                    10
+                  </th>
+                ))}
                 <th className="bg-white border border-gray-300"></th>
                 <th className="bg-white border border-gray-300"></th>
                 <th className="bg-white border border-gray-300"></th>
@@ -339,6 +403,14 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                     10
                   </th>
                 ))}
+                {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
+                  <th
+                    key={index}
+                    className="px-2 py-1 w-8 text-xs bg-gray-50 border-b  border border-gray-300 text-center"
+                  >
+                    10
+                  </th>
+                ))}
                 <th className="bg-gray-50 border border-gray-300"></th>
                 <th className="bg-gray-50 border border-gray-300"></th>
                 <th className="bg-gray-50 border border-gray-300"></th>
@@ -351,6 +423,14 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                   TOTAL
                 </th>
                 {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
+                  <th
+                    key={index}
+                    className="px-2 py-1 w-8 text-xs border-b border border-gray-300 text-center"
+                  >
+                    20
+                  </th>
+                ))}
+                {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                   <th
                     key={index}
                     className="px-2 py-1 w-8 text-xs border-b border border-gray-300 text-center"
@@ -412,6 +492,14 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                         {cc}
                       </td>
                     ))}
+                    {record.retaken.continuous_assessments.map((cc, idx) => (
+                      <td
+                        key={idx}
+                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                      >
+                        {cc}
+                      </td>
+                    ))}
                     <td className=" border border-gray-300"></td>
                     <td className=" border border-gray-300"></td>
                     <td className=" border border-gray-300"></td>
@@ -433,6 +521,14 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                       className="px-4 py-1 bg-white border border-gray-300"
                     ></td> */}
                     {record.no_retaken.exams.map((exam, idx) => (
+                      <td
+                        key={idx}
+                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                      >
+                        {exam}
+                      </td>
+                    ))}
+                    {record.retaken.exams.map((exam, idx) => (
                       <td
                         key={idx}
                         className="px-2 py-1 text-center text-xs border border-gray-300"
@@ -464,6 +560,23 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                         className="px-2 py-2 text-center text-xs border border-gray-300"
                         style={{
                           backgroundColor: total >= 10 ? "#f0fdf4" : "#fef2f2",
+                          color: total >= 10 ? "#00a63e" : "#e7000b",
+                        }}
+                      >
+                        {total}
+                      </td>
+                    ))}
+                    {record.retaken.totals.map((total, idx) => (
+                      <td
+                        key={idx}
+                        className="px-2 py-2 text-center text-xs border border-gray-300"
+                        style={{
+                          backgroundColor:
+                            total === null
+                              ? "#fff"
+                              : total >= 10
+                              ? "#f0fdf4"
+                              : "#fef2f2",
                           color: total >= 10 ? "#00a63e" : "#e7000b",
                         }}
                       >
@@ -548,6 +661,14 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                         {letter}
                       </td>
                     ))}
+                    {record.retaken.grade_letters.map((letter, idx) => (
+                      <td
+                        key={idx}
+                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                      >
+                        {letter}
+                      </td>
+                    ))}
                     <td className="border border-gray-300"></td>
                     <td className="border border-gray-300"></td>
                     <td className="border border-gray-300"></td>
@@ -563,6 +684,14 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                       Validation EC
                     </td>
                     {record.no_retaken.course_decisions.map((decision, idx) => (
+                      <td
+                        key={idx}
+                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                      >
+                        {getShortGradeValidationText(decision)}
+                      </td>
+                    ))}
+                    {record.retaken.course_decisions.map((decision, idx) => (
                       <td
                         key={idx}
                         className="px-2 py-1 text-center text-xs border border-gray-300"
@@ -596,6 +725,14 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                         {credits}
                       </td>
                     ))}
+                    {record.retaken.earned_credits.map((credits, idx) => (
+                      <td
+                        key={idx}
+                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                      >
+                        {credits}
+                      </td>
+                    ))}
                     <td className=" border border-gray-300"></td>
                     <td className=" border border-gray-300"></td>
                     <td className=" border border-gray-300"></td>
@@ -615,6 +752,17 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                       Validation UE
                     </td>
                     {record.no_retaken.teaching_unit_decisions.map(
+                      (TUcredits, idx) => (
+                        <td
+                          key={idx}
+                          colSpan={TUcredits.cols_counter}
+                          className="px-2 py-1 text-center text-xs border border-gray-300"
+                        >
+                          {getShortGradeValidationText(TUcredits.value)}
+                        </td>
+                      )
+                    )}
+                    {record.retaken.teaching_unit_decisions.map(
                       (TUcredits, idx) => (
                         <td
                           key={idx}

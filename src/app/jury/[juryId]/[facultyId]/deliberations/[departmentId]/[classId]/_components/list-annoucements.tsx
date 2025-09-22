@@ -32,7 +32,7 @@ type ActionsBarProps = {
   periods?: Period[];
 };
 const ActionsBar: FC<ActionsBarProps> = ({ announcement, periods }) => {
-  const [anouncementId, setAnnoucementId] = useQueryState(
+  const [announcementId, setAnnoucementId] = useQueryState(
     "grid",
     parseAsInteger
   );
@@ -44,7 +44,7 @@ const ActionsBar: FC<ActionsBarProps> = ({ announcement, periods }) => {
     <>
       <ListPeriodGrades
         annoucement={announcement}
-        anouncementId={anouncementId}
+        announcementId={announcementId}
         setAnnoucementId={setAnnoucementId}
       />
       <EditAnnouncementForm

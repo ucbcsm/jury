@@ -95,6 +95,7 @@ export const EditAnnouncementForm: FC<EditAnnouncementFormProps> = ({
                 error.message ||
                   "Une erreur s'est produite lors de la modification de la publication."
               );
+             console.log(error?.cause)
             },
           }
         );

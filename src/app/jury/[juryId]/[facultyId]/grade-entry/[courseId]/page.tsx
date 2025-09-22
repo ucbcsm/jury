@@ -191,6 +191,7 @@ export default function Page() {
         messageApi.error(
           "Une erreur s'est produite lors de la mise à jour des notes"
         );
+        console.error(error);
       },
     });
   };
