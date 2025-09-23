@@ -27,8 +27,19 @@ body {
 @media print {
   @page {
     /* size: A4; */
-    margin: 0 16mm 0 16mm;
+    margin: 0 16mm 16mm 16mm;
     padding-top: 16mm;
-    padding-bottom: 16mm;
+    marks: none;
+    /* padding-bottom: 16mm; */
+    @bottom-left {
+      content: "UCBC - Université Chrétienne Bilingue du Congo";
+      font-size: 12px;
+      color: var(--foreground);
+    }
+    @bottom-right {
+      content: "" counter(page) " sur " counter(pages) " pages";
+      font-size: 12px;
+      color: var(--foreground);
+    }
   }
 }

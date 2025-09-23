@@ -122,7 +122,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
           </Card>
         )}
 
-        <table className="min-w-fit divide-y divide-gray-200  overflow-hidden ">
+        <table className="min-w-fit divide-y divide-gray-200 [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap ">
           <thead className="bg-gray-50">
             <tr className=" uppercase">
               <th
