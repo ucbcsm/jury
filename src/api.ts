@@ -166,3 +166,12 @@
         // search_matricule
 
         // https://ciucbc.pythonanywhere.com/api/v01/faculty/attendance-list/?course__id=&attendance_reached
+        // https://ciucbc.pythonanywhere.com/api/v01/jury/compensation
+        // {
+        //         grade_to_withdraw:number,
+        //         student_id:number,// yearEnrollment
+        //         courseId_to_withdraw_in:number, //TaughtCourseId
+        //         courseId_to_add_in:number, //TaughtCourseId
+        //         moment:string,
+        //         session:string,
+        // }

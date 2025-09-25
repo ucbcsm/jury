@@ -44,6 +44,25 @@ export async function getResultGrid(searchParams: {
   return res.data as ResultGrid;
 }
 
+export async function postCompensation(data: {
+  grade_to_withdraw: number;
+  student_id: number; // yearEnrollmentId
+  courseId_to_withdraw_in: number; //TaughtCourseId
+  courseId_to_add_in: number; //TaughtCourseId
+  moment: string;
+  session: string;
+}) {
+  const res = await api.post(`/jury/compensation`, {
+    grade_to_withdraw: data.grade_to_withdraw,
+    student_id: data.student_id,
+    courseId_to_withdraw_in: data.courseId_to_withdraw_in,
+    courseId_to_add_in: data.courseId_to_add_in,
+    moment: data.moment,
+    session: data.session,
+  });
+  return res.data;
+}
+
 export function getDecisionText(decision: "passed" | "postponed") {
   if (decision === "passed") {
     return "Admis (e)";

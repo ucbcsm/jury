@@ -26,6 +26,7 @@ import { useReactToPrint } from "react-to-print";
 import { PrintableListGrades } from "./printable/print-list-grades";
 import { ButtonDeleteGradeFromGrid } from "./delete-grade-item";
 import { useYid } from "@/hooks/use-yid";
+import { CompensationForm } from "./compensation-form";
 
 type ListYearGradesProps = {
   department?: Department;
@@ -549,14 +550,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({ department, classYear 
                     className="px-2 py-1 bg-white align-top  border border-gray-300 "
                   >
                     <Space>
-                      <Button
-                        icon={<SlidersOutlined />}
-                        title="Appriquer la compensation"
-                        type="text"
-                        size="small"
-                        color="green"
-                        variant="text"
-                      />
+                      <CompensationForm hearderData={data.HeaderData} itemData={record}/>
                       <ButtonDeleteGradeFromGrid
                         periodEnrollmentId={record.id}
                       />

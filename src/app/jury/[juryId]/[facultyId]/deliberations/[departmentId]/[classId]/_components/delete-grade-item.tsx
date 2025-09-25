@@ -128,11 +128,12 @@ periodEnrollmentId
       >
         <Button
           icon={!isPending ? <DeleteOutlined /> : <LoadingOutlined />}
-          type="text"
-          danger
+          // type="text"
+          // danger
           size="small"
           title="Supprimer l'étudiant de la grille"
           disabled={isPending}
+          style={{boxShadow:"none"}}
         />
       </Popover>
     </>

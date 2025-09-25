@@ -18,6 +18,7 @@ import React, { FC, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { PrintableListGrades } from "./printable/print-list-grades";
 import { ButtonDeleteGradeFromGrid } from "./delete-grade-item";
+import { CompensationForm } from "./compensation-form";
 
 type ListPeriodGradesProps = {
   annoucement: Announcement;
@@ -148,7 +149,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
       }
     >
       <table
-        className="min-w-fit    "
+        className="min-w-fit [&_td]:whitespace-nowrap "
         style={{
           display: data && data.BodyDataList.length > 0 ? "block" : "none",
         }}
@@ -157,7 +158,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
           <tr className=" uppercase">
             <th
               colSpan={4}
-              className="px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
+              className="sticky left-0 z-10 px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
             >
               Semestre
             </th>
@@ -182,10 +183,10 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
               ))}
             <th colSpan={7} className="bg-white border border-gray-300"></th>
           </tr>
-          <tr className=" sticky -top-1 z-10">
+          <tr className=" sticky top-0 z-10">
             <th
               colSpan={4}
-              className="px-4 py-2 bg-gray-100 text-xs font-medium whitespace-nowrap border-b border border-gray-300"
+              className="sticky left-0 z-10  px-4 py-2 bg-gray-100 text-xs font-semibold whitespace-nowrap border-b border border-gray-300"
             >
               Unités d&apos;Enseignement
             </th>
@@ -258,12 +259,12 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
             >
               Décision
             </th>
-            <th rowSpan={6} className="bg-white border border-gray-300"></th>
+            <th rowSpan={2} className="bg-white border border-gray-300"></th>
           </tr>
-          <tr className="sticky top-[28px] z-10">
+          <tr className="sticky top-[33px] z-10  ">
             <th
               colSpan={4}
-              className="px-4 py-2 bg-gray-50 text-xs font-medium whitespace-nowrap border-b  border border-gray-300"
+              className="sticky left-0  px-4 py-2 bg-gray-50 text-xs font-semibold whitespace-nowrap  border border-gray-300"
             >
               Éléments Constitutifs
             </th>
@@ -274,7 +275,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                   writingMode: "sideways-lr",
                   textOrientation: "mixed",
                 }}
-                className="px-2 py-2 w-8 text-xs font-normal bg-gray-50 border-b  border border-gray-300 text-left"
+                className="px-2 py-2 w-8 text-xs font-semibold bg-gray-50 border-b  border border-gray-300 text-left"
               >
                 {course.available_course.name}
               </th>
@@ -286,14 +287,17 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                   writingMode: "sideways-lr",
                   textOrientation: "mixed",
                 }}
-                className="px-2 py-2 w-8 text-xs font-normal bg-gray-50 border-b  border border-gray-300 text-left"
+                className="px-2 py-2 w-8 text-xs font-semibold bg-gray-50 border-b  border border-gray-300 text-left"
               >
                 {course.available_course.name}
               </th>
             ))}
           </tr>
           <tr>
-            <th colSpan={4} className="bg-white border border-gray-300"></th>
+            <th
+              colSpan={4}
+              className=" sticky left-0 bg-white border border-gray-300"
+            ></th>
             {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
               <th
                 key={index}
@@ -316,11 +320,12 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
             <th className="bg-white border border-gray-300"></th>
             <th className="bg-white border border-gray-300"></th>
             <th className="bg-white border border-gray-300"></th>
+            <th className="bg-white border border-gray-300"></th>
           </tr>
           <tr className="bg-gray-50">
             <th
               colSpan={4}
-              className="bg-gray-50 text-xs font-medium border border-gray-300"
+              className="sticky left-0 bg-gray-50 text-xs font-medium border border-gray-300"
             >
               Crédits
             </th>
@@ -350,11 +355,12 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
             <th className=" border border-gray-300"></th>
             <th className=" border border-gray-300"></th>
             <th className=" border border-gray-300"></th>
+            <th className=" border border-gray-300"></th>
           </tr>
           <tr>
             <th
               colSpan={4}
-              className="bg-white text-xs font-medium border border-gray-300"
+              className="sticky left-0 bg-white text-xs font-medium border border-gray-300"
             >
               CC
             </th>
@@ -380,11 +386,12 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
             <th className="bg-white border border-gray-300"></th>
             <th className="bg-white border border-gray-300"></th>
             <th className="bg-white border border-gray-300"></th>
+            <th className="bg-white border border-gray-300"></th>
           </tr>
           <tr className="bg-gray-50">
             <th
               colSpan={4}
-              className="bg-gray-50 text-xs font-medium border border-gray-300"
+              className="sticky left-0 bg-gray-50 text-xs font-medium border border-gray-300"
             >
               Examen
             </th>
@@ -410,11 +417,12 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
             <th className=" border border-gray-300"></th>
             <th className=" border border-gray-300"></th>
             <th className=" border border-gray-300"></th>
+            <th className=" border border-gray-300"></th>
           </tr>
           <tr className="bg-white">
             <th
               colSpan={4}
-              className=" text-xs font-medium border border-gray-300"
+              className=" sticky left-0 px-2 py-2 text-xs font-medium border border-gray-300"
             >
               TOTAL
             </th>
@@ -455,7 +463,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
               <tr className="bg-blue-100 transition">
                 <td
                   rowSpan={7}
-                  className="px-2 py-2 w-8 text-right align-top text-xs font-semibold bg-white border border-gray-300"
+                  className=" sticky left-0 px-2 py-2 w-8 text-right align-top text-xs font-semibold bg-white border border-gray-300"
                 >
                   {indexRecord + 1}
                 </td>
@@ -476,10 +484,10 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                   {record.gender}
                 </td>
                 {/* <td
-                      colSpan={3}
-                      rowSpan={2}
-                      className="px-4 py-1 bg-white border border-gray-300"
-                    ></td> */}
+                                          colSpan={3}
+                                          rowSpan={2}
+                                          className="px-4 py-1 bg-white border border-gray-300"
+                                        ></td> */}
                 {record.no_retaken.continuous_assessments.map((cc, idx) => (
                   <td
                     key={idx}
@@ -504,16 +512,22 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                 <td className=" border border-gray-300"></td>
                 <td
                   rowSpan={7}
-                  className="px-2 py-1 bg-white align-top border border-gray-300 "
+                  className="px-2 py-1 bg-white align-top  border border-gray-300 "
                 >
-                  <ButtonDeleteGradeFromGrid periodEnrollmentId={record.id} />
+                  <Space>
+                    <CompensationForm
+                      hearderData={data.HeaderData}
+                      itemData={record}
+                    />
+                    <ButtonDeleteGradeFromGrid periodEnrollmentId={record.id} />
+                  </Space>
                 </td>
               </tr>
               <tr className="bg-blue-100 transition ">
                 {/* <td
-                      colSpan={3}
-                      className="px-4 py-1 bg-white border border-gray-300"
-                    ></td> */}
+                                          colSpan={3}
+                                          className="px-4 py-1 bg-white border border-gray-300"
+                                        ></td> */}
                 {record.no_retaken.exams.map((exam, idx) => (
                   <td
                     key={idx}
@@ -539,8 +553,8 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
               </tr>
               <tr className=" font-semibold">
                 {/* <td className="px-2 py-2 w-8 text-right text-xs font-semibold border border-gray-300">
-                      {indexRecord + 1}
-                    </td> */}
+                                          {indexRecord + 1}
+                                        </td> */}
                 <td
                   colSpan={3}
                   className="px-2 py-2 text-xs border text-center border-gray-300"
