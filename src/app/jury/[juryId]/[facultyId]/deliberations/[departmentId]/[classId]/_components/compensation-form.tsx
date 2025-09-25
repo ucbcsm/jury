@@ -51,7 +51,6 @@ export const CompensationForm:FC<CompensationFormProps> = ({hearderData, itemDat
     form.resetFields();
   };
 
-  console.log(itemData);
   const onFinish = (values: FormDataType) => {
     if(values.courseId_to_add_in === values.courseId_to_withdraw_in){
       messageApi.error("Le cours donneur et le cours receveur doivent être différents.");
