@@ -11,7 +11,6 @@ import {
   Drawer,
   Flex,
   Form,
-  Input,
   InputNumber,
   message,
   Select,
@@ -22,19 +21,18 @@ import { FC, useState } from "react";
 
 type FormDataType = {
   grade_to_withdraw: number;
-  student_id: number; // yearEnrollment
   courseId_to_withdraw_in: number; //TaughtCourseId
   courseId_to_add_in: number; //TaughtCourseId
-  session: "main_session" | "retake_session";
-  moment: "before_appeal" | "after_appeal";
 };
 
 type CompensationFormProps = {
   hearderData: ResultGrid["HeaderData"];
   itemData: ResultGrid["BodyDataList"][number];
+  session: "main_session" | "retake_session";
+  moment: "before_appeal" | "after_appeal";
 };
 
-export const CompensationForm:FC<CompensationFormProps> = ({hearderData, itemData}) => {
+export const CompensationForm:FC<CompensationFormProps> = ({hearderData, itemData, session, moment}) => {
   const {
     token: { colorPrimary },
   } = theme.useToken();
@@ -63,11 +61,11 @@ export const CompensationForm:FC<CompensationFormProps> = ({hearderData, itemDat
     mutateAsync(
       {
         grade_to_withdraw: values.grade_to_withdraw,
-        student_id: values.student_id,
+        student_id: 0, // yearEnrollment
         courseId_to_withdraw_in: values.courseId_to_withdraw_in,
         courseId_to_add_in: values.courseId_to_add_in,
-        session: values.session,
-        moment: values.moment,
+        session: session,
+        moment: moment,
       },
       {
         onSuccess: () => {

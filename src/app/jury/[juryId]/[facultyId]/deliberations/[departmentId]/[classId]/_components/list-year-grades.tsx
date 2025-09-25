@@ -6,7 +6,13 @@ import {
   getShortGradeValidationText,
 } from "@/lib/api";
 import { Class, Department } from "@/types";
-import { AuditOutlined, CloseOutlined, EyeOutlined, PrinterOutlined, SlidersOutlined } from "@ant-design/icons";
+import {
+  AuditOutlined,
+  CloseOutlined,
+  EyeOutlined,
+  PrinterOutlined,
+  SlidersOutlined,
+} from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
   Button,
@@ -33,7 +39,10 @@ type ListYearGradesProps = {
   classYear?: Class;
 };
 
-export const ListYearGrades: FC<ListYearGradesProps> = ({ department, classYear }) => {
+export const ListYearGrades: FC<ListYearGradesProps> = ({
+  department,
+  classYear,
+}) => {
   const { yid, year } = useYid();
   const { facultyId, departmentId, classId } = useParams();
   const [open, setOpen] = useQueryState(
@@ -89,7 +98,6 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({ department, classYear 
     setSession("main_session");
     setMoment("before_appeal");
   };
-
 
   return (
     <>
@@ -550,7 +558,12 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({ department, classYear 
                     className="px-2 py-1 bg-white align-top  border border-gray-300 "
                   >
                     <Space>
-                      <CompensationForm hearderData={data.HeaderData} itemData={record}/>
+                      <CompensationForm
+                        hearderData={data.HeaderData}
+                        itemData={record}
+                        session={session}
+                        moment={moment}
+                      />
                       <ButtonDeleteGradeFromGrid
                         periodEnrollmentId={record.id}
                       />

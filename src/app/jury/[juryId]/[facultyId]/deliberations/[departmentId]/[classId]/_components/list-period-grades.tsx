@@ -518,6 +518,8 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                     <CompensationForm
                       hearderData={data.HeaderData}
                       itemData={record}
+                      session={annoucement.session}
+                      moment={annoucement.moment}
                     />
                     <ButtonDeleteGradeFromGrid periodEnrollmentId={record.id} />
                   </Space>
