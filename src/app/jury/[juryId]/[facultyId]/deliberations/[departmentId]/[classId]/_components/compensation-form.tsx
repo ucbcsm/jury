@@ -51,17 +51,28 @@ export const CompensationForm:FC<CompensationFormProps> = ({hearderData, itemDat
     form.resetFields();
   };
 
-  console.log(itemData)
-
+  console.log(itemData);
   const onFinish = (values: FormDataType) => {
     if(values.courseId_to_add_in === values.courseId_to_withdraw_in){
       messageApi.error("Le cours donneur et le cours receveur doivent être différents.");
       return;
     }
+    const noRetakecourseToWithDraw = hearderData.no_retaken.course_list.find(course=>course.id===values.courseId_to_withdraw_in)
+    const noRetakecourseToAdd = hearderData.no_retaken.course_list.find(course=>course.id===values.courseId_to_add_in)
+
+
+    if (
+      noRetakecourseToWithDraw?.teaching_unit?.id !==
+      noRetakecourseToAdd?.teaching_unit?.id
+    ) {
+      messageApi.error("Les cours doivent être d'une seule et même unité d'enseignement.");
+      return;
+    }
+
     mutateAsync(
       {
         grade_to_withdraw: values.grade_to_withdraw,
-        student_id: 0, // yearEnrollment
+        student_id: itemData.year_enrollment_id, // yearEnrollment
         courseId_to_withdraw_in: values.courseId_to_withdraw_in,
         courseId_to_add_in: values.courseId_to_add_in,
         session: session,
