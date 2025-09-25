@@ -52,7 +52,7 @@ export async function postCompensation(data: {
   moment: string;
   session: string;
 }) {
-  const res = await api.post(`/jury/compensation`, {
+  const res = await api.post(`/jury/compensation/`, {
     grade_to_withdraw: data.grade_to_withdraw,
     student_id: data.student_id,
     courseId_to_withdraw_in: data.courseId_to_withdraw_in,

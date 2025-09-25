@@ -56,17 +56,17 @@ export const CompensationForm:FC<CompensationFormProps> = ({hearderData, itemDat
       messageApi.error("Le cours donneur et le cours receveur doivent être différents.");
       return;
     }
-    const noRetakecourseToWithDraw = hearderData.no_retaken.course_list.find(course=>course.id===values.courseId_to_withdraw_in)
-    const noRetakecourseToAdd = hearderData.no_retaken.course_list.find(course=>course.id===values.courseId_to_add_in)
+    // const noRetakecourseToWithDraw = hearderData.no_retaken.course_list.find(course=>course.id===values.courseId_to_withdraw_in)
+    // const noRetakecourseToAdd = hearderData.no_retaken.course_list.find(course=>course.id===values.courseId_to_add_in)
 
 
-    if (
-      noRetakecourseToWithDraw?.teaching_unit?.id !==
-      noRetakecourseToAdd?.teaching_unit?.id
-    ) {
-      messageApi.error("Les cours doivent être d'une seule et même unité d'enseignement.");
-      return;
-    }
+    // if (
+    //   noRetakecourseToWithDraw?.teaching_unit?.id !==
+    //   noRetakecourseToAdd?.teaching_unit?.id
+    // ) {
+    //   messageApi.error("Les cours doivent être d'une seule et même unité d'enseignement.");
+    //   return;
+    // }
 
     mutateAsync(
       {
@@ -84,9 +84,10 @@ export const CompensationForm:FC<CompensationFormProps> = ({hearderData, itemDat
           messageApi.success("Compensation appliquée avec succès !");
           setOpen(false);
         },
-        onError: (error: Error) => {
+        onError: (error: any) => {
+          console.log(error);
           messageApi.error(
-            error.message ||
+            error?.response?.data?.message ||
               "Une erreur s'est produite lors de la compensation des notes."
           );
         },

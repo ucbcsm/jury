@@ -511,7 +511,7 @@ export function matchImportedGradesWithEnrollments(
         (importedGrade.continuous_assessment ?? 0) + (importedGrade.exam ?? 0),
       course: correspondingEnrollment?.course ?? null,
       is_retaken: false,
-      status: "pending",
+      status: "validated",
     } as NewGradeClass;
   });
 
