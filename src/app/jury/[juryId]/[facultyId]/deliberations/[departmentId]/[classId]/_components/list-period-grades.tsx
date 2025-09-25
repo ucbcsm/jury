@@ -470,7 +470,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                 <td
                   rowSpan={2}
                   className="px-2 py-2 w-64 text-left align-top text-xs font-semibold border border-gray-300 "
-                >{`${record.first_name} ${record.last_name} ${record.surname}`}</td>
+                >{`${record.surname} ${record.last_name} ${record.first_name}`}</td>
                 <td
                   rowSpan={2}
                   className="px-2 py-2 w-8 text-right align-top text-xs font-semibold border border-gray-300 "

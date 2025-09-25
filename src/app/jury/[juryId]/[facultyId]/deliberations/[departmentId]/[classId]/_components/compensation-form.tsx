@@ -3,7 +3,7 @@
 import { getTaughtCoursAsOptions, postCompensation } from "@/lib/api";
 import { filterOption } from "@/lib/utils";
 import { ResultGrid } from "@/types";
-import { CloseOutlined, SlidersOutlined } from "@ant-design/icons";
+import { CloseOutlined, LoadingOutlined, SlidersOutlined } from "@ant-design/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
@@ -14,6 +14,7 @@ import {
   InputNumber,
   message,
   Select,
+  Spin,
   theme,
   Typography,
 } from "antd";
@@ -244,6 +245,19 @@ export const CompensationForm:FC<CompensationFormProps> = ({hearderData, itemDat
             />
           </Form.Item>
         </Form>
+        <div
+                  className="h-[calc(100vh-196px)] flex-col justify-center items-center"
+                  style={{ display: !isPending ? "none" : "flex" }}
+                >
+                  <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+                  <Typography.Title
+                    type="secondary"
+                    level={3}
+                    style={{ marginTop: 10 }}
+                  >
+                    Compensation en cours ...
+                  </Typography.Title>
+                </div>
       </Drawer>
     </>
   );
