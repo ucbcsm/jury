@@ -124,8 +124,11 @@ export const IndividualGradeEntryForm: FC<IndividualGradeEntryFormProps> = ({
           messageApi.success("Note enregistrée avec succès !");
           onClose();
         },
-        onError: () => {
-          messageApi.error("Erreur lors de l'enregistrement de la note.");
+        onError: (error) => {
+          messageApi.error(
+            (error as any)?.response?.data?.message ||
+              "Erreur lors de l'enregistrement de la note."
+          );
         },
       }
     );
