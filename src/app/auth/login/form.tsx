@@ -37,7 +37,7 @@ export function LoginForm() {
     setLoading(true);
     login(values)
       .then(() => {
-        messageApi.success("Connexion réussie! Redirection en cours...");
+        messageApi.success("Redirection en cours...");
         // router.refresh()
         window.location.reload();
       })
@@ -46,7 +46,10 @@ export function LoginForm() {
         if (error?.message === "Invalid credentials. Please try again.") {
           messageApi.error("Matricule ou mot de passe incorrect!");
         } else {
-          messageApi.error("Ouf, une erreur est survenue, Veuillez réessayer!");
+          messageApi.error(
+            error?.response?.data?.message ||
+              "Ouf, une erreur est survenue, Veuillez réessayer!"
+          );
         }
       })
   };

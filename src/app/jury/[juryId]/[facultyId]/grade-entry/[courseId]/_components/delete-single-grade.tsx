@@ -56,9 +56,12 @@ export const ButtonDeleteSingleGrade: FC<ButtonDeleteSingleGradeProps> = ({
           messageApi.success("La note a été supprimée avec succès");
           afterDeleteSuccess && afterDeleteSuccess();
         },
-        onError: () => {
+        onError: (error:Error) => {
           setOpened(true);
-          messageApi.error("Échec de la suppression. Veuillez réessayer.");
+          messageApi.error(
+            (error as any)?.response?.data?.message ||
+              "Échec de la suppression. Veuillez réessayer."
+          );
         },
       });
     } else {

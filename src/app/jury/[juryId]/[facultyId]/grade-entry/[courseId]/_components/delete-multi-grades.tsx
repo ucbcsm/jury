@@ -50,9 +50,10 @@ export const DeleteMultiGradesButton: FC<DeleteMultiGradesButtonProps> = ({
           setOpen(false);
           form.resetFields()
         },
-        onError: () => {
+        onError: (error:Error) => {
           messageApi.error(
-            "Une erreur s'est produite lors de la suppression des notes."
+            (error as any)?.response?.data?.message ||
+              "Une erreur s'est produite lors de la suppression des notes."
           );
         },
       });

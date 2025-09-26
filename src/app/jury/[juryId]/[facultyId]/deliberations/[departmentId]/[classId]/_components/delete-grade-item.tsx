@@ -46,9 +46,12 @@ periodEnrollmentId
           queryClient.invalidateQueries({ queryKey: ["year_grid_grades"] });
           messageApi.success("Supprimée avec succès");
         },
-        onError: () => {
+        onError: (error:any) => {
           setOpened(true);
-          messageApi.error("Échec de la suppression. Veuillez réessayer.");
+          messageApi.error(
+            error?.response?.data?.message ||
+              "Échec de la suppression. Veuillez réessayer."
+          );
         },
       });
     } else {

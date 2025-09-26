@@ -863,7 +863,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
             title="Erreur de récupération des données"
             subTitle={
               error
-                ? error.message
+                ? (error as any)?.response?.data?.message
                 : "Une erreur est survenue lors de la tentative de récupération des données depuis le serveur. Veuillez réessayer."
             }
             status={"error"}

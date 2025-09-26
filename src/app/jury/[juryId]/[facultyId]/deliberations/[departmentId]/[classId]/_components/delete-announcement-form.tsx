@@ -35,9 +35,9 @@ export const DeleteAnnouncementForm: FC<DeleteAnnouncementFormProps> = ({
                     messageApi.success("Publication supprimée avec succès !");
                     setOpen(false);
                 },
-                onError: (error: Error) => {
+                onError: (error: any) => {
                     messageApi.error(
-                      error.message ||
+                      error?.response?.data?.message ||
                         "Une erreur s'est produite lors de la suppression de la publication."
                     );
                 },

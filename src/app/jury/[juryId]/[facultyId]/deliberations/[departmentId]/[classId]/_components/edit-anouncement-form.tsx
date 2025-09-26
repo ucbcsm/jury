@@ -90,9 +90,9 @@ export const EditAnnouncementForm: FC<EditAnnouncementFormProps> = ({
               messageApi.success("Publication modifiée avec succès !");
               setOpen(false);
             },
-            onError: (error: Error) => {
+            onError: (error: any) => {
               messageApi.error(
-                error.message ||
+                error?.response?.data?.message ||
                   "Une erreur s'est produite lors de la modification de la publication."
               );
              console.log(error?.cause)

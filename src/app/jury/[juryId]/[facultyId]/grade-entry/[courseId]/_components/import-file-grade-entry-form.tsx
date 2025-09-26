@@ -163,8 +163,11 @@ export const ImportFileGradeSubmissionForm: FC<
             messageApi.success("Soumission en masse réussie !");
            onClose()
           },
-          onError: () => {
-            messageApi.error("Erreur lors de la soumission en masse.");
+          onError: (error:Error) => {
+            messageApi.error(
+              (error as any)?.response?.data?.message ||
+                "Erreur lors de la soumission en masse."
+            );
           },
         }
       );

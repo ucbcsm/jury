@@ -84,7 +84,7 @@ export const NewAnnoucementWithAllForm: FC<NewAnnoucementWithAllFormProps> = ({
         },
         onError: (error: Error) => {
           messageApi.error(
-            error.message ||
+            (error as any)?.response?.data?.message ||
               "Une erreur s'est produite lors de la création de la publication."
           );
         },

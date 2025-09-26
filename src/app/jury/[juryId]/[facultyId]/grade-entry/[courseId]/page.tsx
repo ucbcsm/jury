@@ -189,7 +189,8 @@ export default function Page() {
       },
       onError: (error) => {
         messageApi.error(
-          "Une erreur s'est produite lors de la mise à jour des notes"
+          (error as any)?.response?.data?.message ||
+            "Une erreur s'est produite lors de la mise à jour des notes"
         );
         console.error(error);
       },

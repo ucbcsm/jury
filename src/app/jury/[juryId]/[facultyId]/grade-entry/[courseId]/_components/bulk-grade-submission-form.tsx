@@ -125,8 +125,11 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
             messageApi.success("Soumission en masse réussie !");
             setOpen(false);
           },
-          onError: () => {
-            messageApi.error("Erreur lors de la soumission en masse.");
+          onError: (error:Error) => {
+            messageApi.error(
+              (error as any)?.response?.data?.message ||
+                "Erreur lors de la soumission en masse."
+            );
           },
         }
       );
