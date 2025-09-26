@@ -28,11 +28,20 @@ export const DocHeader: FC = () => {
           </p>
         </div>
       </div>
-      <div className="flex flex-col border-l-4 border-[#008367] pl-6">
-        <Typography.Text>{data?.phone_number_1 || "Téléphone"}</Typography.Text>
-        <Typography.Text>{data?.email_address || "Email"}</Typography.Text>
-        <Typography.Text>{data?.web_site || "Site web"}</Typography.Text>
-        <Typography.Text>{data?.address || "Adresse"}</Typography.Text>
+       <div className="flex items-stretch">
+        <div className="w-1 mr-6 flex flex-col">
+          <div className="flex-1 bg-[#3aa890]" />
+          <div className="flex-1 bg-[#ED6851]" />
+          <div className="flex-1 bg-[#FCB34C]" />
+        </div>
+        <div className="flex flex-col">
+          <Typography.Text>
+            {data?.phone_number_1 || "Téléphone"}
+          </Typography.Text>
+          <Typography.Text>{data?.email_address || "Email"}</Typography.Text>
+          <Typography.Text>{data?.web_site || "Site web"}</Typography.Text>
+          <Typography.Text>{data?.address || "Adresse"}</Typography.Text>
+        </div>
       </div>
     </div>
   );
