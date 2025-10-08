@@ -150,7 +150,7 @@ export default function Page() {
     queryKey: ["course_enrollments", yid, facultyId, courseId],
     queryFn: ({ queryKey }) =>
       getCourseEnrollments({
-        academicYearId: Number(1),
+        academicYearId: Number(yid),
         facultyId: Number(queryKey[2]),
         courseId: Number(queryKey[3]),
         status:"validated"

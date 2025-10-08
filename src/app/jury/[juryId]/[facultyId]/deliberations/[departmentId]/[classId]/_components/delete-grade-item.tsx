@@ -24,7 +24,7 @@ type ButtonDeleteGradeFromGridProps = {
 };
 
 export const ButtonDeleteGradeFromGrid: FC<ButtonDeleteGradeFromGridProps> = ({
-periodEnrollmentId
+  periodEnrollmentId,
 }) => {
   const [opened, setOpened] = useState<boolean>(false);
 
@@ -46,7 +46,7 @@ periodEnrollmentId
           queryClient.invalidateQueries({ queryKey: ["year_grid_grades"] });
           messageApi.success("Supprimée avec succès");
         },
-        onError: (error:any) => {
+        onError: (error: any) => {
           setOpened(true);
           messageApi.error(
             error?.response?.data?.message ||
@@ -136,7 +136,7 @@ periodEnrollmentId
           size="small"
           title="Supprimer l'étudiant de la grille"
           disabled={isPending}
-          style={{boxShadow:"none"}}
+          style={{ boxShadow: "none" }}
         />
       </Popover>
     </>
