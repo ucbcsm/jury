@@ -158,8 +158,6 @@ export default function Page() {
     enabled: !!yid && !!facultyId && !!courseId,
   });
 
-  // console.log(courseEnrollments);
-
   const printAllEmptyGradeList = useReactToPrint({
     contentRef: emptyAllGradeRef,
     documentTitle: `${course?.available_course.code}-fiche-de-notes-${course?.available_course.name}`,
