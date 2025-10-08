@@ -97,7 +97,7 @@ export const IndividualGradeEntryForm: FC<IndividualGradeEntryFormProps> = ({
         continuous_assessment: values.continuous_assessment,
         exam: values.exam,
         is_retaken: values.is_retaken ?? false,
-        status: "pending",
+        status: "validated",
       },
     ];
 
