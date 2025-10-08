@@ -5,7 +5,7 @@ import {
   getCourseEnrollments,
   getGradeByTaughtCourse,
   getGradeValidationColor,
-  getGradeValidationText,
+  getShortGradeValidationText,
   getTaughtCours,
   multiUpdateGradeClasses,
 } from "@/lib/api";
@@ -724,6 +724,28 @@ export default function Page() {
                   width: 144,
                 },
                 {
+                  key: "validation",
+                  dataIndex: "validation",
+                  title: "Validation",
+                  render: (_, record) => (
+                    <Tag
+                      color={getGradeValidationColor(record.validation)}
+                      bordered={false}
+                      style={{ width: "100%", padding: "4px 8px" }}
+                      icon={
+                        record.validation === "validated" ? (
+                          <CheckCircleOutlined />
+                        ) : (
+                          <CloseCircleOutlined />
+                        )
+                      }
+                    >
+                      {getShortGradeValidationText(record.validation)}
+                    </Tag>
+                  ),
+                  width: 112,
+                },
+                {
                   key: "status",
                   dataIndex: "status",
                   title: "Statut",
@@ -785,28 +807,6 @@ export default function Page() {
                     </Dropdown>
                   ),
                   width: 128,
-                },
-                {
-                  key: "validation",
-                  dataIndex: "validation",
-                  title: "Validation",
-                  render: (_, record) => (
-                    <Tag
-                      color={getGradeValidationColor(record.validation)}
-                      bordered={false}
-                      style={{ width: "100%", padding: "4px 8px" }}
-                      icon={
-                        record.validation === "validated" ? (
-                          <CheckCircleOutlined />
-                        ) : (
-                          <CloseCircleOutlined />
-                        )
-                      }
-                    >
-                      {getGradeValidationText(record.validation)}
-                    </Tag>
-                  ),
-                  width: 112,
                 },
                 {
                   key: "actions",

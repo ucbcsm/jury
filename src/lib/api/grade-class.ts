@@ -145,6 +145,7 @@ export function getGradeValidationText(
   }
 }
 
+
 export function getShortGradeValidationText(
   validation: "validated" | "no_validated"
 ): string {
