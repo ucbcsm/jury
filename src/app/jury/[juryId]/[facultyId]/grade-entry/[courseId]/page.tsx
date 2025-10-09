@@ -731,7 +731,7 @@ export default function Page() {
                     <Tag
                       color={getGradeValidationColor(record.validation)}
                       bordered={false}
-                      style={{ width: "100%", padding: "4px 8px" }}
+                      style={{ width: "100%", padding: "4px 8px", textAlign:"center" }}
                       icon={
                         record.validation === "validated" ? (
                           <CheckCircleOutlined />
@@ -743,7 +743,7 @@ export default function Page() {
                       {getShortGradeValidationText(record.validation)}
                     </Tag>
                   ),
-                  width: 112,
+                  width: 82,
                 },
                 {
                   key: "status",
