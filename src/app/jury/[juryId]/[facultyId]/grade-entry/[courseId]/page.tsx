@@ -514,10 +514,7 @@ export default function Page() {
                   dataIndex: "matricule",
                   title: "Matricule",
                   render: (_, record) =>
-                    `${record.student?.year_enrollment.user.matricule.padStart(
-                      6,
-                      "0"
-                    )}`,
+                    `${record.student?.year_enrollment.user.matricule}`,
                   width: 96,
                   align: "center",
                   fixed: "left",
@@ -660,7 +657,7 @@ export default function Page() {
                       }}
                     />
                   ),
-                  width: 70,
+                  width: 76,
                   align: "center",
                 },
                 {
