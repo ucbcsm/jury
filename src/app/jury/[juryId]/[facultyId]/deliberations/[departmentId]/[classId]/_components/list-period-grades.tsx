@@ -151,7 +151,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
       <table
         className="min-w-fit [&_td]:whitespace-nowrap "
         style={{
-          display: data && data.BodyDataList.length > 0 ? "block" : "none",
+          display: data && data?.BodyDataList?.length > 0 ? "block" : "none",
         }}
       >
         <thead className="">
@@ -166,6 +166,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
               <th
                 colSpan={period.course_counter}
                 className="px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
+                key={period.period.id}
               >
                 {period.period.acronym}
               </th>
@@ -173,10 +174,11 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
 
             {data?.HeaderData?.retaken?.course_list &&
               data?.HeaderData?.retaken.course_list.length > 0 &&
-              data?.HeaderData?.retaken?.header?.map((header) => (
+              data?.HeaderData?.retaken?.header?.map((header, index) => (
                 <th
                   colSpan={header.course_counter}
                   className="px-4 py-2 text-center font-semibold whitespace-nowrap bg-white border-b  border border-gray-300"
+                  key={`$index-${header.retake_title}`}
                 >
                   Cours repassés {/* {header.retake_title} */}
                 </th>
@@ -458,7 +460,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-100">
-          {data?.BodyDataList.map((record, indexRecord) => (
+          {data?.BodyDataList?.map((record, indexRecord) => (
             <React.Fragment key={record.matricule}>
               <tr className="bg-blue-100 transition">
                 <td

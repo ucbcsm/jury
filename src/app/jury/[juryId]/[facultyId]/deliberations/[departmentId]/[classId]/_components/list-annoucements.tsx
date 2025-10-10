@@ -7,6 +7,8 @@ import {
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
+  FileTextOutlined,
+  LineChartOutlined,
   LockOutlined,
   MinusSquareOutlined,
   MoreOutlined,
@@ -26,6 +28,7 @@ import { DeleteAnnouncementForm } from "./delete-announcement-form";
 import { NewAnnoucementWithSomeForm } from "./new-announcement-with-some-form";
 import { ListYearGrades } from "./list-year-grades";
 import { EditAnnouncementForm } from "./edit-anouncement-form";
+import { ResultPresentation } from "./resultPresentation";
 
 type ActionsBarProps = {
   announcement: Announcement;
@@ -36,6 +39,8 @@ const ActionsBar: FC<ActionsBarProps> = ({ announcement, periods }) => {
     "grid",
     parseAsInteger
   );
+  const [resultPresentationId, setResultPresentationId] = useQueryState("result-presentation", parseAsInteger);
+
   const [openDeleteAnnouncement, setOpenDeleteAnnouncement] =
     useState<boolean>(false);
   const [openEditAnnouncement, setOpenEditAnnouncement] =
@@ -46,6 +51,11 @@ const ActionsBar: FC<ActionsBarProps> = ({ announcement, periods }) => {
         annoucement={announcement}
         announcementId={announcementId}
         setAnnoucementId={setAnnoucementId}
+      />
+      <ResultPresentation
+        annoucement={announcement}
+        announcementId={resultPresentationId}
+        setAnnoucementId={setResultPresentationId}
       />
       <EditAnnouncementForm
         open={openEditAnnouncement}
@@ -74,6 +84,28 @@ const ActionsBar: FC<ActionsBarProps> = ({ announcement, periods }) => {
         <Dropdown
           menu={{
             items: [
+              {
+                key: "deliberation-minutes",
+                label: "Procès-verbal",
+                icon: <FileTextOutlined />,
+                onClick: () => {},
+              },
+              // {
+              //   key: "grade-report",
+              //   label: "Relevé de notes",
+              //   onClick: () => {},
+              // },
+              {
+                key: "result-presentation",
+                label: "Présentation des résultats",
+                icon: <LineChartOutlined />,
+                onClick: () => {
+                  setResultPresentationId(announcement.id);
+                }
+              },
+              {
+                type: "divider",
+              },
               {
                 key: "edit",
                 label: "Modifier",

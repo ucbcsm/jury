@@ -12,11 +12,13 @@ import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
 
 import { ListAnnouncements } from "./_components/list-annoucements";
+import { useYid } from "@/hooks/use-yid";
 
 export default function Page() {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+  const {yid}=useYid()
   const { juryId, departmentId, classId } = useParams();
 
   const [period, setPeriod] = useQueryState("period");
@@ -46,9 +48,9 @@ export default function Page() {
     isPending: isPendingPeriods,
     isError: isErrorPeriods,
   } = useQuery({
-    queryKey: ["periods", juryId],
+    queryKey: ["periods", yid],
     queryFn: ({ queryKey }) => getPeriodsByYear(Number(queryKey[1])),
-    enabled: !!juryId,
+    enabled: !!yid,
   });
 
   const {

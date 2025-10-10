@@ -275,6 +275,7 @@ export default function FacultyLayout({
                     icon: <MailOutlined />,
                     disabled: typeof facultyId === "undefined",
                   },
+                  
                   {
                     key: `/jury/${juryId}/${facultyId}/letter-gradings`,
                     label: "Notation en lettres",
