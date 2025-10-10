@@ -12,6 +12,7 @@ import React, { FC, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { PrintableListGrades } from "./printable/print-list-grades";
 import { getResultPresentation } from "@/lib/api/result-presentation";
+import { PrintableResultPresentation } from "./printable/printResultPresentation";
 
 type ResultPresentationProps = {
   annoucement: Announcement;
@@ -95,7 +96,7 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
         </Space>
       }
       styles={{
-        body: { padding: 0},
+        body: { padding: 0 },
       }}
       loading={isPending}
       open={annoucement.id === announcementId}
@@ -144,9 +145,10 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
       <Table
         style={{
           display: data && data?.length > 0 ? "block" : "none",
-          // marginBottom: 16,
         }}
+        rowKey={"id"}
         size="small"
+        bordered
         dataSource={data || []}
         columns={[
           {
@@ -174,20 +176,20 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
             key: "weighted_average",
             title: "Moyenne",
             dataIndex: "weighted_average",
-            width:80,
-            align: "center",
+            width: 80,
+            align: "right",
           },
           {
             key: "percentage",
             title: "Pourcentage",
             dataIndex: "percentage",
-            width:100
+            width: 100,
           },
           {
             key: "grade",
             title: "Note",
             dataIndex: "grade",
-            width: 64,
+            width: 56,
             align: "center",
           },
           {
@@ -222,7 +224,7 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
           },
         ]}
         pagination={false}
-          scroll={{ y: "calc(100vh - 104px)" }}
+        scroll={{ y: "calc(100vh - 105px)" }}
       />
 
       {isError && (
@@ -246,11 +248,11 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
           }
         />
       )}
-      {/* <PrintableListGrades
+      <PrintableResultPresentation
         ref={refToPrint}
         annoucement={annoucement}
         data={data}
-      /> */}
+      />
     </Drawer>
   );
 };

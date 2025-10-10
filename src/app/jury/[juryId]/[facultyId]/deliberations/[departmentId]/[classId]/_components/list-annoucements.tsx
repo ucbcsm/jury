@@ -29,6 +29,7 @@ import { NewAnnoucementWithSomeForm } from "./new-announcement-with-some-form";
 import { ListYearGrades } from "./list-year-grades";
 import { EditAnnouncementForm } from "./edit-anouncement-form";
 import { ResultPresentation } from "./resultPresentation";
+import { get } from "http";
 
 type ActionsBarProps = {
   announcement: Announcement;
@@ -211,6 +212,21 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
     enabled: !!yearId && !!facultyId && !!departmentId && !!classId,
   });
 
+  const getLastPeriodId = () => {
+    if (!data || data.length === 0) return 0;
+    // Trouver le plus grand order_number
+    const maxOrderNumber = Math.max(...data.map(ann => ann.period.order_number));
+    // Trouver la période correspondante
+    if(maxOrderNumber%2==0){
+    const lastPeriod = data.find(ann => ann.period.order_number === maxOrderNumber)?.period;
+    return lastPeriod?.id || 0;
+    }else{
+      return 0;
+    }
+  }
+// console.log(...(data?.map((ann) => ann.period.order_number) || []));
+//     console.log("IDDDDDDD:",getLastPeriodId());
+// console.log(data)
   return (
     <Layout>
       <Layout.Content
@@ -275,7 +291,11 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
                   open={openNewWithSome}
                   setOpen={setOpenNewWithSome}
                 />
-                <ListYearGrades department={department} classYear={classYear} />
+                <ListYearGrades
+                  department={department}
+                  classYear={classYear}
+                  lastPeriodId={getLastPeriodId()}
+                />
               </Space>
             </header>
           )}

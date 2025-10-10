@@ -1,3 +1,4 @@
+import { ResultPresentionItem } from "@/types";
 import api from "../fetcher";
 
 export async function getResultPresentation(searchParams: {
@@ -34,20 +35,5 @@ export async function getResultPresentation(searchParams: {
   query.append("moment", moment.toString());
   query.append("mode", mode.toString());
   const res = await api.get(`/jury/result-presentation/?${query.toString()}`);
-  return res.data as {
-    decision: "passed" | "postponed";
-    expected_total_credit: number;
-    first_name: string;
-    gender: "M" | "F";
-    grade: string;
-    id: number;
-    id_user_obj: number;
-    last_name: string;
-    matricule: string;
-    percentage: number;
-    surname: string;
-    unvalidated_credit_sum: number;
-    validated_credit_sum: number;
-    weighted_average: number;
-  }[];
+  return res.data as ResultPresentionItem[];
 }

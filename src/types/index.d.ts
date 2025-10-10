@@ -1364,3 +1364,21 @@ export const Appeal = z.object({
 });
 
 export type Appeal = z.infer<typeof Appeal>;
+
+
+export type ResultPresentionItem={
+    decision: "passed" | "postponed";
+    expected_total_credit: number;
+    first_name: string;
+    gender: "M" | "F";
+    grade: string;
+    id: number;
+    id_user_obj: number;
+    last_name: string;
+    matricule: string;
+    percentage: number;
+    surname: string;
+    unvalidated_credit_sum: number;
+    validated_credit_sum: number;
+    weighted_average: number;
+  }

@@ -37,11 +37,13 @@ import { CompensationForm } from "./compensation-form";
 type ListYearGradesProps = {
   department?: Department;
   classYear?: Class;
+  lastPeriodId: number;
 };
 
 export const ListYearGrades: FC<ListYearGradesProps> = ({
   department,
   classYear,
+  lastPeriodId
 }) => {
   const { yid, year } = useYid();
   const { facultyId, departmentId, classId } = useParams();
@@ -86,6 +88,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
         facultyId: Number(facultyId),
         departmentId: Number(departmentId),
         classId: Number(classId),
+        periodId: lastPeriodId, ///The last
         session: session,
         moment: moment,
         mode: "YEAR-GRADE",
@@ -108,6 +111,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
         icon={<EyeOutlined />}
         variant="dashed"
         color="lime"
+        disabled={lastPeriodId === 0}
       >
         Voir résultats annuels
       </Button>
