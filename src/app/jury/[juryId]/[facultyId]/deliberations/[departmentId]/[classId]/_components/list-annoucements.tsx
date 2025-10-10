@@ -202,7 +202,7 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
   const [openYearResultPresentation, setOpenYearResultPresentation] = useQueryState("year-result-presentation", parseAsBoolean.withDefault(false));
 
   const { data, isPending, isError } = useQuery({
-    queryKey: ["announcements", facultyId, departmentId, classId],
+    queryKey: ["announcements", yearId, facultyId, departmentId, classId],
     queryFn: () =>
       getAnnoucements({
         yearId: Number(yearId),

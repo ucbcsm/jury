@@ -79,7 +79,7 @@ export const NewAnnoucementWithAllForm: FC<NewAnnoucementWithAllFormProps> = ({
       {
         onSuccess: () => {
           queryClient.invalidateQueries({
-            queryKey: ["annoucements", facultyId, departmentId, classId],
+            queryKey: ["announcements"],
           });
           messageApi.success("Publication Créée avec succès !");
           setOpen(false);

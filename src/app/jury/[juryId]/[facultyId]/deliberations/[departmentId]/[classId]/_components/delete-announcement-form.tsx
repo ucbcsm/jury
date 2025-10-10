@@ -31,7 +31,7 @@ export const DeleteAnnouncementForm: FC<DeleteAnnouncementFormProps> = ({
         if (values.validate === "DELETE") {
             mutateAsync(announcement.id, {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["annoucements"] });
+                    queryClient.invalidateQueries({ queryKey: ["announcements"] });
                     messageApi.success("Publication supprimée avec succès !");
                     setOpen(false);
                 },
