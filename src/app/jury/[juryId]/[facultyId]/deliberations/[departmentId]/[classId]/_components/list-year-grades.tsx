@@ -7,11 +7,9 @@ import {
 } from "@/lib/api";
 import { Class, Department } from "@/types";
 import {
-  AuditOutlined,
   CloseOutlined,
   EyeOutlined,
   PrinterOutlined,
-  SlidersOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -112,6 +110,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
         variant="dashed"
         color="lime"
         disabled={lastPeriodId === 0}
+        style={{boxShadow:"none"}}
       >
         Voir résultats annuels
       </Button>

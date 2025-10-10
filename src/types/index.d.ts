@@ -1366,7 +1366,7 @@ export const Appeal = z.object({
 export type Appeal = z.infer<typeof Appeal>;
 
 
-export type ResultPresentionItem={
+export type PeriodResultPresentionItem={
     decision: "passed" | "postponed";
     expected_total_credit: number;
     first_name: string;
@@ -1382,3 +1382,28 @@ export type ResultPresentionItem={
     validated_credit_sum: number;
     weighted_average: number;
   }
+
+export type YearResultPresentationItem = {
+  decision: "passed" | "postponed";
+  expected_total_credit: number;
+  first_name: string;
+  gender: "M" | "F";
+  grade: string;
+  id: number;
+  id_user_obj: number;
+  last_name: string;
+  matricule: string;
+  percentage: number;
+  period_0_total_credit: number;
+  period_0_validated_credit_sum: number;
+  period_0_weighted_average: number;
+  period_1_total_credit: number;
+  period_1_validated_credit_sum: number;
+  period_1_weighted_average: number;
+  period_2_total_credit: number;
+  period_2_validated_credit_sum: number;
+  period_2_weighted_average: number;
+  surname: string;
+  validated_credit_total: number;
+  weighted_average: number;
+};

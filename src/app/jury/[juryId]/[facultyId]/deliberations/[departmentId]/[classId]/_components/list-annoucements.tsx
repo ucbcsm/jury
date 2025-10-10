@@ -9,11 +9,9 @@ import {
   EyeOutlined,
   FileTextOutlined,
   LineChartOutlined,
-  LockOutlined,
   MinusSquareOutlined,
   MoreOutlined,
   PlusOutlined,
-  UnlockOutlined,
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Dropdown, Layout, message, Space, Switch, Table, Tag, Typography } from "antd";
@@ -28,8 +26,9 @@ import { DeleteAnnouncementForm } from "./delete-announcement-form";
 import { NewAnnoucementWithSomeForm } from "./new-announcement-with-some-form";
 import { ListYearGrades } from "./list-year-grades";
 import { EditAnnouncementForm } from "./edit-anouncement-form";
-import { ResultPresentation } from "./resultPresentation";
-import { get } from "http";
+import { PeriodResultPresentation } from "./periodResultPresentation";
+import { YearResultPresentation } from "./yearResultPresentation";
+
 
 type ActionsBarProps = {
   announcement: Announcement;
@@ -53,7 +52,7 @@ const ActionsBar: FC<ActionsBarProps> = ({ announcement, periods }) => {
         announcementId={announcementId}
         setAnnoucementId={setAnnoucementId}
       />
-      <ResultPresentation
+      <PeriodResultPresentation
         annoucement={announcement}
         announcementId={resultPresentationId}
         setAnnoucementId={setResultPresentationId}
@@ -200,6 +199,8 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
     parseAsBoolean.withDefault(false)
   );
 
+  const [openYearResultPresentation, setOpenYearResultPresentation] = useQueryState("year-result-presentation", parseAsBoolean.withDefault(false));
+
   const { data, isPending, isError } = useQuery({
     queryKey: ["announcements", facultyId, departmentId, classId],
     queryFn: () =>
@@ -217,10 +218,12 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
     // Trouver le plus grand order_number
     const maxOrderNumber = Math.max(...data.map(ann => ann.period.order_number));
     // Trouver la période correspondante
-    if(maxOrderNumber%2==0){
-    const lastPeriod = data.find(ann => ann.period.order_number === maxOrderNumber)?.period;
-    return lastPeriod?.id || 0;
-    }else{
+    if (maxOrderNumber % 2 === 0) {
+      const lastPeriod = data.find(
+        (ann) => ann.period.order_number === maxOrderNumber
+      )?.period;
+      return lastPeriod?.id || 0;
+    } else {
       return 0;
     }
   }
@@ -293,6 +296,37 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
                   department={department}
                   classYear={classYear}
                   lastPeriodId={getLastPeriodId()}
+                />
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: "deliberation-minutes",
+                        label: "Procès-verbal annuel",
+                        icon: <FileTextOutlined />,
+                        onClick: () => {},
+                        disabled: getLastPeriodId() === 0,
+                      },
+                      {
+                        key: "result-presentation",
+                        label: "Présentation des résultats annuelle",
+                        icon: <LineChartOutlined />,
+                        onClick: () => {
+                          setOpenYearResultPresentation(true);
+                        },
+                        disabled: getLastPeriodId() === 0,
+                      },
+                    ],
+                  }}
+                >
+                  <Button type="text" icon={<MoreOutlined />} />
+                </Dropdown>
+                <YearResultPresentation
+                  department={department}
+                  classYear={classYear}
+                  lastPeriodId={getLastPeriodId()}
+                  open={openYearResultPresentation}
+                  setOpen={setOpenYearResultPresentation}
                 />
               </Space>
             </header>

@@ -5,23 +5,19 @@ import {
   getDecisionText,
   getMomentText,
   getSessionText,
-  getShortGradeValidationText,
 } from "@/lib/api";
 import {
-  Announcement,
   Class,
   Department,
-  ResultGrid,
-  ResultPresentionItem,
+  YearResultPresentationItem,
   Year,
 } from "@/types";
-import { Card, Descriptions, Table, Tag, Watermark } from "antd";
+import { Card, Descriptions, Table, Tag } from "antd";
 import React, { FC, RefObject } from "react";
 
-type PrintableResultPresentationProps = {
+type PrintableYearResultPresentationProps = {
   ref: RefObject<HTMLDivElement | null>;
-  annoucement?: Announcement;
-  data?: ResultPresentionItem[];
+  data?: YearResultPresentationItem[];
   forYearResult?: {
     year?: Year;
     department?: Department;
@@ -30,9 +26,8 @@ type PrintableResultPresentationProps = {
     moment: "before_appeal" | "after_appeal";
   };
 };
-export const PrintableResultPresentation: FC<PrintableResultPresentationProps> = ({
+export const PrintableYearResultPresentation: FC<PrintableYearResultPresentationProps> = ({
   ref,
-  annoucement,
   data,
   forYearResult,
 }) => {
@@ -40,59 +35,10 @@ export const PrintableResultPresentation: FC<PrintableResultPresentationProps> =
     <div className="hidden">
       <div ref={ref} className=" ">
         <DocHeader />
-        {annoucement && (
-          <Card style={{ marginBottom: 28 }}>
-            <Descriptions
-              title="Présentation des résultats"
-              size="small"
-              bordered
-              column={2}
-              items={[
-                {
-                  key: "year",
-                  label: "Année académique",
-                  children: `${annoucement.academic_year.name}`,
-                },
-                {
-                  key: "period",
-                  label: "Période",
-                  children: `${annoucement.period.acronym} (${annoucement.period.name})`,
-                },
-                {
-                  key: "faculty",
-                  label: "Filière",
-                  children: annoucement?.faculty.name || "",
-                },
-                {
-                  key: "department",
-                  label: "Mention",
-                  children: annoucement.departement?.name || "",
-                },
-                {
-                  key: "class",
-                  label: "Promotion",
-                  children: `${annoucement.class_year?.acronym} (${annoucement.class_year.name})`,
-                },
-
-                {
-                  key: "session",
-                  label: "Session",
-                  children: getSessionText(annoucement.session),
-                },
-                {
-                  key: "moment",
-                  label: "Moment",
-                  children: getMomentText(annoucement.moment),
-                },
-              ]}
-            />
-          </Card>
-        )}
-
         {forYearResult && (
           <Card style={{ marginBottom: 28 }}>
             <Descriptions
-              title="Résultats"
+              title="Présentation des résultats annuels"
               column={2}
               items={[
                 {

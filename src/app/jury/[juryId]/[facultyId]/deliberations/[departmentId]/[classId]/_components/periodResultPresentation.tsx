@@ -10,11 +10,10 @@ import { Options } from "nuqs";
 
 import React, { FC, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
-import { PrintableListGrades } from "./printable/print-list-grades";
-import { getResultPresentation } from "@/lib/api/result-presentation";
-import { PrintableResultPresentation } from "./printable/printResultPresentation";
+import { getPeriodResultPresentation } from "@/lib/api/result-presentation";
+import { PrintablePeriodResultPresentation } from "./printable/printPeriodResultPresentation";
 
-type ResultPresentationProps = {
+type PeriodResultPresentationProps = {
   annoucement: Announcement;
   announcementId: number | null;
   setAnnoucementId: (
@@ -23,11 +22,9 @@ type ResultPresentationProps = {
   ) => Promise<URLSearchParams>;
 };
 
-export const ResultPresentation: FC<ResultPresentationProps> = ({
-  annoucement,
-  announcementId,
-  setAnnoucementId,
-}) => {
+export const PeriodResultPresentation: FC<
+  PeriodResultPresentationProps
+> = ({ annoucement, announcementId, setAnnoucementId }) => {
   const { facultyId, departmentId, classId } = useParams();
 
   const refToPrint = useRef<HTMLDivElement | null>(null);
@@ -42,7 +39,7 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
 
   const { data, isPending, isError, error } = useQuery({
     queryKey: [
-      "result-presentation",
+      "period-result-presentation",
       annoucement.academic_year.id,
       facultyId,
       departmentId,
@@ -52,7 +49,7 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
       annoucement.moment,
     ],
     queryFn: () =>
-      getResultPresentation({
+      getPeriodResultPresentation({
         yearId: annoucement.academic_year.id,
         facultyId: Number(facultyId),
         departmentId: Number(departmentId),
@@ -74,8 +71,6 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
   const onClose = () => {
     setAnnoucementId(null);
   };
-
-  console.log(data);
 
   return (
     <Drawer
@@ -248,7 +243,7 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
           }
         />
       )}
-      <PrintableResultPresentation
+      <PrintablePeriodResultPresentation
         ref={refToPrint}
         annoucement={annoucement}
         data={data}
