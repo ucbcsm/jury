@@ -224,9 +224,7 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
       return 0;
     }
   }
-// console.log(...(data?.map((ann) => ann.period.order_number) || []));
-//     console.log("IDDDDDDD:",getLastPeriodId());
-// console.log(data)
+
   return (
     <Layout>
       <Layout.Content
