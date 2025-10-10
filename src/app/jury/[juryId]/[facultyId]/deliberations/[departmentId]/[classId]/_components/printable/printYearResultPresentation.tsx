@@ -31,6 +31,16 @@ export const PrintableYearResultPresentation: FC<PrintableYearResultPresentation
   data,
   forYearResult,
 }) => {
+    const getPeriodHeader=()=>{
+    if (data && data?.length > 0) {
+      const sampleItem = data[0];
+      return {
+        period_0: sampleItem.period_0_acronym,
+        period_1: sampleItem.period_1_acronym,
+        period_2: sampleItem.period_2_acronym,
+      };
+    }
+  }
   return (
     <div className="hidden">
       <div ref={ref} className=" ">
@@ -40,6 +50,7 @@ export const PrintableYearResultPresentation: FC<PrintableYearResultPresentation
             <Descriptions
               title="Présentation des résultats annuels"
               column={2}
+              bordered
               items={[
                 {
                   key: "year",
@@ -77,90 +88,165 @@ export const PrintableYearResultPresentation: FC<PrintableYearResultPresentation
         )}
 
         <Table
-          style={{
-            display: data && data?.length > 0 ? "block" : "none",
-          }}
-          rowKey={"id"}
-          size="small"
-          bordered
-          dataSource={data || []}
-          columns={[
-            {
-              key: "matricule",
-              title: "Matricule",
-              dataIndex: "matricule",
-              ellipsis:true
-            },
-            {
-              key: "gender",
-              title: "Genre",
-              dataIndex: "gender",
-              align: "center",
-            },
-            {
-              key: "full_name",
-              title: "Noms",
-              dataIndex: "name",
-              render: (_, record) =>
-                `${record.surname} ${record.last_name} ${record.first_name} `,
-            },
-            {
-              key: "weighted_average",
-              title: "Moyenne",
-              dataIndex: "weighted_average",
-              ellipsis:true,
-            //   width: 80,
-              align: "right",
-            },
-            {
-              key: "percentage",
-              title: "Pourcentage",
-              dataIndex: "percentage",
-              ellipsis:true,
-            //   width: 100,
-            },
-            {
-              key: "grade",
-              title: "Note",
-              dataIndex: "grade",
-            //   width: 56,
-              align: "center",
-            },
-            {
-              key: "validated_credit_sum",
-              title: "Crédits validés",
-              dataIndex: "validated_credit_sum",
-              ellipsis:true,
-            //   width: 120,
-              align: "center",
-            },
-            {
-              key: "unvalidated_credit_sum",
-              title: "Crédits non validés",
-              dataIndex: "unvalidated_credit_sum",
-              ellipsis:true,
-            //   width: 140,
-              align: "center",
-            },
-            {
-              key: "decision",
-              title: "Décision",
-              dataIndex: "decision",
-            //   width: 88,
-              align: "center",
-              render: (_, record) => (
-                <Tag
-                  color={record.decision === "passed" ? "success" : "error"}
-                  bordered={false}
-                  style={{ marginRight: 0, width: "100%", textAlign: "center" }}
-                >
-                  {getDecisionText(record.decision)}
-                </Tag>
-              ),
-            },
-          ]}
-          pagination={false}
-        />
+                style={{
+                  display: data && data?.length > 0 ? "block" : "none",
+                }}
+                rowKey={"id"}
+                size="small"
+                bordered
+                dataSource={data || []}
+                columns={[
+                  {
+                    key: "matricule",
+                    title: "Matricule",
+                    dataIndex: "matricule",
+                    width: 80,
+                    align: "right",
+                  },
+                  {
+                    key: "gender",
+                    title: "Genre",
+                    dataIndex: "gender",
+                    align: "center",
+                    width: 60,
+                  },
+                  {
+                    key: "full_name",
+                    title: "Noms",
+                    dataIndex: "name",
+                    render: (_, record) =>
+                      `${record.surname} ${record.last_name} ${record.first_name} `,
+                  },
+                  {
+                    key: "credits",
+                    title: "Crédits",
+                    children: [
+                      {
+                        key: "period_0_total_credit",
+                        title: getPeriodHeader()?.period_0 || "",
+                        dataIndex: "period_0_total_credit",
+                        width: 64,
+                        hidden: getPeriodHeader()?.period_0 ? false : true,
+                      },
+                      {
+                        key: "period_1_total_credit",
+                        title: getPeriodHeader()?.period_1 || "",
+                        dataIndex: "period_1_total_credit",
+                        width: 64,
+                        hidden: getPeriodHeader()?.period_1 ? false : true,
+                      },
+                      {
+                        key: "period_2_total_credit",
+                        title: getPeriodHeader()?.period_2 || "",
+                        dataIndex: "period_2_total_credit",
+                        width: 64,
+                        hidden: getPeriodHeader()?.period_2 ? false : true,
+                      },
+                    ],
+                  },
+                  {
+                    key: "expected_total_credit",
+                    title: "Total crédits",
+                    dataIndex: "expected_total_credit",
+                  },
+                  {
+                    key: "validated_credits",
+                    title: "Crédits validés",
+                    children: [
+                      {
+                        key: "period_0_validated_credit_sum",
+                        title: getPeriodHeader()?.period_0 || "",
+                        dataIndex: "period_0_validated_credit_sum",
+                        width: 64,
+                        hidden: getPeriodHeader()?.period_0 ? false : true,
+                      },
+                      {
+                        key: "period_1_validated_credit_sum",
+                        title: getPeriodHeader()?.period_1 || "",
+                        dataIndex: "period_1_validated_credit_sum",
+                        width: 64,
+                        hidden: getPeriodHeader()?.period_1 ? false : true,
+                      },
+                      {
+                        key: "period_2_validated_credit_sum",
+                        title: getPeriodHeader()?.period_2 || "",
+                        dataIndex: "period_2_validated_credit_sum",
+                        width: 64,
+                        hidden: getPeriodHeader()?.period_2 ? false : true,
+                      },
+                    ],
+                  },
+                  {
+                    key: "validated_credit_total",
+                    title: "Total crédits validés",
+                    dataIndex: "validated_credit_total",
+                  },
+                  {
+                    key: "weighted_averages",
+                    title: "Moyennes",
+                    children: [
+                      {
+                        key: "period_0_weighted_average",
+                        title: getPeriodHeader()?.period_0 || "",
+                        dataIndex: "period_0_weighted_average",
+                        width: 64,
+                        hidden: getPeriodHeader()?.period_0 ? false : true,
+                      },
+                      {
+                        key: "period_1_weighted_average",
+                        title: getPeriodHeader()?.period_1 || "",
+                        dataIndex: "period_1_weighted_average",
+                        width: 64,
+                        hidden: getPeriodHeader()?.period_1 ? false : true,
+                      },
+                      {
+                        key: "period_2_weighted_average",
+                        title: getPeriodHeader()?.period_2 || "",
+                        dataIndex: "period_2_weighted_average",
+                        width: 64,
+                        hidden: getPeriodHeader()?.period_2 ? false : true,
+                      },
+                    ],
+                  },
+                  {
+                    key: "weighted_average",
+                    title: "Totale moyenne",
+                    dataIndex: "weighted_average",
+                    width: 80,
+                    // align: "right",
+                  },
+                  {
+                    key: "percentage",
+                    title: "Pourcentage",
+                    dataIndex: "percentage",
+                    width: 100,
+                  },
+                  {
+                    key: "grade",
+                    title: "Note",
+                    dataIndex: "grade",
+                    width: 56,
+                    align: "center",
+                  },
+                  {
+                    key: "decision",
+                    title: "Décision",
+                    dataIndex: "decision",
+                    width: 88,
+                    align: "center",
+                    render: (_, record) => (
+                      <Tag
+                        color={record.decision === "passed" ? "success" : "error"}
+                        bordered={false}
+                        style={{ marginRight: 0, width: "100%", textAlign: "center" }}
+                      >
+                        {getDecisionText(record.decision)}
+                      </Tag>
+                    ),
+                  },
+                ]}
+                pagination={false}
+              />
       </div>
     </div>
   );

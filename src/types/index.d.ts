@@ -1394,12 +1394,15 @@ export type YearResultPresentationItem = {
   last_name: string;
   matricule: string;
   percentage: number;
+  period_0_acronym: string;
   period_0_total_credit: number;
   period_0_validated_credit_sum: number;
   period_0_weighted_average: number;
+  period_1_acronym: string;
   period_1_total_credit: number;
   period_1_validated_credit_sum: number;
   period_1_weighted_average: number;
+  period_2_acronym: string;
   period_2_total_credit: number;
   period_2_validated_credit_sum: number;
   period_2_weighted_average: number;

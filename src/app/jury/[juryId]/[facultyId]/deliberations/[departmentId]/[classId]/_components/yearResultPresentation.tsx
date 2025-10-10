@@ -4,7 +4,7 @@ import { getDecisionText } from "@/lib/api";
 import { Class, Department } from "@/types";
 import { CloseOutlined, PrinterOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Divider, Drawer, Result, Select, Space, Table, Tag, Typography } from "antd";
+import { Button, Divider, Drawer, Empty, Result, Select, Space, Table, Tag, Typography } from "antd";
 import { useParams } from "next/navigation";
 import { Options, parseAsStringEnum, useQueryState } from "nuqs";
 
@@ -79,6 +79,17 @@ export const YearResultPresentation: FC<
     setMoment("before_appeal");
   };
 
+  const getPeriodHeader=()=>{
+    if (data && data?.length > 0) {
+      const sampleItem = data[0];
+      return {
+        period_0: sampleItem.period_0_acronym,
+        period_1: sampleItem.period_1_acronym,
+        period_2: sampleItem.period_2_acronym,
+      };
+    }
+  }
+
   return (
     <Drawer
       width="100%"
@@ -90,7 +101,7 @@ export const YearResultPresentation: FC<
             type="secondary"
             ellipsis={{}}
           >
-            Présentation des résultats
+            Présentation des résultats:
           </Typography.Title>
           <Typography.Title level={5} style={{ marginBottom: 0 }} ellipsis={{}}>
             {classYear?.acronym} {department?.name}
@@ -192,11 +203,102 @@ export const YearResultPresentation: FC<
               `${record.surname} ${record.last_name} ${record.first_name} `,
           },
           {
+            key: "credits",
+            title: "Crédits",
+            children: [
+              {
+                key: "period_0_total_credit",
+                title: getPeriodHeader()?.period_0 || "",
+                dataIndex: "period_0_total_credit",
+                width: 64,
+                hidden: getPeriodHeader()?.period_0 ? false : true,
+              },
+              {
+                key: "period_1_total_credit",
+                title: getPeriodHeader()?.period_1 || "",
+                dataIndex: "period_1_total_credit",
+                width: 64,
+                hidden: getPeriodHeader()?.period_1 ? false : true,
+              },
+              {
+                key: "period_2_total_credit",
+                title: getPeriodHeader()?.period_2 || "",
+                dataIndex: "period_2_total_credit",
+                width: 64,
+                hidden: getPeriodHeader()?.period_2 ? false : true,
+              },
+            ],
+          },
+          {
+            key: "expected_total_credit",
+            title: "Total crédits",
+            dataIndex: "expected_total_credit",
+          },
+          {
+            key: "validated_credits",
+            title: "Crédits validés",
+            children: [
+              {
+                key: "period_0_validated_credit_sum",
+                title: getPeriodHeader()?.period_0 || "",
+                dataIndex: "period_0_validated_credit_sum",
+                width: 64,
+                hidden: getPeriodHeader()?.period_0 ? false : true,
+              },
+              {
+                key: "period_1_validated_credit_sum",
+                title: getPeriodHeader()?.period_1 || "",
+                dataIndex: "period_1_validated_credit_sum",
+                width: 64,
+                hidden: getPeriodHeader()?.period_1 ? false : true,
+              },
+              {
+                key: "period_2_validated_credit_sum",
+                title: getPeriodHeader()?.period_2 || "",
+                dataIndex: "period_2_validated_credit_sum",
+                width: 64,
+                hidden: getPeriodHeader()?.period_2 ? false : true,
+              },
+            ],
+          },
+          {
+            key: "validated_credit_total",
+            title: "Total crédits validés",
+            dataIndex: "validated_credit_total",
+          },
+          {
+            key: "weighted_averages",
+            title: "Moyennes",
+            children: [
+              {
+                key: "period_0_weighted_average",
+                title: getPeriodHeader()?.period_0 || "",
+                dataIndex: "period_0_weighted_average",
+                width: 64,
+                hidden: getPeriodHeader()?.period_0 ? false : true,
+              },
+              {
+                key: "period_1_weighted_average",
+                title: getPeriodHeader()?.period_1 || "",
+                dataIndex: "period_1_weighted_average",
+                width: 64,
+                hidden: getPeriodHeader()?.period_1 ? false : true,
+              },
+              {
+                key: "period_2_weighted_average",
+                title: getPeriodHeader()?.period_2 || "",
+                dataIndex: "period_2_weighted_average",
+                width: 64,
+                hidden: getPeriodHeader()?.period_2 ? false : true,
+              },
+            ],
+          },
+          {
             key: "weighted_average",
-            title: "Moyenne",
+            title: "Totale moyenne",
             dataIndex: "weighted_average",
             width: 80,
-            align: "right",
+            // align: "right",
           },
           {
             key: "percentage",
@@ -209,20 +311,6 @@ export const YearResultPresentation: FC<
             title: "Note",
             dataIndex: "grade",
             width: 56,
-            align: "center",
-          },
-          {
-            key: "validated_credit_sum",
-            title: "Crédits validés",
-            dataIndex: "validated_credit_sum",
-            width: 120,
-            align: "center",
-          },
-          {
-            key: "unvalidated_credit_sum",
-            title: "Crédits non validés",
-            dataIndex: "unvalidated_credit_sum",
-            width: 140,
             align: "center",
           },
           {
@@ -243,8 +331,18 @@ export const YearResultPresentation: FC<
           },
         ]}
         pagination={false}
-        scroll={{ y: "calc(100vh - 105px)" }}
+        scroll={{ y: "calc(100vh - 144px)" }}
       />
+
+      {data?.length === 0 && (
+        <div className="py-32">
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="Aucun résultat trouvé"
+            children="Veuillez peut-être sélectionner une autre session ou un autre moment."
+          />
+        </div>
+      )}
 
       {isError && (
         <Result
