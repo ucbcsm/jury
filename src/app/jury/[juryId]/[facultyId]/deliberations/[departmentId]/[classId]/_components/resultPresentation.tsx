@@ -1,10 +1,10 @@
 "use client";
 
-import { getMomentText, getSessionText } from "@/lib/api";
+import { getDecisionText, getMomentText, getSessionText } from "@/lib/api";
 import { Announcement } from "@/types";
 import { CloseOutlined, PrinterOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Divider, Drawer, Result, Space, Typography } from "antd";
+import { Button, Divider, Drawer, Result, Space, Table, Tag, Typography } from "antd";
 import { useParams } from "next/navigation";
 import { Options } from "nuqs";
 
@@ -41,7 +41,7 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
 
   const { data, isPending, isError, error } = useQuery({
     queryKey: [
-      "grid_grades",
+      "result-presentation",
       annoucement.academic_year.id,
       facultyId,
       departmentId,
@@ -74,6 +74,8 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
     setAnnoucementId(null);
   };
 
+  console.log(data);
+
   return (
     <Drawer
       width="100%"
@@ -93,10 +95,8 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
         </Space>
       }
       styles={{
-        header: { borderColor: "#d1d5dc" },
-        body: { padding: "0 0 40px 0" },
+        body: { padding: 0},
       }}
-      style={{ padding: 0 }}
       loading={isPending}
       open={annoucement.id === announcementId}
       onClose={onClose}
@@ -127,7 +127,7 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
             color="primary"
             variant="dashed"
             onClick={printListGrades}
-            disabled={isPending || data?.BodyDataList?.length === 0}
+            disabled={isPending || data?.length === 0}
           >
             Imprimer
           </Button>
@@ -141,8 +141,90 @@ export const ResultPresentation: FC<ResultPresentationProps> = ({
         </Space>
       }
     >
+      <Table
+        style={{
+          display: data && data?.length > 0 ? "block" : "none",
+          // marginBottom: 16,
+        }}
+        size="small"
+        dataSource={data || []}
+        columns={[
+          {
+            key: "matricule",
+            title: "Matricule",
+            dataIndex: "matricule",
+            width: 80,
+            align: "right",
+          },
+          {
+            key: "gender",
+            title: "Genre",
+            dataIndex: "gender",
+            align: "center",
+            width: 60,
+          },
+          {
+            key: "full_name",
+            title: "Noms",
+            dataIndex: "name",
+            render: (_, record) =>
+              `${record.surname} ${record.last_name} ${record.first_name} `,
+          },
+          {
+            key: "weighted_average",
+            title: "Moyenne",
+            dataIndex: "weighted_average",
+            width:80,
+            align: "center",
+          },
+          {
+            key: "percentage",
+            title: "Pourcentage",
+            dataIndex: "percentage",
+            width:100
+          },
+          {
+            key: "grade",
+            title: "Note",
+            dataIndex: "grade",
+            width: 64,
+            align: "center",
+          },
+          {
+            key: "validated_credit_sum",
+            title: "Crédits validés",
+            dataIndex: "validated_credit_sum",
+            width: 120,
+            align: "center",
+          },
+          {
+            key: "unvalidated_credit_sum",
+            title: "Crédits non validés",
+            dataIndex: "unvalidated_credit_sum",
+            width: 140,
+            align: "center",
+          },
+          {
+            key: "decision",
+            title: "Décision",
+            dataIndex: "decision",
+            width: 88,
+            align: "center",
+            render: (_, record) => (
+              <Tag
+                color={record.decision === "passed" ? "success" : "error"}
+                bordered={false}
+                style={{ marginRight: 0, width: "100%", textAlign: "center" }}
+              >
+                {getDecisionText(record.decision)}
+              </Tag>
+            ),
+          },
+        ]}
+        pagination={false}
+          scroll={{ y: "calc(100vh - 104px)" }}
+      />
 
-      
       {isError && (
         <Result
           title="Erreur de récupération des données"

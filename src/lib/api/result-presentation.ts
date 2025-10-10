@@ -10,18 +10,18 @@ export async function getResultPresentation(searchParams: {
   session: "main_session" | "retake_session";
   mode: "PERIOD-GRADE" | "YEAR-GRADE";
 }) {
-    const {
-      yearId,
-      facultyId,
-      departmentId,
-      classId,
-      periodId,
-      moment,
-      session,
-      mode,
-    } = searchParams;
+  const {
+    yearId,
+    facultyId,
+    departmentId,
+    classId,
+    periodId,
+    moment,
+    session,
+    mode,
+  } = searchParams;
   const query = new URLSearchParams();
-  
+
   query.append("academic_year__id", yearId.toString());
 
   query.append("faculty__id", facultyId.toString());
@@ -34,5 +34,20 @@ export async function getResultPresentation(searchParams: {
   query.append("moment", moment.toString());
   query.append("mode", mode.toString());
   const res = await api.get(`/jury/result-presentation/?${query.toString()}`);
-  return res.data;
+  return res.data as {
+    decision: "passed" | "postponed";
+    expected_total_credit: number;
+    first_name: string;
+    gender: "M" | "F";
+    grade: string;
+    id: number;
+    id_user_obj: number;
+    last_name: string;
+    matricule: string;
+    percentage: number;
+    surname: string;
+    unvalidated_credit_sum: number;
+    validated_credit_sum: number;
+    weighted_average: number;
+  }[];
 }

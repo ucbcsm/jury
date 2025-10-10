@@ -70,7 +70,7 @@ export const NewAnnoucementWithAllForm: FC<NewAnnoucementWithAllFormProps> = ({
     mutateAsync(
       {
         ...values,
-        jury_id:Number(juryId),
+        jury_id: Number(juryId),
         faculty_id: Number(facultyId),
         department_id: Number(departmentId),
         class_id: Number(classId),
@@ -78,7 +78,9 @@ export const NewAnnoucementWithAllForm: FC<NewAnnoucementWithAllFormProps> = ({
       },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["annoucements"] });
+          queryClient.invalidateQueries({
+            queryKey: ["annoucements", facultyId, departmentId, classId],
+          });
           messageApi.success("Publication Créée avec succès !");
           setOpen(false);
         },

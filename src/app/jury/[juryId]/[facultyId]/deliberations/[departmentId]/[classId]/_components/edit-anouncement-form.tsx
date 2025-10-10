@@ -129,7 +129,7 @@ export const EditAnnouncementForm: FC<EditAnnouncementFormProps> = ({
               </Button>
               <Button
                 type="primary"
-                disabled={announcement.period.id === periodId || isPending}
+                disabled={isPending}
                 loading={isPending}
                 onClick={() => {
                   form.submit();

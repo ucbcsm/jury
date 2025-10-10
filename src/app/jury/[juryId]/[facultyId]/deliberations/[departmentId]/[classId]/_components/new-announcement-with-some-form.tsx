@@ -131,7 +131,9 @@ export const NewAnnoucementWithSomeForm: FC<
         },
         {
           onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["annoucements"] });
+            queryClient.invalidateQueries({
+              queryKey: ["annoucements", facultyId, departmentId, classId],
+            });
             messageApi.success("Publication Créée avec succès !");
             setOpen(false);
           },
