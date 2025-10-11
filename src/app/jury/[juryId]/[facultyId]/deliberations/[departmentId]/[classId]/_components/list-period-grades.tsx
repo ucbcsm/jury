@@ -151,7 +151,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
       }
     >
       <table
-        className="min-w-fit [&_td]:whitespace-nowrap "
+        className="min-w-fit [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap"
         style={{
           display: data && data?.BodyDataList?.length > 0 ? "block" : "none",
         }}
@@ -316,18 +316,14 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                 </th>
               ))
             )}
-            {data?.HeaderData?.retaken?.course_list?.map((_, index) =>
-              data?.HeaderData?.no_retaken?.course_list.map(
-                (list, listIndex) => (
-                  <th
-                    key={`${index}-${listIndex}`}
-                    className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
-                  >
-                    { index + 1}
-                  </th>
-                )
-              )
-            )}
+            {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
+              <th
+                key={`${index}`}
+                className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
+              >
+                {index + 1}
+              </th>
+            ))}
             <th className="bg-white border border-gray-300"></th>
             <th className="bg-white border border-gray-300"></th>
             <th className="bg-white border border-gray-300"></th>

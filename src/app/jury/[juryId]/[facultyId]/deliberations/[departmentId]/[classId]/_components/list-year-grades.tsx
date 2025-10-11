@@ -92,7 +92,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
         moment: moment,
         mode: "YEAR-GRADE",
       }),
-    enabled: !!yid && !!facultyId && !!departmentId && !!classId,
+    enabled: !!yid && !!facultyId && !!departmentId && !!lastPeriodId && !!classId,
   });
 
   const onClose = () => {
@@ -196,7 +196,7 @@ console.log(data)
         }
       >
         <table
-          className="min-w-fit [&_td]:whitespace-nowrap "
+          className="min-w-fit [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap"
           style={{
             display: data && data.BodyDataList.length > 0 ? "block" : "none",
           }}

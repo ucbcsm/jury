@@ -268,20 +268,23 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
             </tr>
             <tr>
               <th colSpan={4} className="bg-white border border-gray-300"></th>
-              {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
-                <th
-                  key={index}
-                  className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
-                >
-                  {index + 1}
-                </th>
-              ))}
+              {data?.HeaderData?.no_retaken?.course_list?.map(
+                (list, listIndex) =>
+                  list.map((_, index) => (
+                    <th
+                      key={`${listIndex}-${index}`}
+                      className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
+                    >
+                      {index + 1}
+                    </th>
+                  ))
+              )}
               {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
                   className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
                 >
-                  {data?.HeaderData?.no_retaken?.course_list.length + index + 1}
+                  {index + 1}
                 </th>
               ))}
               <th className="bg-white border border-gray-300"></th>
