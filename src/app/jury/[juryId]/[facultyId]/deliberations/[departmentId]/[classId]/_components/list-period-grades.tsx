@@ -323,7 +323,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                     key={`${index}-${listIndex}`}
                     className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
                   >
-                    {list.length + index + 1}
+                    { index + 1}
                   </th>
                 )
               )
@@ -856,11 +856,11 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
           }
         />
       )}
-      {/* <PrintableListGrades
+      <PrintableListGrades
         ref={refToPrint}
         annoucement={annoucement}
         data={data}
-      /> */}
+      />
     </Drawer>
   );
 };

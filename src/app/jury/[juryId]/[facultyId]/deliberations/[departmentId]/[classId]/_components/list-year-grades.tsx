@@ -76,6 +76,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
       facultyId,
       departmentId,
       classId,
+      lastPeriodId,
       session,
       moment,
       "YEAR-GRADE",
@@ -99,7 +100,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
     setSession("main_session");
     setMoment("before_appeal");
   };
-
+console.log(data)
   return (
     <>
       <Button
@@ -348,20 +349,23 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                 colSpan={4}
                 className=" sticky left-0 bg-white border border-gray-300"
               ></th>
-              {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
-                <th
-                  key={index}
-                  className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
-                >
-                  {index + 1}
-                </th>
-              ))}
+              {data?.HeaderData?.no_retaken?.course_list?.map(
+                (list, listIndex) =>
+                  list.map((_, index) => (
+                    <th
+                      key={`${listIndex}-${index}`}
+                      className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
+                    >
+                      {index + 1}
+                    </th>
+                  ))
+              )}
               {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
                   className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
                 >
-                  {data?.HeaderData?.no_retaken?.course_list.length + index + 1}
+                  {index + 1}
                 </th>
               ))}
               <th className="bg-white border border-gray-300"></th>
@@ -379,14 +383,16 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
               >
                 Crédits
               </th>
-              {data?.HeaderData?.no_retaken?.credits?.map((credit, idx) => (
-                <th
-                  key={idx}
-                  className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300 text-center"
-                >
-                  {credit}
-                </th>
-              ))}
+              {data?.HeaderData?.no_retaken?.credits?.map((list, listIndex) =>
+                list.map((credit, idx) => (
+                  <th
+                    key={`${listIndex}-${idx}`}
+                    className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300 text-center"
+                  >
+                    {credit}
+                  </th>
+                ))
+              )}
               {data?.HeaderData?.retaken?.credits?.map((credit, idx) => (
                 <th
                   key={idx}
@@ -414,14 +420,17 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
               >
                 CC
               </th>
-              {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
-                <th
-                  key={index}
-                  className="px-2 py-1 w-8 text-xs bg-white border-b  border border-gray-300 text-center"
-                >
-                  10
-                </th>
-              ))}
+              {data?.HeaderData?.no_retaken?.course_list?.map(
+                (list, listIndex) =>
+                  list.map((_, index) => (
+                    <th
+                      key={`${listIndex}-${index}`}
+                      className="px-2 py-1 w-8 text-xs bg-white border-b  border border-gray-300 text-center"
+                    >
+                      10
+                    </th>
+                  ))
+              )}
               {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
@@ -445,14 +454,17 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
               >
                 Examen
               </th>
-              {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
-                <th
-                  key={index}
-                  className="px-2 py-1 w-8 text-xs bg-gray-50 border-b  border border-gray-300 text-center"
-                >
-                  10
-                </th>
-              ))}
+              {data?.HeaderData?.no_retaken?.course_list?.map(
+                (list, listIndex) =>
+                  list.map((_, index) => (
+                    <th
+                      key={`${listIndex}-${index}`}
+                      className="px-2 py-1 w-8 text-xs bg-gray-50 border-b  border border-gray-300 text-center"
+                    >
+                      10
+                    </th>
+                  ))
+              )}
               {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
@@ -476,14 +488,17 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
               >
                 TOTAL
               </th>
-              {data?.HeaderData?.no_retaken?.course_list?.map((_, index) => (
-                <th
-                  key={index}
-                  className="px-2 py-1 w-8 text-xs border-b border border-gray-300 text-center"
-                >
-                  20
-                </th>
-              ))}
+              {data?.HeaderData?.no_retaken?.course_list?.map(
+                (list, listIndex) =>
+                  list.map((_, index) => (
+                    <th
+                      key={`${listIndex}-${index}`}
+                      className="px-2 py-1 w-8 text-xs border-b border border-gray-300 text-center"
+                    >
+                      20
+                    </th>
+                  ))
+              )}
               {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
@@ -538,14 +553,17 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                                     rowSpan={2}
                                     className="px-4 py-1 bg-white border border-gray-300"
                                   ></td> */}
-                  {record.no_retaken.continuous_assessments.map((cc, idx) => (
-                    <td
-                      key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
-                    >
-                      {cc}
-                    </td>
-                  ))}
+                  {record.no_retaken.continuous_assessments.map(
+                    (list, listIndex) =>
+                      list.map((cc, idx) => (
+                        <td
+                          key={`${listIndex}-${idx}`}
+                          className="px-2 py-1 text-center text-xs border border-gray-300"
+                        >
+                          {cc}
+                        </td>
+                      ))
+                  )}
                   {record.retaken.continuous_assessments.map((cc, idx) => (
                     <td
                       key={idx}
@@ -582,14 +600,16 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                                     colSpan={3}
                                     className="px-4 py-1 bg-white border border-gray-300"
                                   ></td> */}
-                  {record.no_retaken.exams.map((exam, idx) => (
-                    <td
-                      key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
-                    >
-                      {exam}
-                    </td>
-                  ))}
+                  {record.no_retaken.exams.map((list, listIndex) =>
+                    list.map((exam, idx) => (
+                      <td
+                        key={`${listIndex}-${idx}`}
+                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                      >
+                        {exam}
+                      </td>
+                    ))
+                  )}
                   {record.retaken.exams.map((exam, idx) => (
                     <td
                       key={idx}
@@ -722,14 +742,16 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                   >
                     Grade
                   </td>
-                  {record.no_retaken.grade_letters.map((letter, idx) => (
-                    <td
-                      key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
-                    >
-                      {letter}
-                    </td>
-                  ))}
+                  {record.no_retaken.grade_letters.map((list, listIndex) =>
+                    list.map((letter, idx) => (
+                      <td
+                        key={`${listIndex}-${idx}`}
+                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                      >
+                        {letter}
+                      </td>
+                    ))
+                  )}
                   {record.retaken.grade_letters.map((letter, idx) => (
                     <td
                       key={idx}
@@ -788,14 +810,16 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                   >
                     Crédits validés
                   </td>
-                  {record.no_retaken.earned_credits.map((credits, idx) => (
-                    <td
-                      key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
-                    >
-                      {credits}
-                    </td>
-                  ))}
+                  {record.no_retaken.earned_credits.map((list, listIndex) =>
+                    list.map((credits, idx) => (
+                      <td
+                        key={`${listIndex}-${idx}`}
+                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                      >
+                        {credits}
+                      </td>
+                    ))
+                  )}
                   {record.retaken.earned_credits.map((credits, idx) => (
                     <td
                       key={idx}
@@ -891,7 +915,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
             }
           />
         )}
-        {/* <PrintableListGrades
+        <PrintableListGrades
           ref={refToPrint}
           data={data}
           forYearResult={{
@@ -901,7 +925,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
             session,
             moment,
           }}
-        /> */}
+        />
       </Drawer>
     </>
   );
