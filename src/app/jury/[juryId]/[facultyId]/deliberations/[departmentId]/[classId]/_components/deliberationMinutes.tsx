@@ -184,6 +184,25 @@ export const PeriodDeliberationMinutes: FC<PeriodDeliberationMinutesProps> = ({
             ]}
           />
 
+          <Descriptions
+            style={{ marginTop: 16 }}
+            column={1}
+            bordered
+            size="small"
+            items={[
+              {
+                key: "passed_count",
+                label: "Ont été admis",
+                children: data?.general_statistics.passed_count || 0,
+              },
+              {
+                key: "postponed_count",
+                label: "Ont été ajournés",
+                children: data?.general_statistics.postponed_count || 0,
+              },
+            ]}
+          />
+
           {Object.keys(data?.body).map((key) => {
             const keyTyped = key as
               | keyof typeof data.body
