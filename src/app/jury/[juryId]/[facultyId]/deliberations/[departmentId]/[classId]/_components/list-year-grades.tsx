@@ -196,7 +196,7 @@ console.log(data)
         }
       >
         <table
-          className="min-w-fit [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap"
+          className="min-w-fit [&_th]:whitespace-nowrap [&_th]:p-1 [&_td]:whitespace-nowrap [&_td]:p-1"
           style={{
             display: data && data.BodyDataList.length > 0 ? "block" : "none",
           }}
@@ -205,14 +205,14 @@ console.log(data)
             <tr className=" uppercase">
               <th
                 colSpan={4}
-                className="sticky left-0 z-10 px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
+                className="sticky left-0 z-10  text-center font-semibold bg-white border-b  border border-gray-300"
               >
                 Semestre
               </th>
               {data?.HeaderData?.no_retaken?.period_list?.map((period) => (
                 <th
                   colSpan={period.course_counter}
-                  className="px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
+                  className=" text-center font-semibold bg-white border-b  border border-gray-300"
                 >
                   {period.period.acronym}
                 </th>
@@ -223,7 +223,7 @@ console.log(data)
                 data?.HeaderData?.retaken?.header?.map((header) => (
                   <th
                     colSpan={header.course_counter}
-                    className="px-4 py-2 text-center font-semibold whitespace-nowrap bg-white border-b  border border-gray-300"
+                    className=" text-center font-semibold bg-white border-b  border border-gray-300"
                   >
                     Cours repassés {/* {header.retake_title} */}
                   </th>
@@ -233,7 +233,7 @@ console.log(data)
             <tr className=" sticky top-0 z-10">
               <th
                 colSpan={4}
-                className="sticky left-0 z-10  px-4 py-2 bg-gray-100 text-xs font-semibold whitespace-nowrap border-b border border-gray-300"
+                className="sticky left-0 z-10   bg-gray-100 text-xs font-semibold border-b border border-gray-300"
               >
                 Unités d&apos;Enseignement
               </th>
@@ -242,7 +242,7 @@ console.log(data)
                   <th
                     key={TU.teaching_unit.code}
                     colSpan={TU.course_counter}
-                    className="px-4 py-2 uppercase bg-gray-100 text-xs font-semibold whitespace-nowrap border-b border border-gray-300 text-center"
+                    className=" uppercase bg-gray-100 text-xs font-semibold border-b border border-gray-300 text-center"
                   >
                     {TU.teaching_unit.code}
                   </th>
@@ -252,7 +252,7 @@ console.log(data)
                 <th
                   key={TU.teaching_unit.code}
                   colSpan={TU.course_counter}
-                  className="px-4 py-2 uppercase bg-gray-100 text-xs font-semibold whitespace-nowrap border-b border border-gray-300 text-center"
+                  className=" uppercase bg-gray-100 text-xs font-semibold border-b border border-gray-300 text-center"
                 >
                   {TU.teaching_unit.code}
                 </th>
@@ -262,7 +262,7 @@ console.log(data)
                   writingMode: "sideways-lr",
                   textOrientation: "mixed",
                 }}
-                className="px-2 py-2 w-8 text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left uppercase"
+                className=" text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left uppercase"
                 rowSpan={2}
               >
                 Total Crédits
@@ -272,7 +272,7 @@ console.log(data)
                   writingMode: "sideways-lr",
                   textOrientation: "mixed",
                 }}
-                className="px-2 py-2 w-8 text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left"
+                className=" text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left"
                 rowSpan={2}
               >
                 Pourcentage
@@ -282,7 +282,7 @@ console.log(data)
                   writingMode: "sideways-lr",
                   textOrientation: "mixed",
                 }}
-                className="px-2 py-2 w-8 text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left"
+                className=" text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left"
                 rowSpan={2}
               >
                 Grade
@@ -292,7 +292,7 @@ console.log(data)
                   writingMode: "sideways-lr",
                   textOrientation: "mixed",
                 }}
-                className="px-2 py-2 text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left"
+                className=" text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left"
                 colSpan={2}
                 rowSpan={2}
               >
@@ -304,7 +304,7 @@ console.log(data)
                   textOrientation: "mixed",
                 }}
                 rowSpan={2}
-                className="px-2 py-2 text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left"
+                className=" text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left"
               >
                 Décision
               </th>
@@ -313,7 +313,7 @@ console.log(data)
             <tr className="sticky top-[33px] z-10  ">
               <th
                 colSpan={4}
-                className="sticky left-0  px-4 py-2 bg-gray-50 text-xs font-semibold whitespace-nowrap  border border-gray-300"
+                className="sticky left-0   bg-gray-50 text-xs font-semibold  border border-gray-300"
               >
                 Éléments Constitutifs
               </th>
@@ -325,7 +325,7 @@ console.log(data)
                       writingMode: "sideways-lr",
                       textOrientation: "mixed",
                     }}
-                    className="px-2 py-2 w-8 text-xs font-semibold bg-gray-50 border-b  border border-gray-300 text-left"
+                    className=" text-xs font-semibold bg-gray-50 border-b  border border-gray-300 text-left"
                   >
                     {course.available_course.name}
                   </th>
@@ -338,7 +338,7 @@ console.log(data)
                     writingMode: "sideways-lr",
                     textOrientation: "mixed",
                   }}
-                  className="px-2 py-2 w-8 text-xs font-semibold bg-gray-50 border-b  border border-gray-300 text-left"
+                  className=" text-xs font-semibold bg-gray-50 border-b  border border-gray-300 text-left"
                 >
                   {course.available_course.name}
                 </th>
@@ -354,7 +354,7 @@ console.log(data)
                   list.map((_, index) => (
                     <th
                       key={`${listIndex}-${index}`}
-                      className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
+                      className=" text-xs bg-white border-b border border-gray-300 text-center"
                     >
                       {index + 1}
                     </th>
@@ -363,7 +363,7 @@ console.log(data)
               {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
-                  className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
+                  className=" text-xs bg-white border-b border border-gray-300 text-center"
                 >
                   {index + 1}
                 </th>
@@ -387,7 +387,7 @@ console.log(data)
                 list.map((credit, idx) => (
                   <th
                     key={`${listIndex}-${idx}`}
-                    className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300 text-center"
+                    className=" text-xs bg-gray-50 border-b border border-gray-300 text-center"
                   >
                     {credit}
                   </th>
@@ -396,12 +396,12 @@ console.log(data)
               {data?.HeaderData?.retaken?.credits?.map((credit, idx) => (
                 <th
                   key={idx}
-                  className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300 text-center"
+                  className=" text-xs bg-gray-50 border-b border border-gray-300 text-center"
                 >
                   {credit}
                 </th>
               ))}
-              <th className="px-2 py-1  text-xs bg-gray-50 border-b border border-gray-300 text-center font-bold">
+              <th className="  text-xs bg-gray-50 border-b border border-gray-300 text-center font-bold">
                 {/* {data?.HeaderData?.no_retaken?.credits?.reduce(
                   (prevValue, currenValue) => currenValue + prevValue
                 )} */}
@@ -425,7 +425,7 @@ console.log(data)
                   list.map((_, index) => (
                     <th
                       key={`${listIndex}-${index}`}
-                      className="px-2 py-1 w-8 text-xs bg-white border-b  border border-gray-300 text-center"
+                      className=" text-xs bg-white border-b  border border-gray-300 text-center"
                     >
                       10
                     </th>
@@ -434,7 +434,7 @@ console.log(data)
               {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
-                  className="px-2 py-1 w-8 text-xs bg-white border-b  border border-gray-300 text-center"
+                  className=" text-xs bg-white border-b  border border-gray-300 text-center"
                 >
                   10
                 </th>
@@ -459,7 +459,7 @@ console.log(data)
                   list.map((_, index) => (
                     <th
                       key={`${listIndex}-${index}`}
-                      className="px-2 py-1 w-8 text-xs bg-gray-50 border-b  border border-gray-300 text-center"
+                      className=" text-xs bg-gray-50 border-b  border border-gray-300 text-center"
                     >
                       10
                     </th>
@@ -468,7 +468,7 @@ console.log(data)
               {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
-                  className="px-2 py-1 w-8 text-xs bg-gray-50 border-b  border border-gray-300 text-center"
+                  className=" text-xs bg-gray-50 border-b  border border-gray-300 text-center"
                 >
                   10
                 </th>
@@ -484,7 +484,7 @@ console.log(data)
             <tr className="bg-white">
               <th
                 colSpan={4}
-                className=" sticky left-0 px-2 py-2 text-xs font-medium border border-gray-300"
+                className=" sticky left-0  text-xs font-medium border border-gray-300"
               >
                 TOTAL
               </th>
@@ -493,7 +493,7 @@ console.log(data)
                   list.map((_, index) => (
                     <th
                       key={`${listIndex}-${index}`}
-                      className="px-2 py-1 w-8 text-xs border-b border border-gray-300 text-center"
+                      className=" text-xs border-b border border-gray-300 text-center"
                     >
                       20
                     </th>
@@ -502,20 +502,20 @@ console.log(data)
               {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
-                  className="px-2 py-1 w-8 text-xs border-b border border-gray-300 text-center"
+                  className=" text-xs border-b border border-gray-300 text-center"
                 >
                   20
                 </th>
               ))}
-              <th className="px-2 py-1 text-xs  border-b border border-gray-300 text-center font-bold">
+              <th className=" text-xs  border-b border border-gray-300 text-center font-bold">
                 20
               </th>
               <th className=" border border-gray-300"></th>
               <th className=" border border-gray-300"></th>
-              <th className="px-2 py-1 w-8 text-xs  border-b border border-gray-300  font-bold">
+              <th className=" text-xs  border-b border border-gray-300  font-bold">
                 V
               </th>
-              <th className="px-2 py-1 w-8 text-xs  border-b border border-gray-300  font-bold">
+              <th className=" text-xs  border-b border border-gray-300  font-bold">
                 NV
               </th>
               <th className=" border border-gray-300"></th>
@@ -528,37 +528,37 @@ console.log(data)
                 <tr className="bg-blue-100 transition">
                   <td
                     rowSpan={7}
-                    className=" sticky left-0 px-2 py-2 w-8 text-right align-top text-xs font-semibold bg-white border border-gray-300"
+                    className=" sticky left-0  text-right align-top text-xs font-semibold bg-white border border-gray-300"
                   >
                     {indexRecord + 1}
                   </td>
                   <td
                     rowSpan={2}
-                    className="px-2 py-2 w-64 text-left align-top text-xs font-semibold border border-gray-300 "
+                    className=" text-left align-top text-xs font-semibold border border-gray-300 "
                   >{`${record.surname} ${record.last_name} ${record.first_name}`}</td>
                   <td
                     rowSpan={2}
-                    className="px-2 py-2 w-8 text-right align-top text-xs font-semibold border border-gray-300 "
+                    className=" text-right align-top text-xs font-semibold border border-gray-300 "
                   >
                     {record.matricule}
                   </td>
                   <td
                     rowSpan={2}
-                    className="px-2 py-2 w-8 text-center align-top text-xs font-semibold border border-gray-300 "
+                    className=" text-center align-top text-xs font-semibold border border-gray-300 "
                   >
                     {record.gender}
                   </td>
                   {/* <td
                                     colSpan={3}
                                     rowSpan={2}
-                                    className="px-4 py-1 bg-white border border-gray-300"
+                                    className=" bg-white border border-gray-300"
                                   ></td> */}
                   {record.no_retaken.continuous_assessments.map(
                     (list, listIndex) =>
                       list.map((cc, idx) => (
                         <td
                           key={`${listIndex}-${idx}`}
-                          className="px-2 py-1 text-center text-xs border border-gray-300"
+                          className=" text-center text-xs border border-gray-300"
                         >
                           {cc}
                         </td>
@@ -567,7 +567,7 @@ console.log(data)
                   {record.retaken.continuous_assessments.map((cc, idx) => (
                     <td
                       key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
+                      className=" text-center text-xs border border-gray-300"
                     >
                       {cc}
                     </td>
@@ -580,7 +580,7 @@ console.log(data)
                   <td className=" border border-gray-300"></td>
                   <td
                     rowSpan={7}
-                    className="px-2 py-1 bg-white align-top  border border-gray-300 "
+                    className=" bg-white align-top  border border-gray-300 "
                   >
                     <Space>
                       <CompensationForm
@@ -598,13 +598,13 @@ console.log(data)
                 <tr className="bg-blue-100 transition ">
                   {/* <td
                                     colSpan={3}
-                                    className="px-4 py-1 bg-white border border-gray-300"
+                                    className=" bg-white border border-gray-300"
                                   ></td> */}
                   {record.no_retaken.exams.map((list, listIndex) =>
                     list.map((exam, idx) => (
                       <td
                         key={`${listIndex}-${idx}`}
-                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                        className=" text-center text-xs border border-gray-300"
                       >
                         {exam}
                       </td>
@@ -613,7 +613,7 @@ console.log(data)
                   {record.retaken.exams.map((exam, idx) => (
                     <td
                       key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
+                      className=" text-center text-xs border border-gray-300"
                     >
                       {exam}
                     </td>
@@ -626,12 +626,12 @@ console.log(data)
                   <td className=" border border-gray-300"></td>
                 </tr>
                 <tr className=" font-semibold">
-                  {/* <td className="px-2 py-2 w-8 text-right text-xs font-semibold border border-gray-300">
+                  {/* <td className=" text-right text-xs font-semibold border border-gray-300">
                                     {indexRecord + 1}
                                   </td> */}
                   <td
                     colSpan={3}
-                    className="px-2 py-2 text-xs border text-center border-gray-300"
+                    className=" text-xs border text-center border-gray-300"
                   >
                     Total
                   </td>
@@ -640,7 +640,7 @@ console.log(data)
                     list.map((total, idx) => (
                       <td
                         key={`${listIndex}-${idx}`}
-                        className="px-2 py-2 text-center text-xs border border-gray-300"
+                        className=" text-center text-xs border border-gray-300"
                         style={{
                           backgroundColor:
                             total === null
@@ -658,7 +658,7 @@ console.log(data)
                   {record.retaken.totals.map((total, idx) => (
                     <td
                       key={idx}
-                      className="px-2 py-2 text-center text-xs border border-gray-300"
+                      className=" text-center text-xs border border-gray-300"
                       style={{
                         backgroundColor:
                           total === null
@@ -673,7 +673,7 @@ console.log(data)
                     </td>
                   ))}
                   <td
-                    className="px-2 py-2 text-center text-re text-xs border bg-r border-gray-300"
+                    className=" text-center text-re text-xs border bg-r border-gray-300"
                     style={{
                       backgroundColor:
                         record.weighted_average >= 10 ? "#f0fdf4" : "#fef2f2",
@@ -684,7 +684,7 @@ console.log(data)
                     {record.weighted_average}
                   </td>
                   <td
-                    className="px-2 py-2 text-center text-xs border border-gray-300"
+                    className=" text-center text-xs border border-gray-300"
                     style={{
                       backgroundColor:
                         record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
@@ -695,7 +695,7 @@ console.log(data)
                     {record.percentage}
                   </td>
                   <td
-                    className="px-2 py-2 text-center text-xs font-bold border border-gray-300"
+                    className=" text-center text-xs font-bold border border-gray-300"
                     style={{
                       backgroundColor:
                         record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
@@ -724,7 +724,7 @@ console.log(data)
                     }}
                   ></td>
                   <td
-                    className="px-2 py-1 w-24 text-center text-xs font-semibold border border-gray-300 "
+                    className=" w-24 text-center text-xs font-semibold border border-gray-300 "
                     style={{
                       backgroundColor:
                         record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
@@ -738,7 +738,7 @@ console.log(data)
                 <tr className="bg-gray-50">
                   <td
                     colSpan={3}
-                    className="px-4 py-1  text-xs  border border-gray-300 text-center"
+                    className="  text-xs  border border-gray-300 text-center"
                   >
                     Grade
                   </td>
@@ -746,7 +746,7 @@ console.log(data)
                     list.map((letter, idx) => (
                       <td
                         key={`${listIndex}-${idx}`}
-                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                        className=" text-center text-xs border border-gray-300"
                       >
                         {letter}
                       </td>
@@ -755,7 +755,7 @@ console.log(data)
                   {record.retaken.grade_letters.map((letter, idx) => (
                     <td
                       key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
+                      className=" text-center text-xs border border-gray-300"
                     >
                       {letter}
                     </td>
@@ -770,7 +770,7 @@ console.log(data)
                 <tr>
                   <td
                     colSpan={3}
-                    className="px-4 py-1 bg-white text-xs border border-gray-300 text-center"
+                    className=" bg-white text-xs border border-gray-300 text-center"
                   >
                     Validation EC
                   </td>
@@ -778,7 +778,7 @@ console.log(data)
                     list.map((decision, idx) => (
                       <td
                         key={`${listIndex}-${idx}`}
-                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                        className=" text-center text-xs border border-gray-300"
                       >
                         {getShortGradeValidationText(decision)}
                       </td>
@@ -787,7 +787,7 @@ console.log(data)
                   {record.retaken.course_decisions.map((decision, idx) => (
                     <td
                       key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
+                      className=" text-center text-xs border border-gray-300"
                     >
                       {getShortGradeValidationText(decision)}
                     </td>
@@ -795,10 +795,10 @@ console.log(data)
                   <td className="bg-white border border-gray-300"></td>
                   <td className="bg-white border border-gray-300"></td>
                   <td className="bg-white border border-gray-300"></td>
-                  <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
+                  <td className=" text-center text-xs  font-bold border border-gray-300">
                     {record.validated_courses_count}
                   </td>
-                  <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
+                  <td className=" text-center text-xs  font-bold border border-gray-300">
                     {record.unvalidated_courses_count}
                   </td>
                   <td className="bg-white border border-gray-300"></td>
@@ -806,7 +806,7 @@ console.log(data)
                 <tr className="bg-gray-50">
                   <td
                     colSpan={3}
-                    className="px-4 py-1  text-xs  border border-gray-300 text-center"
+                    className="  text-xs  border border-gray-300 text-center"
                   >
                     Crédits validés
                   </td>
@@ -814,7 +814,7 @@ console.log(data)
                     list.map((credits, idx) => (
                       <td
                         key={`${listIndex}-${idx}`}
-                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                        className=" text-center text-xs border border-gray-300"
                       >
                         {credits}
                       </td>
@@ -823,7 +823,7 @@ console.log(data)
                   {record.retaken.earned_credits.map((credits, idx) => (
                     <td
                       key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
+                      className=" text-center text-xs border border-gray-300"
                     >
                       {credits}
                     </td>
@@ -831,10 +831,10 @@ console.log(data)
                   <td className=" border border-gray-300"></td>
                   <td className=" border border-gray-300"></td>
                   <td className=" border border-gray-300"></td>
-                  <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
+                  <td className=" text-center text-xs  font-bold border border-gray-300">
                     {record.validated_credit_sum}
                   </td>
-                  <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
+                  <td className=" text-center text-xs  font-bold border border-gray-300">
                     {record.unvalidated_credit_sum}
                   </td>
                   <td className=" border border-gray-300"></td>
@@ -842,7 +842,7 @@ console.log(data)
                 <tr>
                   <td
                     colSpan={3}
-                    className="px-4 py-1 bg-white text-xs  border border-gray-300 text-center"
+                    className=" bg-white text-xs  border border-gray-300 text-center"
                   >
                     Validation UE
                   </td>
@@ -852,7 +852,7 @@ console.log(data)
                         <td
                           key={`${listIndex}-${idx}`}
                           colSpan={TUcredits.cols_counter}
-                          className="px-2 py-1 text-center text-xs border border-gray-300"
+                          className=" text-center text-xs border border-gray-300"
                         >
                           {getShortGradeValidationText(TUcredits.value)}
                         </td>
@@ -863,7 +863,7 @@ console.log(data)
                       <td
                         key={idx}
                         colSpan={TUcredits.cols_counter}
-                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                        className=" text-center text-xs border border-gray-300"
                       >
                         {getShortGradeValidationText(TUcredits.value)}
                       </td>
@@ -872,10 +872,10 @@ console.log(data)
                   <td className="bg-white border border-gray-300"></td>
                   <td className="bg-white border border-gray-300"></td>
                   <td className="bg-white border border-gray-300"></td>
-                  <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
+                  <td className=" text-center text-xs  font-bold border border-gray-300">
                     {record.validated_TU_count}
                   </td>
-                  <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
+                  <td className=" text-center text-xs  font-bold border border-gray-300">
                     {record.unvalidated_TU_count}
                   </td>
                   <td className="bg-white border border-gray-300"></td>

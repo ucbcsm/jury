@@ -124,19 +124,19 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
           </Card>
         )}
 
-        <table className="min-w-fit divide-y divide-gray-200 [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap ">
+        <table className="min-w-fit divide-y divide-gray-200 [&_th]:whitespace-nowrap [&_th]:p-1 [&_td]:whitespace-nowrap [&_td]:p-1 ">
           <thead className="bg-gray-50">
             <tr className=" uppercase">
               <th
                 colSpan={4}
-                className="px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
+                className=" text-center font-semibold bg-white border-b  border border-gray-300"
               >
                 Semestre
               </th>
               {data?.HeaderData?.no_retaken?.period_list?.map((period) => (
                 <th
                   colSpan={period.course_counter}
-                  className="px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
+                  className=" text-center font-semibold bg-white border-b  border border-gray-300"
                 >
                   {period.period.acronym}
                 </th>
@@ -146,7 +146,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                 data?.HeaderData?.retaken?.header?.map((header) => (
                   <th
                     colSpan={header.course_counter}
-                    className="px-4 py-2 text-center font-semibold bg-white border-b  border border-gray-300"
+                    className=" text-center font-semibold bg-white border-b  border border-gray-300"
                   >
                     Cours repassés {/* {header.retake_title} */}
                   </th>
@@ -156,7 +156,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
             <tr>
               <th
                 colSpan={4}
-                className="px-4 py-2 bg-gray-100 text-sm font-medium border-b border border-gray-300"
+                className=" bg-gray-100 text-sm font-medium border-b border border-gray-300"
               >
                 Unités d&apos;Enseignement
               </th>
@@ -165,7 +165,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   <th
                     key={TU.teaching_unit.code}
                     colSpan={TU.course_counter}
-                    className="px-4 py-2 uppercase bg-gray-100 text-xs font-semibold border-b border border-gray-300 text-center"
+                    className=" uppercase bg-gray-100 text-xs font-semibold border-b border border-gray-300 text-center"
                   >
                     {TU.teaching_unit.code}
                   </th>
@@ -175,7 +175,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                 <th
                   key={TU.teaching_unit.code}
                   colSpan={TU.course_counter}
-                  className="px-4 py-2 uppercase bg-gray-100 text-xs font-semibold border-b border border-gray-300 text-center"
+                  className=" uppercase bg-gray-100 text-xs font-semibold border-b border border-gray-300 text-center"
                 >
                   {TU.teaching_unit.code}
                 </th>
@@ -185,7 +185,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   writingMode: "sideways-lr",
                   textOrientation: "mixed",
                 }}
-                className="px-2 py-2 w-8 text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left uppercase"
+                className=" text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left uppercase"
                 rowSpan={2}
               >
                 Total Crédits
@@ -195,7 +195,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   writingMode: "sideways-lr",
                   textOrientation: "mixed",
                 }}
-                className="px-2 py-2 w-8 text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left"
+                className=" text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left"
                 rowSpan={2}
               >
                 Pourcentage
@@ -205,7 +205,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   writingMode: "sideways-lr",
                   textOrientation: "mixed",
                 }}
-                className="px-2 py-2 w-8 text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left"
+                className=" text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-left"
                 rowSpan={2}
               >
                 Grade
@@ -215,7 +215,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   writingMode: "sideways-lr",
                   textOrientation: "mixed",
                 }}
-                className="px-2 py-2 text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-center"
+                className=" text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-center"
                 colSpan={2}
                 rowSpan={6}
               >
@@ -227,7 +227,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   textOrientation: "mixed",
                 }}
                 rowSpan={6}
-                className="px-2 py-2 text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-center"
+                className=" text-xs font-semibold bg-gray-100 border-b border border-gray-300 text-center"
               >
                 Décision
               </th>
@@ -235,7 +235,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
             <tr>
               <th
                 colSpan={4}
-                className="px-4 py-2 bg-gray-50 text-xs font-medium border-b  border border-gray-300"
+                className=" bg-gray-50 text-xs font-medium border-b  border border-gray-300"
               >
                 Éléments Constitutifs
               </th>
@@ -247,7 +247,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                       writingMode: "sideways-lr",
                       textOrientation: "mixed",
                     }}
-                    className="px-2 py-2 w-8 text-xs font-normal bg-gray-50 border-b  border border-gray-300 text-left"
+                    className=" text-xs font-normal bg-gray-50 border-b  border border-gray-300 text-left"
                   >
                     {course.available_course.name}
                   </th>
@@ -260,7 +260,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                     writingMode: "sideways-lr",
                     textOrientation: "mixed",
                   }}
-                  className="px-2 py-2 w-8 text-xs font-normal bg-gray-50 border-b  border border-gray-300 text-left"
+                  className=" text-xs font-normal bg-gray-50 border-b  border border-gray-300 text-left"
                 >
                   {course.available_course.name}
                 </th>
@@ -273,7 +273,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   list.map((_, index) => (
                     <th
                       key={`${listIndex}-${index}`}
-                      className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
+                      className="text-xs bg-white border-b border border-gray-300 text-center"
                     >
                       {index + 1}
                     </th>
@@ -282,7 +282,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
-                  className="px-2 py-1 w-8 text-xs bg-white border-b border border-gray-300 text-center"
+                  className="text-xs bg-white border-b border border-gray-300 text-center"
                 >
                   {index + 1}
                 </th>
@@ -302,7 +302,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                 list.map((credit, idx) => (
                   <th
                     key={`${listIndex}-${idx}`}
-                    className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300 text-center"
+                    className="text-xs bg-gray-50 border-b border border-gray-300 text-center"
                   >
                     {credit}
                   </th>
@@ -311,12 +311,12 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               {data?.HeaderData?.retaken?.credits?.map((credit, idx) => (
                 <th
                   key={idx}
-                  className="px-2 py-1 w-8 text-xs bg-gray-50 border-b border border-gray-300 text-center"
+                  className="text-xs bg-gray-50 border-b border border-gray-300 text-center"
                 >
                   {credit}
                 </th>
               ))}
-              <th className="px-2 py-1  text-xs bg-gray-50 border-b border border-gray-300 text-center font-bold">
+              <th className="  text-xs bg-gray-50 border-b border border-gray-300 text-center font-bold">
                 {/* {data?.HeaderData?.no_retaken?.credits?.reduce(
                   (prevValue, currenValue) => currenValue + prevValue
                 )} */}
@@ -336,7 +336,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   list.map((_, index) => (
                     <th
                       key={`${listIndex}-${index}`}
-                      className="px-2 py-1 w-8 text-xs bg-white border-b  border border-gray-300 text-center"
+                      className="text-xs bg-white border-b  border border-gray-300 text-center"
                     >
                       10
                     </th>
@@ -345,7 +345,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
-                  className="px-2 py-1 w-8 text-xs bg-white border-b  border border-gray-300 text-center"
+                  className="text-xs bg-white border-b  border border-gray-300 text-center"
                 >
                   10
                 </th>
@@ -366,7 +366,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   list.map((_, index) => (
                     <th
                       key={`${listIndex}-${index}`}
-                      className="px-2 py-1 w-8 text-xs bg-gray-50 border-b  border border-gray-300 text-center"
+                      className="text-xs bg-gray-50 border-b  border border-gray-300 text-center"
                     >
                       10
                     </th>
@@ -375,7 +375,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
-                  className="px-2 py-1 w-8 text-xs bg-gray-50 border-b  border border-gray-300 text-center"
+                  className="text-xs bg-gray-50 border-b  border border-gray-300 text-center"
                 >
                   10
                 </th>
@@ -396,7 +396,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   list.map((_, index) => (
                     <th
                       key={`${listIndex}-${index}`}
-                      className="px-2 py-1 w-8 text-xs border-b border border-gray-300 text-center"
+                      className="text-xs border-b border border-gray-300 text-center"
                     >
                       20
                     </th>
@@ -405,20 +405,20 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
               {data?.HeaderData?.retaken?.course_list?.map((_, index) => (
                 <th
                   key={index}
-                  className="px-2 py-1 w-8 text-xs border-b border border-gray-300 text-center"
+                  className="text-xs border-b border border-gray-300 text-center"
                 >
                   20
                 </th>
               ))}
-              <th className="px-2 py-1 text-xs  border-b border border-gray-300 text-center font-bold">
+              <th className=" text-xs  border-b border border-gray-300 text-center font-bold">
                 20
               </th>
               <th className=" border border-gray-300"></th>
               <th className=" border border-gray-300"></th>
-              <th className="px-2 py-1 w-8 text-xs  border-b border border-gray-300  font-bold">
+              <th className="text-xs  border-b border border-gray-300  font-bold">
                 V
               </th>
-              <th className="px-2 py-1 w-8 text-xs  border-b border border-gray-300  font-bold">
+              <th className="text-xs  border-b border border-gray-300  font-bold">
                 NV
               </th>
               <th className=" border border-gray-300"></th>
@@ -430,37 +430,37 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                 <tr className="bg-blue-100 transition">
                   <td
                     rowSpan={7}
-                    className="px-2 py-2 w-8 text-right align-top text-xs font-semibold bg-white border border-gray-300"
+                    className=" text-right align-top text-xs font-semibold bg-white border border-gray-300"
                   >
                     {indexRecord + 1}
                   </td>
                   <td
                     rowSpan={2}
-                    className="px-2 py-2 w-64 text-left align-top text-xs font-semibold border border-gray-300 "
+                    className=" text-left align-top text-xs font-semibold border border-gray-300 "
                   >{`${record.first_name} ${record.last_name} ${record.surname}`}</td>
                   <td
                     rowSpan={2}
-                    className="px-2 py-2 w-8 text-right align-top text-xs font-semibold border border-gray-300 "
+                    className=" text-right align-top text-xs font-semibold border border-gray-300 "
                   >
                     {record.matricule}
                   </td>
                   <td
                     rowSpan={2}
-                    className="px-2 py-2 w-8 text-center align-top text-xs font-semibold border border-gray-300 "
+                    className=" text-center align-top text-xs font-semibold border border-gray-300 "
                   >
                     {record.gender}
                   </td>
                   {/* <td
                                 colSpan={3}
                                 rowSpan={2}
-                                className="px-4 py-1 bg-white border border-gray-300"
+                                className=" bg-white border border-gray-300"
                               ></td> */}
                   {record?.no_retaken.continuous_assessments?.map(
                     (list, listIndex) =>
                       list.map((cc, idx) => (
                         <td
                           key={`${listIndex}-${idx}`}
-                          className="px-2 py-1 text-center text-xs border border-gray-300"
+                          className=" text-center text-xs border border-gray-300"
                         >
                           {cc}
                         </td>
@@ -469,7 +469,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   {record.retaken.continuous_assessments.map((cc, idx) => (
                     <td
                       key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
+                      className=" text-center text-xs border border-gray-300"
                     >
                       {cc}
                     </td>
@@ -486,7 +486,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                     list.map((exam, idx) => (
                       <td
                         key={`${listIndex}-${idx}`}
-                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                        className=" text-center text-xs border border-gray-300"
                       >
                         {exam}
                       </td>
@@ -495,7 +495,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   {record.retaken.exams.map((exam, idx) => (
                     <td
                       key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
+                      className=" text-center text-xs border border-gray-300"
                     >
                       {exam}
                     </td>
@@ -510,7 +510,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                 <tr className=" font-semibold">
                   <td
                     colSpan={3}
-                    className="px-2 py-2 text-xs border text-center border-gray-300"
+                    className=" text-xs border text-center border-gray-300"
                   >
                     Total
                   </td>
@@ -519,7 +519,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                     list.map((total, idx) => (
                       <td
                         key={`${listIndex}-${idx}`}
-                        className="px-2 py-2 text-center text-xs border border-gray-300"
+                        className=" text-center text-xs border border-gray-300"
                         style={{
                           backgroundColor: total >= 10 ? "#f0fdf4" : "#fef2f2",
                           color: total >= 10 ? "#00a63e" : "#e7000b",
@@ -532,7 +532,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   {record.retaken.totals.map((total, idx) => (
                     <td
                       key={idx}
-                      className="px-2 py-2 text-center text-xs border border-gray-300"
+                      className=" text-center text-xs border border-gray-300"
                       style={{
                         backgroundColor:
                           total === null
@@ -547,7 +547,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                     </td>
                   ))}
                   <td
-                    className="px-2 py-2 text-center text-re text-xs border bg-r border-gray-300"
+                    className=" text-center text-re text-xs border bg-r border-gray-300"
                     style={{
                       backgroundColor:
                         record.weighted_average >= 10 ? "#f0fdf4" : "#fef2f2",
@@ -558,7 +558,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                     {record.weighted_average}
                   </td>
                   <td
-                    className="px-2 py-2 text-center text-xs border border-gray-300"
+                    className=" text-center text-xs border border-gray-300"
                     style={{
                       backgroundColor:
                         record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
@@ -569,7 +569,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                     {record.percentage}
                   </td>
                   <td
-                    className="px-2 py-2 text-center text-xs font-bold border border-gray-300"
+                    className=" text-center text-xs font-bold border border-gray-300"
                     style={{
                       backgroundColor:
                         record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
@@ -598,7 +598,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                     }}
                   ></td>
                   <td
-                    className="px-2 py-1 w-24 text-center text-xs font-semibold border border-gray-300 "
+                    className=" w-24 text-center text-xs font-semibold border border-gray-300 "
                     style={{
                       backgroundColor:
                         record.decision === "passed" ? "#f0fdf4" : "#fef2f2",
@@ -612,7 +612,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                 <tr className="bg-gray-50">
                   <td
                     colSpan={3}
-                    className="px-4 py-1  text-xs  border border-gray-300 text-center"
+                    className="  text-xs  border border-gray-300 text-center"
                   >
                     Grade
                   </td>
@@ -620,7 +620,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                     list.map((letter, idx) => (
                       <td
                         key={`${listIndex}-${idx}`}
-                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                        className=" text-center text-xs border border-gray-300"
                       >
                         {letter}
                       </td>
@@ -629,7 +629,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   {record.retaken.grade_letters.map((letter, idx) => (
                     <td
                       key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
+                      className=" text-center text-xs border border-gray-300"
                     >
                       {letter}
                     </td>
@@ -644,7 +644,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                 <tr>
                   <td
                     colSpan={3}
-                    className="px-4 py-1 bg-white text-xs border border-gray-300 text-center"
+                    className=" bg-white text-xs border border-gray-300 text-center"
                   >
                     Validation EC
                   </td>
@@ -652,7 +652,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                     list.map((decision, idx) => (
                       <td
                         key={`${listIndex}-${idx}`}
-                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                        className=" text-center text-xs border border-gray-300"
                       >
                         {getShortGradeValidationText(decision)}
                       </td>
@@ -661,7 +661,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   {record.retaken.course_decisions.map((decision, idx) => (
                     <td
                       key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
+                      className=" text-center text-xs border border-gray-300"
                     >
                       {getShortGradeValidationText(decision)}
                     </td>
@@ -669,10 +669,10 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   <td className="bg-white border border-gray-300"></td>
                   <td className="bg-white border border-gray-300"></td>
                   <td className="bg-white border border-gray-300"></td>
-                  <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
+                  <td className=" text-center text-xs  font-bold border border-gray-300">
                     {record.validated_courses_count}
                   </td>
-                  <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
+                  <td className=" text-center text-xs  font-bold border border-gray-300">
                     {record.unvalidated_courses_count}
                   </td>
                   <td className="bg-white border border-gray-300"></td>
@@ -680,7 +680,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                 <tr className="bg-gray-50">
                   <td
                     colSpan={3}
-                    className="px-4 py-1  text-xs  border border-gray-300 text-center"
+                    className="  text-xs  border border-gray-300 text-center"
                   >
                     Crédits validés
                   </td>
@@ -688,7 +688,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                     list.map((credits, idx) => (
                       <td
                         key={`${listIndex}-${idx}`}
-                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                        className=" text-center text-xs border border-gray-300"
                       >
                         {credits}
                       </td>
@@ -697,7 +697,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   {record.retaken.earned_credits.map((credits, idx) => (
                     <td
                       key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
+                      className=" text-center text-xs border border-gray-300"
                     >
                       {credits}
                     </td>
@@ -705,10 +705,10 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   <td className=" border border-gray-300"></td>
                   <td className=" border border-gray-300"></td>
                   <td className=" border border-gray-300"></td>
-                  <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
+                  <td className=" text-center text-xs  font-bold border border-gray-300">
                     {record.validated_credit_sum}
                   </td>
-                  <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
+                  <td className=" text-center text-xs  font-bold border border-gray-300">
                     {record.unvalidated_credit_sum}
                   </td>
                   <td className=" border border-gray-300"></td>
@@ -716,7 +716,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                 <tr>
                   <td
                     colSpan={3}
-                    className="px-4 py-1 bg-white text-xs  border border-gray-300 text-center"
+                    className=" bg-white text-xs  border border-gray-300 text-center"
                   >
                     Validation UE
                   </td>
@@ -726,7 +726,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                         <td
                           key={`${listIndex}-${idx}`}
                           colSpan={TUcredits.cols_counter}
-                          className="px-2 py-1 text-center text-xs border border-gray-300"
+                          className=" text-center text-xs border border-gray-300"
                         >
                           {getShortGradeValidationText(TUcredits.value)}
                         </td>
@@ -737,7 +737,7 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                       <td
                         key={idx}
                         colSpan={TUcredits.cols_counter}
-                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                        className=" text-center text-xs border border-gray-300"
                       >
                         {getShortGradeValidationText(TUcredits.value)}
                       </td>
@@ -746,10 +746,10 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                   <td className="bg-white border border-gray-300"></td>
                   <td className="bg-white border border-gray-300"></td>
                   <td className="bg-white border border-gray-300"></td>
-                  <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
+                  <td className=" text-center text-xs  font-bold border border-gray-300">
                     {record.validated_TU_count}
                   </td>
-                  <td className="px-2 py-1 text-center text-xs  font-bold border border-gray-300">
+                  <td className=" text-center text-xs  font-bold border border-gray-300">
                     {record.unvalidated_TU_count}
                   </td>
                   <td className="bg-white border border-gray-300"></td>
