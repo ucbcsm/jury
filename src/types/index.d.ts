@@ -1247,8 +1247,8 @@ export type RetakeCourse = z.infer<typeof RetakeCourse>;
 export const ResultGrid = z.object({
   HeaderData: z.object({
     no_retaken: z.object({
-      course_list: z.array(TaughtCourse),
-      credits: z.array(number),
+      course_list: z.array(z.array(TaughtCourse)),
+      credits: z.array(z.array(z.number())),
       period_list: z.array(
         z.object({
           course_counter: z.number(),
@@ -1257,11 +1257,13 @@ export const ResultGrid = z.object({
         })
       ),
       teaching_unit_list: z.array(
-        z.object({
-          course_counter: z.number(),
-          course_id_list: z.array(number),
-          teaching_unit: TeachingUnit,
-        })
+        z.array(
+          z.object({
+            course_counter: z.number(),
+            course_id_list: z.array(z.number()),
+            teaching_unit: TeachingUnit,
+          })
+        )
       ),
     }),
     retaken: z.object({
@@ -1300,31 +1302,35 @@ export const ResultGrid = z.object({
       unvalidated_TU_count: z.number(),
       unvalidated_credit_sum: z.number(),
       validated_TU_count: z.number(),
-      validated_courses_count:z.number(),
-      unvalidated_courses_count:z.number(),
+      validated_courses_count: z.number(),
+      unvalidated_courses_count: z.number(),
       validated_credit_sum: z.number(),
       weighted_average: z.number(),
       no_retaken: z.object({
-        continuous_assessments: z.array(number),
-        course_decisions: z.array(z.enum(["validated", "no_validated"])),
-        earned_credits: z.array(number),
-        exams: z.array(number),
-        grade_letters: z.array(string),
-        teaching_unit_decisions: z.array(
-          z.object({
-            cols_counter: z.number(),
-            name: z.string(),
-            value: z.enum(["validated", "no_validated"]),
-          })
+        continuous_assessments: z.array(z.array(z.number())),
+        course_decisions: z.array(
+          z.array(z.enum(["validated", "no_validated"]))
         ),
-        teaching_units: z.array(number),
-        totals: z.array(number),
+        earned_credits: z.array(z.array(z.number())),
+        exams: z.array(z.array(z.number())),
+        grade_letters: z.array(z.array(z.string())),
+        teaching_unit_decisions: z.array(
+          z.array(
+            z.object({
+              cols_counter: z.number(),
+              name: z.string(),
+              value: z.enum(["validated", "no_validated"]),
+            })
+          )
+        ),
+        teaching_units: z.array(z.array(z.number())),
+        totals: z.array(z.array(z.number())),
       }),
       retaken: z.object({
-        continuous_assessments: z.array(number),
+        continuous_assessments: z.array(z.number()),
         course_decisions: z.array(z.enum(["validated", "no_validated"])),
-        earned_credits: z.array(number),
-        exams: z.array(number),
+        earned_credits: z.array(z.number()),
+        exams: z.array(z.number()),
         grade_letters: z.array(string),
         teaching_unit_decisions: z.array(
           z.object({
@@ -1333,8 +1339,8 @@ export const ResultGrid = z.object({
             value: z.enum(["validated", "no_validated"]),
           })
         ),
-        teaching_units: z.array(number),
-        totals: z.array(number),
+        teaching_units: z.array(z.number()),
+        totals: z.array(z.number()),
       }),
     })
   ),

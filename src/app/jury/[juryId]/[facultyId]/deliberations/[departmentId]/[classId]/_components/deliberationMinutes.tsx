@@ -45,7 +45,7 @@ export const PeriodDeliberationMinutes: FC<PeriodDeliberationMinutesProps> = ({
   const { facultyId, departmentId, classId } = useParams();
 
   const refToPrint = useRef<HTMLDivElement | null>(null);
-  const printListGrades = useReactToPrint({
+  const printDeliberationMinutes = useReactToPrint({
     contentRef: refToPrint,
     documentTitle: `PV-${annoucement.class_year.acronym}-${
       annoucement.departement.name
@@ -88,8 +88,6 @@ export const PeriodDeliberationMinutes: FC<PeriodDeliberationMinutesProps> = ({
   const onClose = () => {
     setAnnoucementId(null);
   };
-
-  console.log(data);
 
   return (
     <Drawer
@@ -143,7 +141,7 @@ export const PeriodDeliberationMinutes: FC<PeriodDeliberationMinutesProps> = ({
             icon={<PrinterOutlined />}
             color="primary"
             variant="dashed"
-            onClick={printListGrades}
+            onClick={printDeliberationMinutes}
             disabled={isPending || data === undefined}
           >
             Imprimer
@@ -234,6 +232,7 @@ export const PeriodDeliberationMinutes: FC<PeriodDeliberationMinutesProps> = ({
                 size="small"
                 pagination={false}
                 style={{ marginTop: 28 }}
+                rowKey="id"
                 columns={[
                   {
                     key: "number",
@@ -349,6 +348,7 @@ export const PeriodDeliberationMinutes: FC<PeriodDeliberationMinutesProps> = ({
               },
             ]}
             pagination={false}
+            rowKey="id"
           />
           <Descriptions
             title="Secrétaire du jury"

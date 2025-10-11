@@ -2,7 +2,7 @@
 
 import { getTaughtCoursAsOptions, postCompensation } from "@/lib/api";
 import { filterOption } from "@/lib/utils";
-import { ResultGrid } from "@/types";
+import { ResultGrid, TaughtCourse } from "@/types";
 import { CloseOutlined, LoadingOutlined, SlidersOutlined } from "@ant-design/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -53,13 +53,14 @@ export const CompensationForm:FC<CompensationFormProps> = ({hearderData, itemDat
   };
 
   const onFinish = (values: FormDataType) => {
-    if(values.courseId_to_add_in === values.courseId_to_withdraw_in){
-      messageApi.error("Le cours donneur et le cours receveur doivent être différents.");
+    if (values.courseId_to_add_in === values.courseId_to_withdraw_in) {
+      messageApi.error(
+        "Le cours donneur et le cours receveur doivent être différents."
+      );
       return;
     }
     // const noRetakecourseToWithDraw = hearderData.no_retaken.course_list.find(course=>course.id===values.courseId_to_withdraw_in)
     // const noRetakecourseToAdd = hearderData.no_retaken.course_list.find(course=>course.id===values.courseId_to_add_in)
-
 
     // if (
     //   noRetakecourseToWithDraw?.teaching_unit?.id !==
@@ -95,6 +96,15 @@ export const CompensationForm:FC<CompensationFormProps> = ({hearderData, itemDat
       }
     );
   };
+
+  const mergeCourses= ()=>{
+    let mergedcourses: TaughtCourse[] = [];
+    
+      hearderData.no_retaken.course_list.forEach((list) => {
+        mergedcourses = [...mergedcourses, ...list];
+      });
+      return mergedcourses
+  }
 
   return (
     <>
@@ -198,9 +208,7 @@ export const CompensationForm:FC<CompensationFormProps> = ({hearderData, itemDat
               filterOption={filterOption}
               style={{ width: "100%" }}
               options={[
-                ...(getTaughtCoursAsOptions(
-                  hearderData.no_retaken.course_list
-                ) || []),
+                ...(getTaughtCoursAsOptions(mergeCourses()) || []),
                 ...(getTaughtCoursAsOptions(hearderData.retaken.course_list) ||
                   []),
               ]}
@@ -235,9 +243,7 @@ export const CompensationForm:FC<CompensationFormProps> = ({hearderData, itemDat
               filterOption={filterOption}
               style={{ width: "100%" }}
               options={[
-                ...(getTaughtCoursAsOptions(
-                  hearderData.no_retaken.course_list
-                ) || []),
+                ...(getTaughtCoursAsOptions(mergeCourses()) || []),
                 ...(getTaughtCoursAsOptions(hearderData.retaken.course_list) ||
                   []),
               ]}
@@ -246,18 +252,18 @@ export const CompensationForm:FC<CompensationFormProps> = ({hearderData, itemDat
           </Form.Item>
         </Form>
         <div
-                  className="h-[calc(100vh-196px)] flex-col justify-center items-center"
-                  style={{ display: !isPending ? "none" : "flex" }}
-                >
-                  <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
-                  <Typography.Title
-                    type="secondary"
-                    level={3}
-                    style={{ marginTop: 10 }}
-                  >
-                    Compensation en cours ...
-                  </Typography.Title>
-                </div>
+          className="h-[calc(100vh-196px)] flex-col justify-center items-center"
+          style={{ display: !isPending ? "none" : "flex" }}
+        >
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+          <Typography.Title
+            type="secondary"
+            level={3}
+            style={{ marginTop: 10 }}
+          >
+            Compensation en cours ...
+          </Typography.Title>
+        </div>
       </Drawer>
     </>
   );

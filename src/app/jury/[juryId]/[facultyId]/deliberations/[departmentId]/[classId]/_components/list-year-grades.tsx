@@ -110,7 +110,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
         variant="dashed"
         color="lime"
         disabled={lastPeriodId === 0}
-        style={{boxShadow:"none"}}
+        style={{ boxShadow: "none" }}
       >
         Voir résultats annuels
       </Button>
@@ -236,15 +236,17 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
               >
                 Unités d&apos;Enseignement
               </th>
-              {data?.HeaderData?.no_retaken?.teaching_unit_list?.map((TU) => (
-                <th
-                  key={TU.teaching_unit.code}
-                  colSpan={TU.course_counter}
-                  className="px-4 py-2 uppercase bg-gray-100 text-xs font-semibold whitespace-nowrap border-b border border-gray-300 text-center"
-                >
-                  {TU.teaching_unit.code}
-                </th>
-              ))}
+              {data?.HeaderData?.no_retaken?.teaching_unit_list?.map((list) =>
+                list.map((TU) => (
+                  <th
+                    key={TU.teaching_unit.code}
+                    colSpan={TU.course_counter}
+                    className="px-4 py-2 uppercase bg-gray-100 text-xs font-semibold whitespace-nowrap border-b border border-gray-300 text-center"
+                  >
+                    {TU.teaching_unit.code}
+                  </th>
+                ))
+              )}
               {data?.HeaderData?.retaken?.teaching_unit_list?.map((TU) => (
                 <th
                   key={TU.teaching_unit.code}
@@ -314,18 +316,20 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
               >
                 Éléments Constitutifs
               </th>
-              {data?.HeaderData?.no_retaken?.course_list?.map((course) => (
-                <th
-                  key={course.id}
-                  style={{
-                    writingMode: "sideways-lr",
-                    textOrientation: "mixed",
-                  }}
-                  className="px-2 py-2 w-8 text-xs font-semibold bg-gray-50 border-b  border border-gray-300 text-left"
-                >
-                  {course.available_course.name}
-                </th>
-              ))}
+              {data?.HeaderData?.no_retaken?.course_list?.map((list) =>
+                list.map((course) => (
+                  <th
+                    key={course.id}
+                    style={{
+                      writingMode: "sideways-lr",
+                      textOrientation: "mixed",
+                    }}
+                    className="px-2 py-2 w-8 text-xs font-semibold bg-gray-50 border-b  border border-gray-300 text-left"
+                  >
+                    {course.available_course.name}
+                  </th>
+                ))
+              )}
               {data?.HeaderData?.retaken?.course_list?.map((course) => (
                 <th
                   key={course.id}
@@ -392,9 +396,9 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                 </th>
               ))}
               <th className="px-2 py-1  text-xs bg-gray-50 border-b border border-gray-300 text-center font-bold">
-                {data?.HeaderData?.no_retaken?.credits?.reduce(
+                {/* {data?.HeaderData?.no_retaken?.credits?.reduce(
                   (prevValue, currenValue) => currenValue + prevValue
-                )}
+                )} */}
               </th>
               <th className="bg-gray-50 border border-gray-300"></th>
               <th className="bg-gray-50 border border-gray-300"></th>
@@ -612,23 +616,25 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                     Total
                   </td>
 
-                  {record.no_retaken.totals.map((total, idx) => (
-                    <td
-                      key={idx}
-                      className="px-2 py-2 text-center text-xs border border-gray-300"
-                      style={{
-                        backgroundColor:
-                          total === null
-                            ? "#fff"
-                            : total >= 10
-                            ? "#f0fdf4"
-                            : "#fef2f2",
-                        color: total >= 10 ? "#00a63e" : "#e7000b",
-                      }}
-                    >
-                      {total}
-                    </td>
-                  ))}
+                  {record.no_retaken.totals.map((list, listIndex) =>
+                    list.map((total, idx) => (
+                      <td
+                        key={`${listIndex}-${idx}`}
+                        className="px-2 py-2 text-center text-xs border border-gray-300"
+                        style={{
+                          backgroundColor:
+                            total === null
+                              ? "#fff"
+                              : total >= 10
+                              ? "#f0fdf4"
+                              : "#fef2f2",
+                          color: total >= 10 ? "#00a63e" : "#e7000b",
+                        }}
+                      >
+                        {total}
+                      </td>
+                    ))
+                  )}
                   {record.retaken.totals.map((total, idx) => (
                     <td
                       key={idx}
@@ -746,14 +752,16 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                   >
                     Validation EC
                   </td>
-                  {record.no_retaken.course_decisions.map((decision, idx) => (
-                    <td
-                      key={idx}
-                      className="px-2 py-1 text-center text-xs border border-gray-300"
-                    >
-                      {getShortGradeValidationText(decision)}
-                    </td>
-                  ))}
+                  {record.no_retaken.course_decisions.map((list, listIndex) =>
+                    list.map((decision, idx) => (
+                      <td
+                        key={`${listIndex}-${idx}`}
+                        className="px-2 py-1 text-center text-xs border border-gray-300"
+                      >
+                        {getShortGradeValidationText(decision)}
+                      </td>
+                    ))
+                  )}
                   {record.retaken.course_decisions.map((decision, idx) => (
                     <td
                       key={idx}
@@ -815,15 +823,16 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                     Validation UE
                   </td>
                   {record.no_retaken.teaching_unit_decisions.map(
-                    (TUcredits, idx) => (
-                      <td
-                        key={idx}
-                        colSpan={TUcredits.cols_counter}
-                        className="px-2 py-1 text-center text-xs border border-gray-300"
-                      >
-                        {getShortGradeValidationText(TUcredits.value)}
-                      </td>
-                    )
+                    (list, listIndex) =>
+                      list.map((TUcredits, idx) => (
+                        <td
+                          key={`${listIndex}-${idx}`}
+                          colSpan={TUcredits.cols_counter}
+                          className="px-2 py-1 text-center text-xs border border-gray-300"
+                        >
+                          {getShortGradeValidationText(TUcredits.value)}
+                        </td>
+                      ))
                   )}
                   {record.retaken.teaching_unit_decisions.map(
                     (TUcredits, idx) => (
