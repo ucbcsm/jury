@@ -19,7 +19,7 @@ import dayjs from "dayjs";
 import { useParams } from "next/navigation";
 import { FC, useState } from "react";
 import { NewAnnoucementWithAllForm } from "./new-announcement-with-all-form";
-import { Announcement, Class, Department, Period } from "@/types";
+import { Announcement, Class, Department, Jury, Period } from "@/types";
 import { parseAsBoolean, parseAsInteger, useQueryState } from "nuqs";
 import { ListPeriodGrades } from "./list-period-grades";
 import { DeleteAnnouncementForm } from "./delete-announcement-form";
@@ -28,18 +28,29 @@ import { ListYearGrades } from "./list-year-grades";
 import { EditAnnouncementForm } from "./edit-anouncement-form";
 import { PeriodResultPresentation } from "./periodResultPresentation";
 import { YearResultPresentation } from "./yearResultPresentation";
+import { PeriodDeliberationMinutes } from "./deliberationMinutes";
+import { set } from "zod";
+import { useJury } from "@/hooks/useJury";
 
 
 type ActionsBarProps = {
   announcement: Announcement;
   periods?: Period[];
+  jury?:Jury
 };
-const ActionsBar: FC<ActionsBarProps> = ({ announcement, periods }) => {
+const ActionsBar: FC<ActionsBarProps> = ({ announcement, periods, jury }) => {
   const [announcementId, setAnnoucementId] = useQueryState(
     "grid",
     parseAsInteger
   );
-  const [resultPresentationId, setResultPresentationId] = useQueryState("result-presentation", parseAsInteger);
+  const [resultPresentationId, setResultPresentationId] = useQueryState(
+    "result-presentation",
+    parseAsInteger
+  );
+  const [deliberationMinutesId, setDeliberationMinutesId] = useQueryState(
+    "deliberation-minutes",
+    parseAsInteger
+  );
 
   const [openDeleteAnnouncement, setOpenDeleteAnnouncement] =
     useState<boolean>(false);
@@ -51,6 +62,12 @@ const ActionsBar: FC<ActionsBarProps> = ({ announcement, periods }) => {
         annoucement={announcement}
         announcementId={announcementId}
         setAnnoucementId={setAnnoucementId}
+      />
+      <PeriodDeliberationMinutes
+        annoucement={announcement}
+        announcementId={deliberationMinutesId}
+        setAnnoucementId={setDeliberationMinutesId}
+        jury={jury}
       />
       <PeriodResultPresentation
         annoucement={announcement}
@@ -88,7 +105,9 @@ const ActionsBar: FC<ActionsBarProps> = ({ announcement, periods }) => {
                 key: "deliberation-minutes",
                 label: "Procès-verbal",
                 icon: <FileTextOutlined />,
-                onClick: () => {},
+                onClick: () => {
+                  setDeliberationMinutesId(announcement.id);
+                },
               },
               // {
               //   key: "grade-report",
@@ -101,7 +120,7 @@ const ActionsBar: FC<ActionsBarProps> = ({ announcement, periods }) => {
                 icon: <LineChartOutlined />,
                 onClick: () => {
                   setResultPresentationId(announcement.id);
-                }
+                },
               },
               {
                 type: "divider",
@@ -189,7 +208,7 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
   classYear,
   periods,
 }) => {
-  const { facultyId, departmentId, classId } = useParams();
+  const { facultyId, departmentId, classId, juryId } = useParams();
   const [openNewWithAll, setOpenNewWithAll] = useQueryState(
     "new-with-all",
     parseAsBoolean.withDefault(false)
@@ -199,7 +218,13 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
     parseAsBoolean.withDefault(false)
   );
 
-  const [openYearResultPresentation, setOpenYearResultPresentation] = useQueryState("year-result-presentation", parseAsBoolean.withDefault(false));
+  const [openYearResultPresentation, setOpenYearResultPresentation] =
+    useQueryState(
+      "year-result-presentation",
+      parseAsBoolean.withDefault(false)
+    );
+
+    const { data: jury } = useJury(Number(juryId));
 
   const { data, isPending, isError } = useQuery({
     queryKey: ["announcements", yearId, facultyId, departmentId, classId],
@@ -414,7 +439,11 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
               key: "actions",
               dataIndex: "view",
               render: (_, record) => (
-                <ActionsBar announcement={record} periods={periods} />
+                <ActionsBar
+                  announcement={record}
+                  periods={periods}
+                  jury={jury}
+                />
               ),
               width: 188,
               fixed: "right",

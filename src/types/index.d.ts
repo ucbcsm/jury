@@ -1410,3 +1410,51 @@ export type YearResultPresentationItem = {
   validated_credit_total: number;
   weighted_average: number;
 };
+
+const DeliberationMinutesDataBodyItem = z.object({
+  title: z.string(),
+  student_list: z.array(
+    z.object({
+      decision: z.enum(["passed", "postponed"]),
+      first_name: z.string(),
+      gender: z.enum(["M", "F"]),
+      grade: z.string(),
+      id: z.number(),
+      last_name: z.string(),
+      matricule: z.string(),
+      percentage: z.number(),
+      surname: z.string(),
+      weighted_average: z.number(),
+    })
+  ),
+});
+
+export const DeliberationMinutesData = z.object({
+  body: z.object({
+    A: DeliberationMinutesDataBodyItem,
+    B: DeliberationMinutesDataBodyItem,
+    C: DeliberationMinutesDataBodyItem,
+    D: DeliberationMinutesDataBodyItem,
+    E: DeliberationMinutesDataBodyItem,
+    F: DeliberationMinutesDataBodyItem,
+    G: DeliberationMinutesDataBodyItem,
+  }),
+  general_statistics: z.object({
+    female_count: z.number(),
+    male_count: z.number(),
+    passed_count: z.number(),
+    postponed_count: z.number(),
+    total_class_announced: z.number(),
+    total_class_enrolled: z.number(),
+  }),
+  grade_statistics: z.object({
+    A: z.object({ count: z.number(), percentage: z.number() }),
+    B: z.object({ count: z.number(), percentage: z.number() }),
+    C: z.object({ count: z.number(), percentage: z.number() }),
+    D: z.object({ count: z.number(), percentage: z.number() }),
+    E: z.object({ count: z.number(), percentage: z.number() }),
+    F: z.object({ count: z.number(), percentage: z.number() }),
+    G: z.object({ count: z.number(), percentage: z.number() }),
+  }),
+});
+export type DeliberationMinutesData = z.infer<typeof DeliberationMinutesData>;

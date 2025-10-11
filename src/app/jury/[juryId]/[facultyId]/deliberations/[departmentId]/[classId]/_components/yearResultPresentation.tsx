@@ -71,8 +71,6 @@ export const YearResultPresentation: FC<
     enabled: !!yid && !!facultyId && !!departmentId && !!classId,
   });
 
-  console.log(data)
-
   const onClose = () => {
     setOpen(false);
     setSession("main_session");

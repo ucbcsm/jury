@@ -1,6 +1,7 @@
 "use client";
 
 import { DataFetchErrorResult } from "@/components/errorResult";
+import { useJury } from "@/hooks/useJury";
 import { getJury } from "@/lib/api";
 import { getHSLColor } from "@/lib/utils";
 import { RightOutlined, SafetyCertificateOutlined } from "@ant-design/icons";
@@ -20,21 +21,13 @@ import {
   Typography,
 } from "antd";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 
 export default function Page() {
   const { juryId } = useParams();
-  const router = useRouter();
 
-  const {
-    data: jury,
-    isPending,
-    isError,
-  } = useQuery({
-    queryKey: ["jury", juryId],
-    queryFn: ({ queryKey }) => getJury(Number(queryKey[1])),
-    enabled: !!juryId,
-  });
+  const { data: jury, isPending, isError } = useJury(Number(juryId));
+
   if (isError) {
     return (
       <div className=" max-w-6xl mx-auto pt-7 px-2">
