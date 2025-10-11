@@ -891,7 +891,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
             }
           />
         )}
-        <PrintableListGrades
+        {/* <PrintableListGrades
           ref={refToPrint}
           data={data}
           forYearResult={{
@@ -901,7 +901,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
             session,
             moment,
           }}
-        />
+        /> */}
       </Drawer>
     </>
   );
