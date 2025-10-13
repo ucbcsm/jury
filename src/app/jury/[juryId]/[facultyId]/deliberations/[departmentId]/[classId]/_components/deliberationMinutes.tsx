@@ -25,6 +25,7 @@ import React, { FC, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { getDeliberationMinutes } from "@/lib/api/deliberation-minutes";
 import { record } from "zod";
+import { PrintableDeliberationMinutes } from "./printable/printDeliberationMinutes";
 
 type PeriodDeliberationMinutesProps = {
   annoucement: Announcement;
@@ -411,11 +412,12 @@ export const PeriodDeliberationMinutes: FC<PeriodDeliberationMinutesProps> = ({
           }
         />
       )}
-      {/* <PrintablePeriodResultPresentation
+      <PrintableDeliberationMinutes
         ref={refToPrint}
         annoucement={annoucement}
         data={data}
-      /> */}
+        jury={jury}
+      />
     </Drawer>
   );
 };
