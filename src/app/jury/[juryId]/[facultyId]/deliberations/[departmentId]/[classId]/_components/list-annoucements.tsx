@@ -28,9 +28,10 @@ import { ListYearGrades } from "./list-year-grades";
 import { EditAnnouncementForm } from "./edit-anouncement-form";
 import { PeriodResultPresentation } from "./periodResultPresentation";
 import { YearResultPresentation } from "./yearResultPresentation";
-import { PeriodDeliberationMinutes } from "./deliberationMinutes";
+import { PeriodDeliberationMinutes } from "./periodDeliberationMinutes";
 import { set } from "zod";
 import { useJury } from "@/hooks/useJury";
+import { YearDeliberationMinutes } from "./yearDeliberationMinutes";
 
 
 type ActionsBarProps = {
@@ -224,6 +225,11 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
       parseAsBoolean.withDefault(false)
     );
 
+  const [openDeliberationMinutes, setOpenDeliberationMinutes] = useQueryState(
+    "yearly-deliberation-minutes",
+    parseAsBoolean.withDefault(false)
+  );
+
     const { data: jury } = useJury(Number(juryId));
 
   const { data, isPending, isError } = useQuery({
@@ -329,7 +335,9 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
                         key: "deliberation-minutes",
                         label: "Procès-verbal annuel",
                         icon: <FileTextOutlined />,
-                        onClick: () => {},
+                        onClick: () => {
+                          setOpenDeliberationMinutes(true);
+                        },
                         disabled: getLastPeriodId() === 0,
                       },
                       {
@@ -352,6 +360,14 @@ export const ListAnnouncements: FC<ListAnnouncementsProps> = ({
                   lastPeriodId={getLastPeriodId()}
                   open={openYearResultPresentation}
                   setOpen={setOpenYearResultPresentation}
+                />
+                <YearDeliberationMinutes
+                  department={department}
+                  classYear={classYear}
+                  lastPeriodId={getLastPeriodId()}
+                  open={openDeliberationMinutes}
+                  setOpen={setOpenDeliberationMinutes}
+                  jury={jury}
                 />
               </Space>
             </header>

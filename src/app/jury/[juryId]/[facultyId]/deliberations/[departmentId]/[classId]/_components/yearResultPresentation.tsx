@@ -41,7 +41,7 @@ export const YearResultPresentation: FC<
   );
 
   const refToPrint = useRef<HTMLDivElement | null>(null);
-  const printListGrades = useReactToPrint({
+  const printResultPresenation = useReactToPrint({
     contentRef: refToPrint,
     documentTitle: `presentation-resultat-${yid}`,
   });
@@ -155,7 +155,7 @@ export const YearResultPresentation: FC<
             icon={<PrinterOutlined />}
             color="primary"
             variant="dashed"
-            onClick={printListGrades}
+            onClick={printResultPresenation}
             disabled={isPending || data?.length === 0}
           >
             Imprimer
@@ -165,7 +165,7 @@ export const YearResultPresentation: FC<
             type="text"
             icon={<CloseOutlined />}
             onClick={onClose}
-            title="Fermer la grille"
+            title="Fermer"
           />
         </Space>
       }

@@ -8,8 +8,11 @@ import {
 } from "@/lib/api";
 import {
   Announcement,
+  Class,
   DeliberationMinutesData,
+  Department,
   Jury,
+  Year,
 } from "@/types";
 import { Card, Descriptions, Divider, Empty, Space, Table, Tag, Typography } from "antd";
 import React, { FC, RefObject } from "react";
@@ -18,12 +21,20 @@ type PrintableDeliberationMinutesProps = {
   ref: RefObject<HTMLDivElement | null>;
   annoucement?: Announcement;
   data?: DeliberationMinutesData;
-  jury?:Jury
+  forYearResult?: {
+    year?: Year;
+    department?: Department;
+    classYear?: Class;
+    session: "main_session" | "retake_session";
+    moment: "before_appeal" | "after_appeal";
+  };
+  jury?: Jury;
 };
 export const PrintableDeliberationMinutes: FC<PrintableDeliberationMinutesProps> = ({
   ref,
   annoucement,
   data,
+  forYearResult,
   jury,
 }) => {
   return (
@@ -78,6 +89,47 @@ export const PrintableDeliberationMinutes: FC<PrintableDeliberationMinutesProps>
             />
           </Card>
         )}
+        {forYearResult && (
+                  <Card style={{ marginBottom: 28 }}>
+                    <Descriptions
+                      title="Procès-verbal de délibération annuel"
+                      column={2}
+                      bordered
+                      items={[
+                        {
+                          key: "year",
+                          label: "Année académique",
+                          children: `${forYearResult?.year?.name || ""}`,
+                        },
+                        {
+                          key: "faculty",
+                          label: "Filière",
+                          children: forYearResult.department?.faculty.name || "",
+                        },
+                        {
+                          key: "department",
+                          label: "Mention",
+                          children: forYearResult?.department?.name || "",
+                        },
+                        {
+                          key: "class",
+                          label: "Promotion",
+                          children: `${forYearResult.classYear?.acronym} (${forYearResult?.classYear?.name})`,
+                        },
+                        {
+                          key: "session",
+                          label: "Session",
+                          children: getSessionText(forYearResult.session),
+                        },
+                        {
+                          key: "moment",
+                          label: "Moment",
+                          children: getMomentText(forYearResult.moment),
+                        },
+                      ]}
+                    />
+                  </Card>
+                )}
         <Divider />
         {data && (
           <div className=" max-w-3xl mx-auto">

@@ -100,7 +100,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
     setSession("main_session");
     setMoment("before_appeal");
   };
-console.log(data)
+
   return (
     <>
       <Button

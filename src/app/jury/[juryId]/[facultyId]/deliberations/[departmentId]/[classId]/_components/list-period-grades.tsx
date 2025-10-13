@@ -81,8 +81,6 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
     setAnnoucementId(null);
   };
 
-  console.log(data);
-
   return (
     <Drawer
       width="100%"

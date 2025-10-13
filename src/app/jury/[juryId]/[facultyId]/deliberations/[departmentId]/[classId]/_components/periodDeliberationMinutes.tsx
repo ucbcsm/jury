@@ -6,12 +6,10 @@ import { CloseOutlined, PrinterOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
   Button,
-  Card,
   Descriptions,
   Divider,
   Drawer,
   Empty,
-  List,
   Result,
   Space,
   Table,
@@ -24,7 +22,6 @@ import { Options } from "nuqs";
 import React, { FC, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { getDeliberationMinutes } from "@/lib/api/deliberation-minutes";
-import { record } from "zod";
 import { PrintableDeliberationMinutes } from "./printable/printDeliberationMinutes";
 
 type PeriodDeliberationMinutesProps = {
