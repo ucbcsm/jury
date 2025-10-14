@@ -1231,15 +1231,22 @@ export const Announcement = z.object({
 
 export type Announcement = z.infer<typeof Announcement>;
 
+
+export const RetakeCourseReason = z.object({
+  id: z.number(),
+  reason: z.enum(["low_attendance", "missing_course", "failed_course"]),
+  academic_year: Year,
+  available_course: Course,
+  class_year: Class,
+});
+
 export const RetakeCourse = z.object({
   id: z.number(),
   user: User,
-  retake_course_list: z.array(Course),
-  retake_course_done_list: z.array(Course),
+  retake_course_list: z.array(RetakeCourseReason),
+  retake_course_done_list: z.array(RetakeCourseReason),
   faculty: Faculty,
   departement: Department,
-  class_year: Class,
-  academic_year: Year,
 });
 
 export type RetakeCourse = z.infer<typeof RetakeCourse>;

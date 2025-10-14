@@ -1,19 +1,23 @@
 "use client";
 
 import { useYid } from "@/hooks/use-yid";
-import { getAppeals, getFacultiesAAsOptionsWithAcronym, getJury } from "@/lib/api";
+import {
+  getAppeals,
+  getFacultiesAAsOptionsWithAcronym,
+} from "@/lib/api";
 import { logout } from "@/lib/api/auth";
 import { filterOption } from "@/lib/utils";
 import {
+  AppstoreOutlined,
   CloseOutlined,
   FileTextOutlined,
   FontSizeOutlined,
   FormOutlined,
-  HomeOutlined,
   LoadingOutlined,
   LogoutOutlined,
   MailOutlined,
   MenuOutlined,
+  SolutionOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
@@ -39,6 +43,7 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useState } from "react";
 import { ListLetterGradings } from "./[facultyId]/letter-gradings/_components/list-letter-gradings";
+import { useJury } from "@/hooks/useJury";
 
 export default function FacultyLayout({
   children,
@@ -46,7 +51,7 @@ export default function FacultyLayout({
   children: React.ReactNode;
 }>) {
   const {
-    token: { colorBgContainer, borderRadiusLG},
+    token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoadingLogout, setIsLoadingLogout] = useState<boolean>(false);
@@ -60,15 +65,7 @@ export default function FacultyLayout({
 
   const { removeYid } = useYid();
 
-  const {
-    data: jury,
-    isPending,
-    isError,
-  } = useQuery({
-    queryKey: ["jury", juryId],
-    queryFn: ({ queryKey }) => getJury(Number(queryKey[1])),
-    enabled: !!juryId,
-  });
+  const { data: jury, isPending } = useJury(Number(juryId));
 
   const {
     data: appealsData,
@@ -137,7 +134,7 @@ export default function FacultyLayout({
                 variant="filled"
                 filterOption={filterOption}
                 options={getFacultiesAAsOptionsWithAcronym(jury?.faculties)}
-                style={{ width: 128 }}
+                // style={{ width: 128 }}
                 loading={isPending}
                 onSelect={(value) => {
                   router.push(`/jury/${juryId}/${value}/grade-entry`);
@@ -237,8 +234,8 @@ export default function FacultyLayout({
                 items={[
                   {
                     key: `/jury/${juryId}`,
-                    label: <Link href={`/jury/${juryId}`}>Accueil</Link>,
-                    icon: <HomeOutlined />,
+                    label: <Link href={`/jury/${juryId}`}>Aperçu</Link>,
+                    icon: <AppstoreOutlined />,
                   },
                   {
                     key: `/jury/${juryId}/${facultyId}/grade-entry`,
@@ -275,7 +272,18 @@ export default function FacultyLayout({
                     icon: <MailOutlined />,
                     disabled: typeof facultyId === "undefined",
                   },
-                  
+                  {
+                    key: `/jury/${juryId}/${facultyId}/courses-to-retake`,
+                    label: (
+                      <Link
+                        href={`/jury/${juryId}/${facultyId}/courses-to-retake`}
+                      >
+                        Cours à reprendre
+                      </Link>
+                    ),
+                    icon: <SolutionOutlined />, //<RedoOutlined />,
+                    disabled: typeof facultyId === "undefined",
+                  },
                   {
                     key: `/jury/${juryId}/${facultyId}/letter-gradings`,
                     label: "Notation en lettres",
