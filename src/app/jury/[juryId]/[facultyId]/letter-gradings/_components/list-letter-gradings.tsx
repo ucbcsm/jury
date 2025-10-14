@@ -48,32 +48,32 @@ export const ListLetterGradings: FC<ListLetterGradingsProps> = ({
 
   const onClose = () => setOpen(false);
 
-  if (isPending) {
-    return (
-      <div
-        style={{
-          padding: 32,
-          overflowY: "auto",
-          height: "calc(100vh - 110px)",
-        }}
-      >
-        <DataFetchPendingSkeleton />
-      </div>
-    );
-  }
-  if (isError) {
-    return (
-      <div
-        style={{
-          padding: 32,
-          overflowY: "auto",
-          height: "calc(100vh - 110px)",
-        }}
-      >
-        <DataFetchErrorResult />
-      </div>
-    );
-  }
+  // if (isPending) {
+  //   return (
+  //     <div
+  //       style={{
+  //         padding: 32,
+  //         overflowY: "auto",
+  //         height: "calc(100vh - 110px)",
+  //       }}
+  //     >
+  //       <DataFetchPendingSkeleton />
+  //     </div>
+  //   );
+  // }
+  // if (isError) {
+  //   return (
+  //     <div
+  //       style={{
+  //         padding: 32,
+  //         overflowY: "auto",
+  //         height: "calc(100vh - 110px)",
+  //       }}
+  //     >
+  //       <DataFetchErrorResult />
+  //     </div>
+  //   );
+  // }
 
   return (
     <Drawer
@@ -85,6 +85,7 @@ export const ListLetterGradings: FC<ListLetterGradingsProps> = ({
       maskClosable
       width="50%"
       styles={{ header: { background: colorPrimary, color: "#fff" } }}
+      loading={isPending}
     >
       <Table
         columns={[

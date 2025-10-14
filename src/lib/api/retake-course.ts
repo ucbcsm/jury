@@ -3,24 +3,24 @@ import api from "../fetcher";
 
 export async function getRetakeCourses(queryParams?: {
   facultyId?: number;
-  departementId?: number;
+  departmentId?: number;
   page?: number;
-  page_size?: number;
+  pageSize?: number;
 }) {
-  const { facultyId, departementId, page, page_size } = queryParams || {};
+  const { facultyId, departmentId, page, pageSize } = queryParams || {};
   const query = new URLSearchParams();
 
   if (facultyId !== undefined) {
     query.append("faculty__id", facultyId.toString());
   }
-  if (departementId !== undefined) {
-    query.append("departement__id", departementId.toString());
+  if (departmentId !== undefined) {
+    query.append("departement__id", departmentId.toString());
   }
   if (page !== undefined) {
     query.append("page", page.toString());
   }
-  if (page_size !== undefined) {
-    query.append("page_size", page_size.toString());
+  if (pageSize !== undefined) {
+    query.append("page_size", pageSize.toString());
   }
 
   const res = await api.get(`/jury/retake-course/?${query.toString()}`);
@@ -30,4 +30,19 @@ export async function getRetakeCourses(queryParams?: {
     previous: number | null;
     results: RetakeCourse[];
   };
+}
+
+export function getRetakeReasonText(
+    reason: "low_attendance" | "missing_course" | "failed_course"
+) {
+    switch (reason) {
+        case "failed_course":
+            return "Échec au cours";
+        case "low_attendance":
+            return "Faible assiduité";
+        case "missing_course":
+            return "Cours manquant";
+        default:
+            return "Inconnue";
+    }
 }

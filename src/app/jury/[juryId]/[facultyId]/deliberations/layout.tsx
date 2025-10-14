@@ -1,7 +1,16 @@
 "use client";
 
-import { getClasses, getDepartmentsByFacultyId, getJury, getPeriodsByYear } from "@/lib/api";
-import { SearchOutlined, SubnodeOutlined, TagOutlined } from "@ant-design/icons";
+import {
+  getClasses,
+  getDepartmentsByFacultyId,
+  getJury,
+  getPeriodsByYear,
+} from "@/lib/api";
+import {
+  SearchOutlined,
+  SubnodeOutlined,
+  TagOutlined,
+} from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
   Collapse,
@@ -24,49 +33,51 @@ export default function DeliberationsLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const {token:{colorBorder}}=theme.useToken()
+  const {
+    token: { colorBorder },
+  } = theme.useToken();
   const { juryId, facultyId } = useParams();
 
-    const { data: departments, isPending: isPendingDepartment } = useQuery({
-      queryKey: ["departments", facultyId],
-      queryFn: ({ queryKey }) => getDepartmentsByFacultyId(Number(queryKey[1])),
-      enabled: !!facultyId,
-    });
+  const { data: departments, isPending: isPendingDepartment } = useQuery({
+    queryKey: ["departments", facultyId],
+    queryFn: ({ queryKey }) => getDepartmentsByFacultyId(Number(queryKey[1])),
+    enabled: !!facultyId,
+  });
 
-    const {
-        data: classes,
-        isPending:isPendingClasses,
-        isError:isErrorClasses,
-      } = useQuery({
-        queryKey: ["classes"],
-        queryFn: getClasses,
-      });
-  
-    const getDepartmentsAsCollapseItems = () => {
-      const items = departments?.map((dep) => ({
-        key: `/faculty/${dep.faculty.id}/department/${dep.id}`,
-        label: dep.name,
-        icon: <SubnodeOutlined />,
-        children: (
-          <div className="pl-8">
-            <TreeClasses classes={classes} department={dep} />
-            {/* <ListClasses classes={classes} department={dep}/> */}
-          </div>
-        ),
-        styles: {
-          header: {
-            background: "#fff",
-            fontWeight: 700,
-          },
-          body: { background: "#fff" },
+  const {
+    data: classes,
+    isPending: isPendingClasses,
+    isError: isErrorClasses,
+  } = useQuery({
+    queryKey: ["classes"],
+    queryFn: getClasses,
+  });
+
+  const getDepartmentsAsCollapseItems = () => {
+    const items = departments?.map((dep) => ({
+      key: `/faculty/${dep.faculty.id}/department/${dep.id}`,
+      label: dep.name,
+      icon: <SubnodeOutlined />,
+      children: (
+        <div className="pl-8">
+          <TreeClasses classes={classes} department={dep} />
+          {/* <ListClasses classes={classes} department={dep}/> */}
+        </div>
+      ),
+      styles: {
+        header: {
+          background: "#fff",
+          fontWeight: 700,
         },
-      }));
-      return items as CollapseProps["items"];
-    };
+        body: { background: "#fff" },
+      },
+    }));
+    return items as CollapseProps["items"];
+  };
 
   return (
     <Splitter style={{ height: `calc(100vh - 110px)` }}>
-      <Splitter.Panel defaultSize="20%" min="20%" max="25%">
+      <Splitter.Panel defaultSize={320} min={320} max="25%">
         <Flex
           style={{
             paddingLeft: 16,
