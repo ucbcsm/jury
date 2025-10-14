@@ -6,12 +6,12 @@ import {
   Collapse,
   type CollapseProps,
   Flex,
+  Skeleton,
   Splitter,
   theme,
   Typography,
 } from "antd";
 import { useParams } from "next/navigation";
-import { ListCourse } from "./_components/list-course";
 import { DataFetchPendingSkeleton } from "@/components/loadingSkeleton";
 import { DataFetchErrorResult } from "@/components/errorResult";
 import { TreeCourses } from "./_components/tree-courses";
@@ -81,15 +81,10 @@ export default function GradeEntryLayout({
             Cours / Périodes
           </Typography.Title>
         </Flex>
-       
+
         {isPendingPeriods && (
           <div className="p-4">
-            <DataFetchPendingSkeleton />
-          </div>
-        )}
-        {isErrorPeriods && (
-          <div className="p-4">
-            <DataFetchErrorResult />
+            <Skeleton active />
           </div>
         )}
         {periods && (
@@ -101,9 +96,7 @@ export default function GradeEntryLayout({
           />
         )}
       </Splitter.Panel>
-      <Splitter.Panel>
-        {children}
-      </Splitter.Panel>
+      <Splitter.Panel>{children}</Splitter.Panel>
     </Splitter>
   );
 }

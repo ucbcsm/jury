@@ -317,9 +317,9 @@ export const PrintableListGrades: FC<PrintableListGradesProps> = ({
                 </th>
               ))}
               <th className="  text-xs bg-gray-50 border-b border border-gray-300 text-center font-bold">
-                {/* {data?.HeaderData?.no_retaken?.credits?.reduce(
-                  (prevValue, currenValue) => currenValue + prevValue
-                )} */}
+                {data?.HeaderData?.no_retaken?.credits
+                  ?.flat()
+                  .reduce((sum, value) => sum + value, 0)}
               </th>
               <th className="bg-gray-50 border border-gray-300"></th>
               <th className="bg-gray-50 border border-gray-300"></th>

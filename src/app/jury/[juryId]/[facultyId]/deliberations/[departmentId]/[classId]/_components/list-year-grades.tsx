@@ -2,7 +2,9 @@
 
 import {
   getDecisionText,
+  getMomentText,
   getResultGrid,
+  getSessionText,
   getShortGradeValidationText,
 } from "@/lib/api";
 import { Class, Department } from "@/types";
@@ -66,7 +68,11 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
   const refToPrint = useRef<HTMLDivElement | null>(null);
   const printListGrades = useReactToPrint({
     contentRef: refToPrint,
-    documentTitle: `Resultat-${yid}`,
+    documentTitle: `grille-resultats-${year?.name}-${classYear?.acronym}-${
+      department?.acronym
+    }-${getMomentText(moment).replace(" ", "-")}-${getSessionText(
+      session
+    ).replace(" ", "-")}`,
   });
 
   const { data, isPending, isError, error } = useQuery({
@@ -310,7 +316,7 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
               </th>
               <th rowSpan={2} className="bg-white border border-gray-300"></th>
             </tr>
-            <tr className="sticky top-[33px] z-10  ">
+            <tr className="sticky top-[27px] z-10  ">
               <th
                 colSpan={4}
                 className="sticky left-0   bg-gray-50 text-xs font-semibold  border border-gray-300"
@@ -402,9 +408,9 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                 </th>
               ))}
               <th className="  text-xs bg-gray-50 border-b border border-gray-300 text-center font-bold">
-                {/* {data?.HeaderData?.no_retaken?.credits?.reduce(
-                  (prevValue, currenValue) => currenValue + prevValue
-                )} */}
+                {data?.HeaderData?.no_retaken?.credits
+                  ?.flat()
+                  .reduce((sum, value) => sum + value, 0)}
               </th>
               <th className="bg-gray-50 border border-gray-300"></th>
               <th className="bg-gray-50 border border-gray-300"></th>

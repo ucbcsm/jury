@@ -45,11 +45,13 @@ export const PeriodDeliberationMinutes: FC<PeriodDeliberationMinutesProps> = ({
   const refToPrint = useRef<HTMLDivElement | null>(null);
   const printDeliberationMinutes = useReactToPrint({
     contentRef: refToPrint,
-    documentTitle: `PV-${annoucement.class_year.acronym}-${
-      annoucement.departement.name
-    }-${getSessionText(annoucement.session)}-${getMomentText(
+    documentTitle: `PV-${annoucement.period.acronym}-${
+      annoucement.academic_year.name
+    }-${annoucement.class_year.acronym}-${
+      annoucement.departement.acronym
+    }-${getSessionText(annoucement.session).replace(" ", "-")}-${getMomentText(
       annoucement.moment
-    )}`,
+    ).replace(" ", "-")}`,
   });
 
   const { data, isPending, isError, error } = useQuery({

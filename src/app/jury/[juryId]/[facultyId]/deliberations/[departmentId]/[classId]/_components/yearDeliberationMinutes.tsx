@@ -24,7 +24,7 @@ import { useReactToPrint } from "react-to-print";
 import { useYid } from "@/hooks/use-yid";
 import { getDeliberationMinutes } from "@/lib/api/deliberation-minutes";
 import { PrintableDeliberationMinutes } from "./printable/printDeliberationMinutes";
-import { getDecisionText } from "@/lib/api";
+import { getDecisionText, getMomentText, getSessionText } from "@/lib/api";
 
 type YearDeliberationMinutesProps = {
   department?: Department;
@@ -64,7 +64,11 @@ export const YearDeliberationMinutes: FC<YearDeliberationMinutesProps> = ({
   const refToPrint = useRef<HTMLDivElement | null>(null);
   const printDeliberationMinutes = useReactToPrint({
     contentRef: refToPrint,
-    documentTitle: `presentation-resultat-${yid}`,
+    documentTitle: `PV-${year?.name}-${classYear?.acronym}-${
+      department?.acronym
+    }-${getMomentText(moment).replace(" ", "-")}-${getSessionText(
+      session
+    ).replace(" ", "-")}`,
   });
 
   const { data, isPending, isError, error } = useQuery({
@@ -99,7 +103,7 @@ export const YearDeliberationMinutes: FC<YearDeliberationMinutesProps> = ({
     setSession("main_session");
     setMoment("before_appeal");
   };
-  console.log(data);
+
   return (
     <Drawer
       width="100%"

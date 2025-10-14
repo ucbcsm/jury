@@ -1,6 +1,6 @@
 "use client";
 
-import { getDecisionText } from "@/lib/api";
+import { getDecisionText, getMomentText, getSessionText } from "@/lib/api";
 import { Class, Department } from "@/types";
 import { CloseOutlined, PrinterOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
@@ -43,7 +43,11 @@ export const YearResultPresentation: FC<
   const refToPrint = useRef<HTMLDivElement | null>(null);
   const printResultPresenation = useReactToPrint({
     contentRef: refToPrint,
-    documentTitle: `presentation-resultat-${yid}`,
+    documentTitle: `presentation-resultat-${year?.name}-${classYear?.acronym}-${
+      department?.acronym
+    }-${getMomentText(moment).replace(" ", "-")}-${getSessionText(
+      session
+    ).replace(" ", "-")}`,
   });
 
   const { data, isPending, isError, error } = useQuery({

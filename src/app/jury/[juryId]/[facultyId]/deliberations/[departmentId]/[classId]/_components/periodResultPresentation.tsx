@@ -30,11 +30,13 @@ export const PeriodResultPresentation: FC<
   const refToPrint = useRef<HTMLDivElement | null>(null);
   const printListGrades = useReactToPrint({
     contentRef: refToPrint,
-    documentTitle: `${annoucement.class_year.acronym}-${
+    documentTitle: `presentation-resultat-${annoucement.period.acronym}-${
+      annoucement.academic_year.name
+    }-${annoucement.class_year.acronym}-${
       annoucement.departement.name
-    }-${getSessionText(annoucement.session)}-${getMomentText(
+    }-${getSessionText(annoucement.session).replace(" ", "-")}-${getMomentText(
       annoucement.moment
-    )}`,
+    ).replace(" ", "-")}`,
   });
 
   const { data, isPending, isError, error } = useQuery({

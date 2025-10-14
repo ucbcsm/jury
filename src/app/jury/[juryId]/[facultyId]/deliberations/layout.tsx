@@ -9,6 +9,7 @@ import {
   Flex,
   Input,
   List,
+  Skeleton,
   Splitter,
   Tag,
   theme,
@@ -26,17 +27,7 @@ export default function DeliberationsLayout({
   const {token:{colorBorder}}=theme.useToken()
   const { juryId, facultyId } = useParams();
 
-  const {
-    data: jury,
-    isPending,
-    isError,
-  } = useQuery({
-    queryKey: ["jury", juryId],
-    queryFn: ({ queryKey }) => getJury(Number(queryKey[1])),
-    enabled: !!juryId,
-  });
-
-    const { data: departments } = useQuery({
+    const { data: departments, isPending: isPendingDepartment } = useQuery({
       queryKey: ["departments", facultyId],
       queryFn: ({ queryKey }) => getDepartmentsByFacultyId(Number(queryKey[1])),
       enabled: !!facultyId,
@@ -76,24 +67,36 @@ export default function DeliberationsLayout({
   return (
     <Splitter style={{ height: `calc(100vh - 110px)` }}>
       <Splitter.Panel defaultSize="20%" min="20%" max="25%">
-        <Flex  style={{
+        <Flex
+          style={{
             paddingLeft: 16,
             height: 64,
             borderBottom: `1px solid ${colorBorder}`,
           }}
-          align="center">
-          <Typography.Title level={3} style={{ marginBottom: 0, textTransform:"uppercase" }}>
+          align="center"
+        >
+          <Typography.Title
+            level={3}
+            style={{ marginBottom: 0, textTransform: "uppercase" }}
+          >
             Promotions
           </Typography.Title>
         </Flex>
-        <Collapse
-          accordion
-          items={getDepartmentsAsCollapseItems()}
-          bordered={false}
-          style={{ borderRadius: 0 }}
+        {isPendingDepartment && (
+          <div className="p-4">
+            <Skeleton active />
+          </div>
+        )}
+        {departments && (
+          <Collapse
+            accordion
+            items={getDepartmentsAsCollapseItems()}
+            bordered={false}
+            style={{ borderRadius: 0 }}
 
-          //   ghost
-        />
+            //   ghost
+          />
+        )}
       </Splitter.Panel>
       <Splitter.Panel>{children}</Splitter.Panel>
     </Splitter>

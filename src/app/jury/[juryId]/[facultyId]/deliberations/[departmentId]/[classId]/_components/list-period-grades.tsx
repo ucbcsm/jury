@@ -39,11 +39,13 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
   const refToPrint = useRef<HTMLDivElement | null>(null);
   const printListGrades = useReactToPrint({
     contentRef: refToPrint,
-    documentTitle: `${annoucement.class_year.acronym}-${
+    documentTitle: `grille-resultats-${annoucement.period.acronym}-${
+      annoucement.academic_year.name
+    }-${annoucement.class_year.acronym}-${
       annoucement.departement.name
-    }-${getSessionText(annoucement.session)}-${getMomentText(
+    }-${getSessionText(annoucement.session).replace(" ", "-")}-${getMomentText(
       annoucement.moment
-    )}`,
+    ).replace(" ", "-")}`,
   });
 
   const { data, isPending, isError, error } = useQuery({
@@ -265,7 +267,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
             </th>
             <th rowSpan={2} className="bg-white border border-gray-300"></th>
           </tr>
-          <tr className="sticky top-[33px] z-10  ">
+          <tr className="sticky top-[27px] z-10  ">
             <th
               colSpan={4}
               className="sticky left-0  bg-gray-50 text-xs font-semibold  border border-gray-300"
@@ -356,9 +358,9 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
               </th>
             ))}
             <th className="  text-xs bg-gray-50 border-b border border-gray-300 text-center font-bold">
-              {/* {data?.HeaderData?.no_retaken?.credits?.reduce(
-                (prevValue, currenValue) => currenValue + prevValue
-              )} */}
+              {data?.HeaderData?.no_retaken?.credits
+                ?.flat()
+                .reduce((sum, value) => sum + value, 0)}
             </th>
             <th className="bg-gray-50 border border-gray-300"></th>
             <th className="bg-gray-50 border border-gray-300"></th>
