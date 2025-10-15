@@ -1240,6 +1240,8 @@ export const RetakeCourseReason = z.object({
   class_year: Class,
 });
 
+export type RetakeCourseReason = z.infer<typeof RetakeCourseReason>;
+
 export const RetakeCourse = z.object({
   id: z.number(),
   user: User,

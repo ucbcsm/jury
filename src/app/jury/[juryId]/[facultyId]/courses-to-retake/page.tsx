@@ -1,15 +1,25 @@
 "use client";
 
-import { getCurrentDepartmentsAsOptions, getDepartmentsByFacultyId } from "@/lib/api";
+import {
+  getCurrentDepartmentsAsOptions,
+  getDepartmentsByFacultyId,
+} from "@/lib/api";
 import { getRetakeCourses, getRetakeReasonText } from "@/lib/api/retake-course";
 import { RetakeCourse } from "@/types";
-import { BookOutlined, CheckCircleOutlined, CloseOutlined, MoreOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  BookOutlined,
+  CheckCircleOutlined,
+  CloseOutlined,
+  MoreOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
   Button,
   Dropdown,
   Empty,
   Flex,
+  Input,
   Layout,
   List,
   Select,
@@ -24,6 +34,8 @@ import { useParams } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { record } from "zod";
+import { RetakeReasonItem } from "./_components/retakeReasonItem";
+import { NewRetakeReasonForm } from "./_components/newRetakeReasonForm";
 
 export default function Page() {
   const {
@@ -39,51 +51,44 @@ export default function Page() {
     "dep",
     parseAsInteger.withDefault(0)
   );
+  const [search, setSearch] = useQueryState("search");
+
   const [selectedRetake, setSelectedRetake] = useState<
     RetakeCourse | undefined
   >();
 
   const { data, isPending } = useQuery({
-    queryKey: ["retake-courses", facultyId, departmentId, page, pageSize],
+    queryKey: [
+      "retake-courses",
+      facultyId,
+      departmentId,
+      page,
+      pageSize,
+      search,
+    ],
     queryFn: () =>
       getRetakeCourses({
         facultyId: Number(facultyId),
         departmentId: departmentId !== 0 ? departmentId : undefined,
         page: page !== 0 ? page : undefined,
         pageSize: pageSize !== 0 ? pageSize : undefined,
+        search: search !== null && search.trim() !== "" ? search : undefined,
       }),
     enabled: !!facultyId,
   });
 
-   const {
-     data: departments,
-     isPending: isPendingDepartments,
-     isError: isErrorDepartments,
-   } = useQuery({
-     queryKey: ["departments", facultyId],
-     queryFn: ({ queryKey }) => getDepartmentsByFacultyId(Number(queryKey[1])),
-     enabled: !!facultyId,
-   });
+  const {
+    data: departments,
+    isPending: isPendingDepartments,
+    isError: isErrorDepartments,
+  } = useQuery({
+    queryKey: ["departments", facultyId],
+    queryFn: ({ queryKey }) => getDepartmentsByFacultyId(Number(queryKey[1])),
+    enabled: !!facultyId,
+  });
 
   return (
     <Splitter style={{ height: `calc(100vh - 110px)` }}>
-      {/* <Splitter.Panel defaultSize={320} min={320} max="25%">
-        <Flex
-          style={{
-            paddingLeft: 16,
-            height: 64,
-            borderBottom: `1px solid ${colorBorder}`,
-          }}
-          align="center"
-        >
-          <Typography.Title
-            level={3}
-            style={{ marginBottom: 0, textTransform: "uppercase" }}
-          >
-            Cours à refaire
-          </Typography.Title>
-        </Flex>
-      </Splitter.Panel> */}
       <Splitter.Panel style={{ background: "#f5f5f5" }}>
         <Layout.Content style={{ padding: "16px 16px 0 16px" }}>
           <Table
@@ -99,6 +104,15 @@ export default function Page() {
                   </Typography.Title>
                 </Space>
                 <Space>
+                  <Input.Search
+                    placeholder="Rechercher un étudiant ..."
+                    onChange={(e) => {
+                      setPage(0);
+                      setSearch(e.target.value);
+                    }}
+                    allowClear
+                    variant="filled"
+                  />
                   <Select
                     prefix={
                       <Typography.Text type="secondary">
@@ -137,7 +151,7 @@ export default function Page() {
                 title: "Noms",
                 dataIndex: "user",
                 render: (_, record) =>
-                  `${record.user.surname} ${record.user.first_name} ${record.user.last_name}`,
+                  `${record.user.surname} ${record.user.last_name} ${record.user.first_name}`,
                 ellipsis: true,
               },
               {
@@ -187,8 +201,10 @@ export default function Page() {
             ]}
             size="small"
             rowClassName={(record) =>
-              `bg-white odd:bg-[#f5f5f5] hover:cursor-pointer ${
-                record.id === selectedRetake?.id ? "bg-green-400" : ""
+              `${
+                record.id === selectedRetake?.id
+                  ? "bg-green-100"
+                  : "bg-white odd:bg-[#f5f5f5] hover:cursor-pointer"
               }`
             }
             rowKey="id"
@@ -247,14 +263,7 @@ export default function Page() {
           <Tabs
             tabBarStyle={{ padding: "0 16px 0 16px" }}
             tabBarExtraContent={
-              <Button
-                icon={<PlusOutlined />}
-                size="small"
-                variant="dashed"
-                color="primary"
-                style={{ boxShadow: "none" }}
-                title="Ajouter un cours à reprendre"
-              />
+              <NewRetakeReasonForm courses={[]} student={selectedRetake.user} />
             }
             items={[
               {
@@ -265,42 +274,17 @@ export default function Page() {
                     <List
                       dataSource={selectedRetake.retake_course_list}
                       renderItem={(item) => (
-                        <List.Item
+                        <RetakeReasonItem
                           key={item.id}
-                          extra={
-                            <Dropdown
-                              menu={{
-                                items: [
-                                  {
-                                    key: "validate",
-                                    label: "Marquer comme repris et validé",
-                                    icon: <CheckCircleOutlined />,
-                                  },
-                                ],
-                              }}
-                            >
-                              <Button type="text" icon={<MoreOutlined />} />
-                            </Dropdown>
-                          }
-                        >
-                          <List.Item.Meta
-                            title={
-                              <Typography.Text>
-                                <BookOutlined /> {item.available_course.name}
-                              </Typography.Text>
-                            }
-                            description={
-                              <Space>
-                                <Typography.Text type="secondary">
-                                  Raison :
-                                </Typography.Text>
-                                <Typography.Text type="danger">
-                                  {getRetakeReasonText(item.reason)}
-                                </Typography.Text>
-                              </Space>
-                            }
-                          />
-                        </List.Item>
+                          itemData={item}
+                          staticData={{
+                            userRetakeId: selectedRetake.id,
+                            userId: selectedRetake.user.id,
+                            studentName: `${selectedRetake.user.surname} ${selectedRetake.user.last_name} ${selectedRetake.user.first_name}`,
+                            facultyId: selectedRetake.faculty.id,
+                            departmentId: selectedRetake.departement.id,
+                          }}
+                        />
                       )}
                       size="small"
                       locale={{
@@ -321,6 +305,11 @@ export default function Page() {
                 children: (
                   <List
                     dataSource={selectedRetake.retake_course_done_list}
+                    renderItem={(item) => (
+                      <List.Item key={item.id}>
+                        <List.Item.Meta title={item.available_course.name} />
+                      </List.Item>
+                    )}
                     locale={{
                       emptyText: (
                         <Empty
