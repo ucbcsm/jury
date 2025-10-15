@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  getAllCourses,
   getCurrentDepartmentsAsOptions,
   getDepartmentsByFacultyId,
 } from "@/lib/api";
@@ -32,10 +33,10 @@ import {
 } from "antd";
 import { useParams } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useState } from "react";
-import { record } from "zod";
+import { useEffect, useState } from "react";
 import { RetakeReasonItem } from "./_components/retakeReasonItem";
 import { NewRetakeReasonForm } from "./_components/newRetakeReasonForm";
+import { useClasses } from "@/hooks/useClasses";
 
 export default function Page() {
   const {
@@ -86,6 +87,28 @@ export default function Page() {
     queryFn: ({ queryKey }) => getDepartmentsByFacultyId(Number(queryKey[1])),
     enabled: !!facultyId,
   });
+
+  const { data: courses } = useQuery({
+    queryKey: ["courses", facultyId, "all"],
+    queryFn: ({ queryKey }) =>
+      getAllCourses({ facultyId: Number(queryKey[1]) }),
+    enabled: !!facultyId,
+  });
+
+   const {
+     data: classes,
+     isPending: isPendingClasses,
+     isError: isErrorClasses,
+   } = useClasses();
+
+  useEffect(() => {
+    if (selectedRetake && data) {
+      const refreshedSelectedRetake = data.results.find(
+        (retake) => retake.id === selectedRetake.id
+      );
+      setSelectedRetake(refreshedSelectedRetake);
+    }
+  }, [data]);
 
   return (
     <Splitter style={{ height: `calc(100vh - 110px)` }}>
@@ -263,7 +286,19 @@ export default function Page() {
           <Tabs
             tabBarStyle={{ padding: "0 16px 0 16px" }}
             tabBarExtraContent={
-              <NewRetakeReasonForm courses={[]} student={selectedRetake.user} />
+              <NewRetakeReasonForm
+                courses={courses}
+                staticData={{
+                  userRetakeId: selectedRetake.id,
+                  userId: selectedRetake.user.id,
+                  matricule: selectedRetake.user.matricule,
+                  studentName: `${selectedRetake.user.surname} ${selectedRetake.user.last_name} ${selectedRetake.user.first_name}`,
+                  facultyId: selectedRetake.faculty.id,
+                  departmentId: selectedRetake.departement.id,
+                }}
+                currentRetakeCourseReason={selectedRetake.retake_course_list}
+                classes={classes}
+              />
             }
             items={[
               {
@@ -303,22 +338,34 @@ export default function Page() {
                 key: "retake_course_done_list",
                 label: "Repris et acquis",
                 children: (
-                  <List
-                    dataSource={selectedRetake.retake_course_done_list}
-                    renderItem={(item) => (
-                      <List.Item key={item.id}>
-                        <List.Item.Meta title={item.available_course.name} />
-                      </List.Item>
-                    )}
-                    locale={{
-                      emptyText: (
-                        <Empty
-                          description="Aucun cours"
-                          image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  <div className="px-4">
+                    <List
+                      dataSource={selectedRetake.retake_course_done_list}
+                      renderItem={(item) => (
+                        <RetakeReasonItem
+                          key={item.id}
+                          type="done"
+                          itemData={item}
+                          staticData={{
+                            userRetakeId: selectedRetake.id,
+                            userId: selectedRetake.user.id,
+                            studentName: `${selectedRetake.user.surname} ${selectedRetake.user.last_name} ${selectedRetake.user.first_name}`,
+                            facultyId: selectedRetake.faculty.id,
+                            departmentId: selectedRetake.departement.id,
+                          }}
                         />
-                      ),
-                    }}
-                  />
+                      )}
+                      size="small"
+                      locale={{
+                        emptyText: (
+                          <Empty
+                            description="Aucun cours"
+                            image={Empty.PRESENTED_IMAGE_SIMPLE}
+                          />
+                        ),
+                      }}
+                    />
+                  </div>
                 ),
               },
             ]}

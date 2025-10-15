@@ -1,15 +1,17 @@
 "use client";
 
 import { getRetakeReasonText } from "@/lib/api/retake-course";
-import { RetakeCourseReason, User } from "@/types";
+import { RetakeCourseReason, } from "@/types";
 import {
   BookOutlined,
   CheckCircleOutlined,
+  CloseCircleOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
 import { Button, Dropdown, List, Space, Typography } from "antd";
 import { FC, useState } from "react";
 import { ValidateRetakeCourseForm } from "./validateRetakeReasonForm";
+import { InvalidateRetakeCourseForm } from "./invalidateRetakeReasonForm";
 
 type RetakeReasonItemProps = {
   itemData: RetakeCourseReason;
@@ -20,13 +22,18 @@ type RetakeReasonItemProps = {
     userId: number;
     studentName: string;
   };
+  type?: "not_done" | "done";
 };
 
 export const RetakeReasonItem: FC<RetakeReasonItemProps> = ({
   itemData,
   staticData,
+  type = "not_done",
 }) => {
+
   const [openToValidate, setOpenToValidate] = useState<boolean>(false);
+  const [openToInvalidate, setOpenToInvalidate] = useState<boolean>(false);
+
   return (
     <List.Item
       extra={
@@ -34,14 +41,27 @@ export const RetakeReasonItem: FC<RetakeReasonItemProps> = ({
           <Dropdown
             menu={{
               items: [
-                {
-                  key: "validate",
-                  label: "Marquer comme repris et validé",
-                  icon: <CheckCircleOutlined />,
-                  onClick: () => {
-                    setOpenToValidate(true);
-                  },
-                },
+                type === "not_done"
+                  ? {
+                      key: "validate",
+                      label: "Marquer comme repris et acquis",
+                      icon: <CheckCircleOutlined />,
+                      onClick: () => {
+                        setOpenToValidate(true);
+                      },
+                    }
+                  : null,
+                type === "done"
+                  ? {
+                      key: "invalidate",
+                      label: "Marquer comme à refaire",
+                      icon: <CloseCircleOutlined />,
+                      danger: true,
+                      onClick: () => {
+                        setOpenToInvalidate(true);
+                      },
+                    }
+                  : null,
               ],
             }}
           >
@@ -51,6 +71,18 @@ export const RetakeReasonItem: FC<RetakeReasonItemProps> = ({
             course={itemData.available_course}
             open={openToValidate}
             setOpen={setOpenToValidate}
+            staticData={{
+              userRetakeId: staticData.userRetakeId,
+              userId: staticData.userId,
+              studentName: staticData.studentName,
+              facultyId: staticData.facultyId,
+              departmentId: staticData.departmentId,
+            }}
+          />
+          <InvalidateRetakeCourseForm
+            course={itemData.available_course}
+            open={openToInvalidate}
+            setOpen={setOpenToInvalidate}
             staticData={{
               userRetakeId: staticData.userRetakeId,
               userId: staticData.userId,
@@ -71,7 +103,7 @@ export const RetakeReasonItem: FC<RetakeReasonItemProps> = ({
         description={
           <Space>
             <Typography.Text type="secondary">Raison :</Typography.Text>
-            <Typography.Text type="danger">
+            <Typography.Text type={type === "not_done" ? "danger" : "warning"}>
               {getRetakeReasonText(itemData.reason)}
             </Typography.Text>
           </Space>

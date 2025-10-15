@@ -27,6 +27,7 @@ import {
 import { useParams } from "next/navigation";
 import { ListClasses } from "./_components/list-classes";
 import { TreeClasses } from "./_components/tree-classes";
+import { useClasses } from "@/hooks/useClasses";
 
 export default function DeliberationsLayout({
   children,
@@ -48,10 +49,7 @@ export default function DeliberationsLayout({
     data: classes,
     isPending: isPendingClasses,
     isError: isErrorClasses,
-  } = useQuery({
-    queryKey: ["classes"],
-    queryFn: getClasses,
-  });
+  } = useClasses();
 
   const getDepartmentsAsCollapseItems = () => {
     const items = departments?.map((dep) => ({

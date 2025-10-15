@@ -3,13 +3,14 @@ import React, { Dispatch, FC, SetStateAction } from "react";
 import { Alert, Form, Input, message, Modal, Typography } from "antd";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Course } from "@/types";
-import { validateRetakeCourse } from "@/lib/api/retake-course";
+import { invalidateRetakeCourse } from "@/lib/api/retake-course";
+import { error } from "console";
 
 type FormDataType = {
-  validate: string;
+  invalidate: string;
 };
 
-type ValidateRetakeCourseFormProps = {
+type InvalidateRetakeCourseFormProps = {
   course: Course;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -22,25 +23,22 @@ type ValidateRetakeCourseFormProps = {
   };
 };
 
-export const ValidateRetakeCourseForm: FC<ValidateRetakeCourseFormProps> = ({
-  course,
-  open,
-  setOpen,
-  staticData,
-}) => {
+export const InvalidateRetakeCourseForm: FC<
+  InvalidateRetakeCourseFormProps
+> = ({ course, open, setOpen, staticData }) => {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: validateRetakeCourse,
+    mutationFn: invalidateRetakeCourse,
   });
 
   const onFinish = (values: FormDataType) => {
-    if (values.validate === course.code) {
+    if (values.invalidate === course.code) {
       mutateAsync(
         {
           userRetakeId: staticData.userRetakeId,
-          retake_courseId_done_list: [course.id],
+          retake_courseId_not_done_list: [course.id],
           userId: staticData.userId,
           facultyId: staticData.facultyId,
           departmentId: staticData.departmentId,
@@ -50,13 +48,13 @@ export const ValidateRetakeCourseForm: FC<ValidateRetakeCourseFormProps> = ({
             queryClient.invalidateQueries({
               queryKey: ["retake-courses"],
             });
-            messageApi.success("Cours validé comme repris et acquis !");
+            messageApi.success("Cours invalidé comme repris et acquis !");
             setOpen(false);
           },
           onError: (error) => {
             messageApi.error(
               (error as any)?.response?.data?.message ||
-                "Une erreur s'est produite lors de la validation du cours."
+                "Une erreur s'est produite lors de l'invalidation du cours."
             );
           },
         }
@@ -71,9 +69,9 @@ export const ValidateRetakeCourseForm: FC<ValidateRetakeCourseFormProps> = ({
       {contextHolder}
       <Modal
         open={open}
-        title="Validation du cours repris et acquis"
+        title="Invalidation du cours repris et acquis"
         centered
-        okText="Valider"
+        okText="Invalider"
         cancelText="Annuler"
         styles={{ body: { paddingTop: 16, paddingBottom: "24px" } }}
         okButtonProps={{
@@ -95,7 +93,7 @@ export const ValidateRetakeCourseForm: FC<ValidateRetakeCourseFormProps> = ({
           <Form
             form={form}
             layout="vertical"
-            name="validate_retake_course_form"
+            name="invalidate_retake_course_form"
             onFinish={onFinish}
             disabled={isPending}
             initialValues={{ enabled: true }}
@@ -108,7 +106,7 @@ export const ValidateRetakeCourseForm: FC<ValidateRetakeCourseFormProps> = ({
           message="Confirmation importante"
           description={
             <div>
-              Vous êtes sur le point de valider le cours{" "}
+              Vous êtes sur le point d'invalider le cours{" "}
               <Typography.Text strong italic>
                 "{course.name}" ({course.code})
               </Typography.Text>{" "}
@@ -116,8 +114,8 @@ export const ValidateRetakeCourseForm: FC<ValidateRetakeCourseFormProps> = ({
               <Typography.Text strong italic>
                 {staticData.studentName}
               </Typography.Text>
-              . Veuillez vous assurer que l'étudiant a bien finalisé ce cours et
-              l'a acquis.`
+              . Veuillez vous assurer que l'étudiant n'a pas finalisé ce cours
+              ou qu'une erreur a été commise.
             </div>
           }
           type="warning"
@@ -125,12 +123,12 @@ export const ValidateRetakeCourseForm: FC<ValidateRetakeCourseFormProps> = ({
           style={{ border: 0 }}
         />
         <Form.Item
-          name="validate"
-          label={`Veuillez saisir le code (${course.code}) du cours pour confirmer.`}
+          name="invalidate"
+          label={`Veuillez saisir le code (${course.code}) du cours pour confirmer l'invalidation.`}
           rules={[
             {
               required: true,
-              message: `Ce champ est requis. Veuillez saisir le code (${course.code}) du cours pour confirmer.`,
+              message: `Ce champ est requis. Veuillez saisir le code (${course.code}) du cours pour confirmer l'invalidation.`,
             },
           ]}
           style={{ marginTop: 24 }}

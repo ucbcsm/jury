@@ -1,4 +1,4 @@
-import { RetakeCourse } from "@/types";
+import { RetakeCourse, RetakeCourseReason } from "@/types";
 import api from "../fetcher";
 
 export async function getRetakeCourses(queryParams?: {
@@ -42,10 +42,10 @@ export async function validateRetakeCourse(data: {
   userId: number;
   facultyId: number;
   departmentId: number;
-  retake_CourseId_done_list: number[]; // IDs des cours à valider (available course)
+  retake_courseId_done_list: number[]; // IDs des cours à valider (available course)
 }) {
   const res = await api.put(`/jury/retake-course/${data.userRetakeId}/`, {
-    retake_CourseId_done_list: data.retake_CourseId_done_list,
+    retake_courseId_done_list: data.retake_courseId_done_list,
     user: data.userId,
     faculty: data.facultyId,
     departement: data.departmentId,
@@ -58,10 +58,10 @@ export async function invalidateRetakeCourse(data: {
   userId: number;
   facultyId: number;
   departmentId: number;
-  retake_CourseId_not_done_list: number[]; // IDs des cours à valider (available course)
+  retake_courseId_not_done_list: number[]; // IDs des cours à valider (available course)
 }) {
   const res = await api.put(`/jury/retake-course/${data.userRetakeId}/`, {
-    retake_CourseId_not_done_list: data.retake_CourseId_not_done_list,
+    retake_courseId_not_done_list: data.retake_courseId_not_done_list,
     user: data.userId,
     faculty: data.facultyId,
     departement: data.departmentId,
@@ -70,25 +70,53 @@ export async function invalidateRetakeCourse(data: {
 }
 
 export async function addRetakeReason(data: {
+  userRetakeId: number;
   userId: number;
-  courseId: number;
-  reason: "low_attendance" | "missing_course" | "failed_course";
+  facultyId: number;
+  departmentId: number;
+  retakeCourseAndReason: (Omit<
+    RetakeCourseReason,
+    "id" | "available_course" | "academic_year" | "class_year"
+  > & {
+    id?: number;
+    available_course: number;
+    academic_year: number;
+    class_year: number;
+  })[];
+  //   retakeCourseAndReasonDone: number[];
 }) {
-  const res = await api.post(`/jury/retake-course/`, data);
-  return res.data as RetakeCourse;
+  const res = await api.put(`/jury/retake-course/${data.userRetakeId}`, {
+    user: data.userId,
+    retakeCourseAndReason: data.retakeCourseAndReason,
+    faculty: data.facultyId,
+    departement: data.departmentId,
+  });
+  return res.data;
+}
+
+export function fomartedRetakeCourseReason(data: RetakeCourseReason[]) {
+  const formatedData = data.map((item) => ({
+    id: item.id,
+    reason: item.reason,
+    available_course: item.available_course.id,
+    academic_year: item.academic_year.id,
+    class_year: item.class_year.id,
+  }));
+
+  return formatedData;
 }
 
 export function getRetakeReasonText(
-    reason: "low_attendance" | "missing_course" | "failed_course"
+  reason: "low_attendance" | "missing_course" | "failed_course"
 ) {
-    switch (reason) {
-        case "failed_course":
-            return "Échec au cours";
-        case "low_attendance":
-            return "Faible assiduité";
-        case "missing_course":
-            return "Cours manquant";
-        default:
-            return "Inconnue";
-    }
+  switch (reason) {
+    case "failed_course":
+      return "Échec au cours";
+    case "low_attendance":
+      return "Faible assiduité";
+    case "missing_course":
+      return "Cours manquant";
+    default:
+      return "Inconnue";
+  }
 }

@@ -1,5 +1,5 @@
 import api from "@/lib/fetcher";
-import { Course, CourseProgram } from "@/types";
+import { Course } from "@/types";
 
 export async function getCouses() {
   const res = await api.get(`/faculty/available-course/`);
@@ -9,6 +9,22 @@ export async function getCouses() {
 export async function getCoursesByFacultyId(facultyId: number) {
   const res = await api.get(`/faculty/available-course/?faculties__id=${facultyId}`);
   return res.data.results as Course[];
+}
+export async function getAllCourses(searchParams: {
+  facultyId?: number;
+}) {
+  const { facultyId } = searchParams;
+  const queryParams = new URLSearchParams();
+  if (facultyId !== undefined) {
+    queryParams.append("faculties__id", facultyId.toString());
+     queryParams.append("get_all", "true");
+  }
+
+  const res = await api.get(
+    `/faculty/available-course?${queryParams.toString()}`
+  );
+
+  return res.data as Course[];
 }
 
 export async function createCourse(
