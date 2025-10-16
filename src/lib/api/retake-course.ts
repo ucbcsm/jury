@@ -145,6 +145,22 @@ export async function addDoneRetakeReason(data: {
   return res.data;
 }
 
+export async function updateRetakeReason(data: {
+  id: number;
+  reason: "low_attendance" | "missing_course" | "failed_course";
+  courseId: number;
+  yearId: number;
+  classId: number;
+}) {
+  const res = await api.put(`/jury/retake-course-reason/${data.id}/`, {
+    reason: data.reason,
+    available_course: data.courseId,
+    academic_year: data.yearId,
+    class_year: data.classId,
+  });
+  return res.data;
+}
+
 export async function deleteRetakeReason(retakeReasonId: number) {
   const res = await api.delete(`/jury/retake-course-reason/${retakeReasonId}/`);
   return res.data;

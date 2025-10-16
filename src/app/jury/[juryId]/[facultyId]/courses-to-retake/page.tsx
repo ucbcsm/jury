@@ -18,6 +18,7 @@ import {
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
+  Avatar,
   Button,
   Dropdown,
   Empty,
@@ -41,6 +42,7 @@ import { NewRetakeReasonForm } from "./_components/newRetakeReasonForm";
 import { useClasses } from "@/hooks/useClasses";
 import { DeleteStudentFromRetakeForm } from "./_components/deleteStudentFromRetake";
 import { NewStudentWithRetakeForm } from "./_components/newStudentWithRetake";
+import { getHSLColor } from "@/lib/utils";
 
 export default function Page() {
   const {
@@ -99,11 +101,11 @@ export default function Page() {
     enabled: !!facultyId,
   });
 
-   const {
-     data: classes,
-     isPending: isPendingClasses,
-     isError: isErrorClasses,
-   } = useClasses();
+  const {
+    data: classes,
+    isPending: isPendingClasses,
+    isError: isErrorClasses,
+  } = useClasses();
 
   useEffect(() => {
     if (selectedRetake && data) {
@@ -176,6 +178,25 @@ export default function Page() {
             )}
             dataSource={data?.results}
             columns={[
+              {
+                key: "avatar",
+                title: "Photo",
+                dataIndex: "user",
+                render: (_, record) => (
+                  <Avatar
+                    src={record.user.avatar}
+                    style={{
+                      backgroundColor: getHSLColor(
+                        `${record.user.surname} ${record.user.last_name} ${record.user.first_name}`
+                      ),
+                    }}
+                  >
+                    {record.user.first_name?.charAt(0).toUpperCase()}
+                  </Avatar>
+                ),
+                width: 56,
+                align: "center",
+              },
               {
                 key: "name",
                 title: "Noms",
@@ -343,10 +364,19 @@ export default function Page() {
                           staticData={{
                             userRetakeId: selectedRetake.id,
                             userId: selectedRetake.user.id,
+                            matricule: selectedRetake.user.matricule,
                             studentName: `${selectedRetake.user.surname} ${selectedRetake.user.last_name} ${selectedRetake.user.first_name}`,
                             facultyId: selectedRetake.faculty.id,
                             departmentId: selectedRetake.departement.id,
                           }}
+                          classes={classes}
+                          courses={courses}
+                          currentRetakeCourseReason={
+                            selectedRetake.retake_course_list
+                          }
+                          currentDoneRetakeCourseReason={
+                            selectedRetake.retake_course_done_list
+                          }
                         />
                       )}
                       //   size="small"
@@ -408,10 +438,19 @@ export default function Page() {
                           staticData={{
                             userRetakeId: selectedRetake.id,
                             userId: selectedRetake.user.id,
+                            matricule: selectedRetake.user.matricule,
                             studentName: `${selectedRetake.user.surname} ${selectedRetake.user.last_name} ${selectedRetake.user.first_name}`,
                             facultyId: selectedRetake.faculty.id,
                             departmentId: selectedRetake.departement.id,
                           }}
+                          classes={classes}
+                          courses={courses}
+                          currentRetakeCourseReason={
+                            selectedRetake.retake_course_list
+                          }
+                          currentDoneRetakeCourseReason={
+                            selectedRetake.retake_course_done_list
+                          }
                         />
                       )}
                       size="small"

@@ -3,7 +3,7 @@
 import { FC, useState } from "react";
 import { Alert, Form, message, Modal, Select, Button } from "antd";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Class, Course } from "@/types";
+import { Class, Course, Enrollment } from "@/types";
 import {
   createStudentWithRetake
 } from "@/lib/api/retake-course";
@@ -12,9 +12,11 @@ import { filterOption } from "@/lib/utils";
 import {
   getCurrentClassesAsOptions,
 } from "@/lib/api";
+import { DebounceEnrollmentSelect } from "./debounceSelectStudent";
+import { useParams } from "next/navigation";
 
 type FormDataType = {
-  studentId: number;
+  userId: number;
   courseIds: number[];
   reason: "low_attendance" | "missing_course" | "failed_course";
   classId: number;
@@ -32,9 +34,10 @@ export const NewStudentWithRetakeForm: FC<NewStudentWithRetakeFormProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
+  const {facultyId}=useParams()
   const [open, setOpen] = useState<boolean>(false);
   const queryClient = useQueryClient();
-
+  const [yearEnrollment, setYearEnrollment] = useState<Enrollment|undefined>();
   const { mutateAsync, isPending } =
     useMutation({
       mutationFn: createStudentWithRetake,
@@ -42,47 +45,53 @@ export const NewStudentWithRetakeForm: FC<NewStudentWithRetakeFormProps> = ({
 
   const onCancel = () => {
     setOpen(false);
+    setYearEnrollment(undefined);
     form.resetFields();
   };
 
   const onFinish = (values: FormDataType) => {
-    // mutateAsync(
-    //   {
-    //     userId: values.studentId,
-    //     facultyId: staticData.facultyId,
-    //     departmentId: staticData.departmentId,
-    //     retakeCourseAndReason: values.courseIds.map((courseId) => ({
-    //       available_course: courseId,
-    //       reason: values.reason,
-    //       academic_year: values.yearId,
-    //       class_year: values.classId,
-    //     })),
-    //   },
-    //   {
-    //     onSuccess: () => {
-    //       queryClient.invalidateQueries({ queryKey: ["retake-courses"] });
-    //       messageApi.success("Raison ajoutée avec succès !");
-    //       form.resetFields();
-    //       setOpen(false);
-    //     },
-    //     onError: (error) => {
-    //       if ((error as any).status === 403) {
-    //         messageApi.error(
-    //           `Vous n'avez pas la permission d'effectuer cette action`
-    //         );
-    //       } else if ((error as any).status === 401) {
-    //         messageApi.error(
-    //           "Vous devez être connecté pour effectuer cette action."
-    //         );
-    //       } else {
-    //         messageApi.error(
-    //           (error as any)?.response?.data?.message ||
-    //             "Erreur lors de l'ajout."
-    //         );
-    //       }
-    //     },
-    //   }
-    // );
+    if(yearEnrollment){
+    mutateAsync(
+      {
+        userId: yearEnrollment?.user.id!,
+        facultyId: Number(facultyId),
+        departmentId: yearEnrollment?.departement.id!,
+        retakeCourseAndReason: values.courseIds.map((courseId) => ({
+          available_course: courseId,
+          reason: values.reason,
+          academic_year: yearEnrollment?.academic_year?.id!,
+          class_year: yearEnrollment?.class_year?.id!,
+        })),
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["retake-courses"] });
+          messageApi.success("Raison ajoutée avec succès !");
+          form.resetFields();
+          setYearEnrollment(undefined);
+          setOpen(false);
+        },
+        onError: (error) => {
+          if ((error as any).status === 403) {
+            messageApi.error(
+              `Vous n'avez pas la permission d'effectuer cette action`
+            );
+          } else if ((error as any).status === 401) {
+            messageApi.error(
+              "Vous devez être connecté pour effectuer cette action."
+            );
+          } else {
+            messageApi.error(
+              (error as any)?.response?.data?.message ||
+                "Erreur lors de l'ajout."
+            );
+          }
+        },
+      }
+    );
+    } else {
+      messageApi.error("Veuillez sélectionner un étudiant valide.");
+    }
   };
 
   return (
@@ -99,11 +108,11 @@ export const NewStudentWithRetakeForm: FC<NewStudentWithRetakeFormProps> = ({
       </Button>
       <Modal
         open={open}
-        title={"Nouvel étudiant avec cours à reprendre"}
+        title={"Ajouter un étudiant avec des cours à reprendre"}
         centered
         okText="Ajouter"
         cancelText="Annuler"
-        styles={{ body: { paddingTop: 16, paddingBottom: "24px" } }}
+        styles={{ body: { paddingBottom: "24px" } }}
         okButtonProps={{
           autoFocus: true,
           htmlType: "submit",
@@ -132,8 +141,7 @@ export const NewStudentWithRetakeForm: FC<NewStudentWithRetakeFormProps> = ({
         )}
       >
         <Alert
-          message="Ajouter un cours à reprendre"
-          description="Sélectionnez l'étudiant, les cours à reprendre, la raison, l'année académique et la promotion."
+          description="Sélectionnez l'étudiant, les cours à reprendre et indiquez la raison pour laquelle l'étudiant doit reprendre les cours, ainsi que l'année académique et la promotion durant laquelle il a manqué ou échoué ces cours."
           type="info"
           showIcon
           icon={<BulbOutlined />}
@@ -141,22 +149,38 @@ export const NewStudentWithRetakeForm: FC<NewStudentWithRetakeFormProps> = ({
           closable
         />
         <Form.Item
-          name="studentId"
+          name="userId"
           label="Étudiant"
-          rules={[{ required: true, message: "Veuillez sélectionner un étudiant." }]}
+          rules={[
+            { required: true, message: "Veuillez sélectionner un étudiant." },
+          ]}
           style={{ marginTop: 24 }}
         >
-          <Select
+          <DebounceEnrollmentSelect
+            facultyId={Number(facultyId)}
             placeholder="Sélectionnez un étudiant"
-            options={[]}
-            showSearch
-            filterOption={filterOption}
+            onChange={(_, option) => {
+              form.setFieldValue(
+                "classId",
+                (option as any)?.data.class_year?.id
+              );
+              form.setFieldValue(
+                "yearId",
+                (option as any)?.data.academic_year?.name
+              );
+              setYearEnrollment((option as any)?.data);
+            }}
           />
         </Form.Item>
         <Form.Item
           name="courseIds"
           label="Cours à reprendre"
-          rules={[{ required: true, message: "Veuillez sélectionner au moins un cours." }]}
+          rules={[
+            {
+              required: true,
+              message: "Veuillez sélectionner au moins un cours.",
+            },
+          ]}
         >
           <Select
             mode="multiple"
@@ -186,18 +210,22 @@ export const NewStudentWithRetakeForm: FC<NewStudentWithRetakeFormProps> = ({
         <Form.Item
           name="yearId"
           label="Année académique"
-          rules={[{ required: true, message: "" }]}
-          tooltip="Sélectionnez l'année académique durant laquelle l'étudiant avait manqué ou échoué ce cours."
+          rules={[
+            { required: true, message: "Veuillez sélectionner une année." },
+          ]}
+          tooltip="L'année académique durant laquelle l'étudiant avait manqué ou échoué ce cours."
         >
-          <Select options={[]} />
+          <Select options={[]} disabled />
         </Form.Item>
         <Form.Item
           name="classId"
           label="Promotion"
-          rules={[{ required: true, message: "" }]}
-          tooltip="Sélectionnez la promotion durant laquelle l'étudiant avait manqué ou échoué ce cours."
+          rules={[
+            { required: true, message: "Veuillez sélectionner une promotion." },
+          ]}
+          tooltip="La promotion durant laquelle l'étudiant avait manqué ou échoué ce cours."
         >
-          <Select options={getCurrentClassesAsOptions(classes)} />
+          <Select options={getCurrentClassesAsOptions(classes)} disabled />
         </Form.Item>
       </Modal>
     </>

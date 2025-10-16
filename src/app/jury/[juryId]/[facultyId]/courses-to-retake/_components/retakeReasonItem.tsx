@@ -1,12 +1,13 @@
 "use client";
 
 import { getRetakeReasonText } from "@/lib/api/retake-course";
-import { RetakeCourseReason, } from "@/types";
+import { Class, Course, RetakeCourseReason } from "@/types";
 import {
   BookOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
+  EditOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
 import { Button, Dropdown, Flex, List, Space, Typography } from "antd";
@@ -14,6 +15,7 @@ import { FC, useState } from "react";
 import { ValidateRetakeCourseForm } from "./validateRetakeReasonForm";
 import { InvalidateRetakeCourseForm } from "./invalidateRetakeReasonForm";
 import { DeleteRetakeReasonForm } from "./deleteRetakeReason";
+import { EditRetakeReasonForm } from "./editRetakeReasonForm";
 
 type RetakeReasonItemProps = {
   itemData: RetakeCourseReason;
@@ -23,19 +25,28 @@ type RetakeReasonItemProps = {
     departmentId: number;
     userId: number;
     studentName: string;
+    matricule: string;
   };
   type?: "not_done" | "done";
+  courses?: Course[];
+  classes?: Class[];
+  currentRetakeCourseReason: RetakeCourseReason[];
+  currentDoneRetakeCourseReason: RetakeCourseReason[];
 };
 
 export const RetakeReasonItem: FC<RetakeReasonItemProps> = ({
   itemData,
   staticData,
   type = "not_done",
+  classes,
+  courses,
+  currentRetakeCourseReason,
+  currentDoneRetakeCourseReason,
 }) => {
-
   const [openToValidate, setOpenToValidate] = useState<boolean>(false);
   const [openToInvalidate, setOpenToInvalidate] = useState<boolean>(false);
   const [openToDelete, setOpenToDelete] = useState<boolean>(false);
+  const [openToEdit, setOpenToEdit] = useState<boolean>(false);
 
   return (
     <List.Item
@@ -66,8 +77,19 @@ export const RetakeReasonItem: FC<RetakeReasonItemProps> = ({
                     }
                   : null,
                 {
+                  type: "divider",
+                },
+                {
+                  key: "edit",
+                  label: "Modifier",
+                  icon: <EditOutlined />,
+                  onClick: () => {
+                    setOpenToEdit(true);
+                  },
+                },
+                {
                   key: "delete",
-                  label: "Supprimer la raison",
+                  label: "Supprimer",
                   danger: true,
                   icon: <DeleteOutlined />,
                   onClick: () => {
@@ -107,6 +129,21 @@ export const RetakeReasonItem: FC<RetakeReasonItemProps> = ({
               }}
             />
           )}
+          <EditRetakeReasonForm
+            retakeCourseReasonToEdit={itemData}
+            staticData={{
+              matricule: staticData.matricule, // Assuming matricule is the same as studentName here; adjust if needed
+              studentName: staticData.studentName,
+              facultyId: staticData.facultyId,
+              departmentId: staticData.departmentId,
+            }}
+            classes={classes}
+            courses={courses}
+            open={openToEdit}
+            setOpen={setOpenToEdit}
+            currentDoneRetakeCourseReason={currentDoneRetakeCourseReason}
+            currentRetakeCourseReason={currentRetakeCourseReason}
+          />
           <DeleteRetakeReasonForm
             retakeReason={itemData}
             studentName={staticData.studentName}
