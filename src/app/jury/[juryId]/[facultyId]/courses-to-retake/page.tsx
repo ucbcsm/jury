@@ -40,6 +40,7 @@ import { RetakeReasonItem } from "./_components/retakeReasonItem";
 import { NewRetakeReasonForm } from "./_components/newRetakeReasonForm";
 import { useClasses } from "@/hooks/useClasses";
 import { DeleteStudentFromRetakeForm } from "./_components/deleteStudentFromRetake";
+import { NewStudentWithRetakeForm } from "./_components/newStudentWithRetake";
 
 export default function Page() {
   const {
@@ -158,14 +159,18 @@ export default function Page() {
                     loading={isPendingDepartments}
                     disabled={isPendingDepartments || isErrorDepartments}
                   />
-                  <Button
+                  {/* <Button
                     icon={<UserAddOutlined />}
                     type="primary"
                     style={{ boxShadow: "none" }}
                     title="Ajouter un étudiant avec un cours à reprendre"
                   >
                     Ajouter un étudiant
-                  </Button>
+                  </Button> */}
+                  <NewStudentWithRetakeForm
+                    courses={courses}
+                    classes={classes}
+                  />
                 </Space>
               </header>
             )}

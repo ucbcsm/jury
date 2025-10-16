@@ -1,6 +1,29 @@
 import { RetakeCourse, RetakeCourseReason } from "@/types";
 import api from "../fetcher";
 
+export async function createStudentWithRetake(data: {
+  userId: number;
+  facultyId: number;
+    departmentId: number;
+    retakeCourseAndReason: (Omit<
+        RetakeCourseReason,
+        "id" | "available_course" | "academic_year" | "class_year"
+      > & {
+        id?: number;
+        available_course: number;
+        academic_year: number;
+        class_year: number;
+        })[];
+}) {
+  const res = await api.post(`/jury/retake-course/`, {
+    user: data.userId,
+    faculty: data.facultyId,
+    departement: data.departmentId,
+    retakeCourseAndReason: data.retakeCourseAndReason,
+  });
+  return res.data;
+}
+
 export async function getRetakeCourses(queryParams?: {
   facultyId?: number;
   departmentId?: number;

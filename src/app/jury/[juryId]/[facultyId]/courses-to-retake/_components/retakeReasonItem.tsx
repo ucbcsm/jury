@@ -9,7 +9,7 @@ import {
   DeleteOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
-import { Button, Dropdown, List, Space, Typography } from "antd";
+import { Button, Dropdown, Flex, List, Space, Typography } from "antd";
 import { FC, useState } from "react";
 import { ValidateRetakeCourseForm } from "./validateRetakeReasonForm";
 import { InvalidateRetakeCourseForm } from "./invalidateRetakeReasonForm";
@@ -42,6 +42,7 @@ export const RetakeReasonItem: FC<RetakeReasonItemProps> = ({
       extra={
         <>
           <Dropdown
+            arrow
             menu={{
               items: [
                 type === "not_done"
@@ -123,12 +124,19 @@ export const RetakeReasonItem: FC<RetakeReasonItemProps> = ({
           </Typography.Text>
         }
         description={
-          <Space>
-            <Typography.Text type="secondary">Raison :</Typography.Text>
-            <Typography.Text type={type === "not_done" ? "danger" : "warning"}>
-              {getRetakeReasonText(itemData.reason)}
+          <Flex justify="space-between">
+            <Space>
+              <Typography.Text type="secondary">Raison :</Typography.Text>
+              <Typography.Text
+                type={type === "not_done" ? "danger" : "warning"}
+              >
+                {getRetakeReasonText(itemData.reason)}
+              </Typography.Text>
+            </Space>
+            <Typography.Text type="secondary">
+              {itemData.academic_year.name}
             </Typography.Text>
-          </Space>
+          </Flex>
         }
       />
     </List.Item>
