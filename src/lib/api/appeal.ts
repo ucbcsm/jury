@@ -2,15 +2,17 @@ import { Appeal } from "@/types";
 import api from "../fetcher"
 
 export async function getAppeals(searchParams: {
+  yearId: number | string;
   juryId: number | string;
   facultyId: number | string;
   departmentId?: number;
   classId?: number;
   status?: string;
 }) {
-  const { juryId, facultyId, departmentId, classId, status } = searchParams;
+  const {yearId, juryId, facultyId, departmentId, classId, status } = searchParams;
 
   const queryParams = new URLSearchParams();
+  queryParams.append("academic_year__id", yearId.toString());
   queryParams.append("jury__id", juryId.toString());
   queryParams.append("faculty__id", facultyId.toString());
 
@@ -23,7 +25,6 @@ export async function getAppeals(searchParams: {
   if (classId !== undefined) {
     queryParams.append("class_year__id", classId.toString());
   }
-
 
   const res = await api.get(`/jury/appeals?${queryParams.toString()}`);
   return res.data as {

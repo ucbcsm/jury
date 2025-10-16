@@ -3,7 +3,7 @@
 import { FC, useState } from "react";
 import { Alert, Form, message, Modal, Select, Button } from "antd";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Class, Course, RetakeCourseReason, User } from "@/types";
+import { Class, Course, RetakeCourseReason } from "@/types";
 import {
   addDoneRetakeReason,
   addRetakeReason,
@@ -122,45 +122,66 @@ export const NewRetakeReasonForm: FC<NewRetakeReasonFormProps> = ({
             setOpen(false);
           },
           onError: (error) => {
-            messageApi.error(
-              (error as any)?.response?.data?.message ||
-                "Erreur lors de l'ajout de la raison."
-            );
+            if ((error as any).status === 403) {
+              messageApi.error(
+                `Vous n'avez pas la permission d'effectuer cette action`
+              );
+            } else if ((error as any).status === 401) {
+              messageApi.error(
+                "Vous devez être connecté pour effectuer cette action."
+              );
+            } else {
+              messageApi.error(
+                (error as any)?.response?.data?.message ||
+                  "Erreur lors de l'ajout."
+              );
+            }
           },
         }
       );
     } else if (type === "done") {
-        createDoneRetakenReason(
-          {
-            userRetakeId: staticData.userRetakeId,
-            userId: staticData.userId,
-            facultyId: staticData.facultyId,
-            departmentId: staticData.departmentId,
-            retakeCourseAndReasonDone: [
-              {
-                available_course: values.courseId,
-                reason: values.reason,
-                academic_year: values.yearId,
-                class_year: values.classId,
-              },
-              ...(fomartedRetakeCourseReason(currentDoneRetakeCourseReason) || []),
-            ],
-          },
-          {
-            onSuccess: () => {
-              queryClient.invalidateQueries({ queryKey: ["retake-courses"] });
-              messageApi.success("Raison ajoutée avec succès !");
-              form.resetFields();
-              setOpen(false);
+      createDoneRetakenReason(
+        {
+          userRetakeId: staticData.userRetakeId,
+          userId: staticData.userId,
+          facultyId: staticData.facultyId,
+          departmentId: staticData.departmentId,
+          retakeCourseAndReasonDone: [
+            {
+              available_course: values.courseId,
+              reason: values.reason,
+              academic_year: values.yearId,
+              class_year: values.classId,
             },
-            onError: (error) => {
+            ...(fomartedRetakeCourseReason(currentDoneRetakeCourseReason) ||
+              []),
+          ],
+        },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["retake-courses"] });
+            messageApi.success("Raison ajoutée avec succès !");
+            form.resetFields();
+            setOpen(false);
+          },
+          onError: (error) => {
+            if ((error as any).status === 403) {
+              messageApi.error(
+                `Vous n'avez pas la permission d'effectuer cette action`
+              );
+            } else if ((error as any).status === 401) {
+              messageApi.error(
+                "Vous devez être connecté pour effectuer cette action."
+              );
+            } else {
               messageApi.error(
                 (error as any)?.response?.data?.message ||
-                  "Erreur lors de l'ajout de la raison."
+                  "Erreur lors de l'ajout."
               );
-            },
-          }
-        );
+            }
+          },
+        }
+      );
     }
   };
 

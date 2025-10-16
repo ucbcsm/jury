@@ -37,6 +37,11 @@ export async function getRetakeCourses(queryParams?: {
   };
 }
 
+export async function deleteStudentFromRetake(userRetakeId: number) {
+    const res = await api.delete(`/jury/retake-course/${userRetakeId}/`)
+    return res.data;
+}
+
 export async function validateRetakeCourse(data: {
   userRetakeId: number; // ID des retake pour user
   userId: number;

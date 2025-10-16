@@ -11,8 +11,10 @@ import {
   BookOutlined,
   CheckCircleOutlined,
   CloseOutlined,
+  DeleteOutlined,
   MoreOutlined,
   PlusOutlined,
+  UserAddOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -37,6 +39,7 @@ import { useEffect, useState } from "react";
 import { RetakeReasonItem } from "./_components/retakeReasonItem";
 import { NewRetakeReasonForm } from "./_components/newRetakeReasonForm";
 import { useClasses } from "@/hooks/useClasses";
+import { DeleteStudentFromRetakeForm } from "./_components/deleteStudentFromRetake";
 
 export default function Page() {
   const {
@@ -156,13 +159,12 @@ export default function Page() {
                     disabled={isPendingDepartments || isErrorDepartments}
                   />
                   <Button
-                    icon={<PlusOutlined />}
-                    variant="dashed"
-                    color="primary"
+                    icon={<UserAddOutlined />}
+                    type="primary"
                     style={{ boxShadow: "none" }}
                     title="Ajouter un étudiant avec un cours à reprendre"
                   >
-                    Ajouter
+                    Ajouter un étudiant
                   </Button>
                 </Space>
               </header>
@@ -211,15 +213,18 @@ export default function Page() {
                 dataIndex: "actions",
                 title: "",
                 render: (_, record) => (
-                  <Button
-                    color="primary"
-                    variant="dashed"
-                    style={{ boxShadow: "none" }}
-                  >
-                    Voir détails
-                  </Button>
+                  <Space>
+                    <Button
+                      color="primary"
+                      variant="dashed"
+                      style={{ boxShadow: "none" }}
+                    >
+                      Voir détails
+                    </Button>
+                    <DeleteStudentFromRetakeForm studentWithRetake={record} />
+                  </Space>
                 ),
-                width: 120,
+                width: 158,
               },
             ]}
             size="small"

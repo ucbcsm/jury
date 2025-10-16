@@ -63,7 +63,7 @@ export default function FacultyLayout({
     parseAsBoolean.withDefault(false)
   );
 
-  const { removeYid } = useYid();
+  const { yid,removeYid } = useYid();
 
   const { data: jury, isPending } = useJury(Number(juryId));
 
@@ -72,14 +72,15 @@ export default function FacultyLayout({
     isPending: isPendingAppeals,
     isError: isErrorAppeals,
   } = useQuery({
-    queryKey: ["appeals", juryId, facultyId, "submitted"],
+    queryKey: ["appeals", yid, juryId, facultyId, "submitted"],
     queryFn: ({ queryKey }) =>
       getAppeals({
+        yearId: Number(yid),
         juryId: Number(queryKey[1]),
         facultyId: Number(queryKey[2]),
         status: "submitted",
       }),
-    enabled: !!juryId && !!facultyId,
+    enabled: !!yid && !!juryId && !!facultyId,
   });
 
   return (

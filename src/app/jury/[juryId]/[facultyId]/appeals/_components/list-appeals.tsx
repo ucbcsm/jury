@@ -8,6 +8,7 @@ import { useParams } from "next/navigation";
 import dayjs from "dayjs";
 import { Options, parseAsString, useQueryState } from "nuqs";
 import { FC } from "react";
+import { useYid } from "@/hooks/use-yid";
 
 
 
@@ -26,6 +27,7 @@ export const ListAppeals: FC<ListAppealsProps> = ({
   classId,
   status,
 }) => {
+  const { yid } = useYid();
   const { juryId, facultyId } = useParams();
 
   const {
@@ -33,16 +35,17 @@ export const ListAppeals: FC<ListAppealsProps> = ({
     isPending: isPendingAppeals,
     isError: isErrorAppeals,
   } = useQuery({
-    queryKey: ["appeals", juryId, facultyId],
+    queryKey: ["appeals", yid, juryId, facultyId],
     queryFn: ({ queryKey }) =>
       getAppeals({
+        yearId: Number(yid),
         juryId: String(queryKey[1]),
         facultyId: String(queryKey[2]),
         status: status !== "all" ? status : undefined,
         departmentId: departmentId !== 0 ? departmentId : undefined,
         classId: classId !== 0 ? classId : undefined,
       }),
-    enabled: !!juryId && !!facultyId,
+    enabled: !!yid && !!juryId && !!facultyId,
   });
   if (isPendingAppeals)
     return (

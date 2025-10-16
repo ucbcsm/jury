@@ -51,7 +51,7 @@ export const DeleteRetakeReasonForm: FC<DeleteRetakeReasonFormProps> = ({
       onError: (error) => {
         if ((error as any).status === 403) {
           messageApi.error(
-            `Vous n'avez pas la permission de supprimer ce cours.`
+            `Vous n'avez pas la permission d'effectuer cette action`
           );
         } else if ((error as any).status === 401) {
           messageApi.error(
