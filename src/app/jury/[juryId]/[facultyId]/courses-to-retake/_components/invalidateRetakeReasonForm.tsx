@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Course } from "@/types";
 import { invalidateRetakeCourse } from "@/lib/api/retake-course";
 import { error } from "console";
+import { on } from "events";
 
 type FormDataType = {
   invalidate: string;
@@ -32,6 +33,11 @@ export const InvalidateRetakeCourseForm: FC<
   const { mutateAsync, isPending } = useMutation({
     mutationFn: invalidateRetakeCourse,
   });
+
+   const onCancel=()=>{
+     setOpen(false)
+     form.resetFields();
+  }
 
   const onFinish = (values: FormDataType) => {
     if (values.invalidate === course.code) {
@@ -85,7 +91,7 @@ export const InvalidateRetakeCourseForm: FC<
           style: { boxShadow: "none" },
           disabled: isPending,
         }}
-        onCancel={() => setOpen(false)}
+        onCancel={onCancel}
         destroyOnHidden
         closable={{ disabled: isPending }}
         maskClosable={!isPending}

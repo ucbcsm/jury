@@ -6,12 +6,14 @@ import {
   BookOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  DeleteOutlined,
   MoreOutlined,
 } from "@ant-design/icons";
 import { Button, Dropdown, List, Space, Typography } from "antd";
 import { FC, useState } from "react";
 import { ValidateRetakeCourseForm } from "./validateRetakeReasonForm";
 import { InvalidateRetakeCourseForm } from "./invalidateRetakeReasonForm";
+import { DeleteRetakeReasonForm } from "./deleteRetakeReason";
 
 type RetakeReasonItemProps = {
   itemData: RetakeCourseReason;
@@ -33,6 +35,7 @@ export const RetakeReasonItem: FC<RetakeReasonItemProps> = ({
 
   const [openToValidate, setOpenToValidate] = useState<boolean>(false);
   const [openToInvalidate, setOpenToInvalidate] = useState<boolean>(false);
+  const [openToDelete, setOpenToDelete] = useState<boolean>(false);
 
   return (
     <List.Item
@@ -56,40 +59,59 @@ export const RetakeReasonItem: FC<RetakeReasonItemProps> = ({
                       key: "invalidate",
                       label: "Marquer comme à refaire",
                       icon: <CloseCircleOutlined />,
-                      danger: true,
                       onClick: () => {
                         setOpenToInvalidate(true);
                       },
                     }
                   : null,
+                {
+                  key: "delete",
+                  label: "Supprimer la raison",
+                  danger: true,
+                  icon: <DeleteOutlined />,
+                  onClick: () => {
+                    setOpenToDelete(true);
+                  },
+                },
               ],
             }}
           >
             <Button type="text" icon={<MoreOutlined />} />
           </Dropdown>
-          <ValidateRetakeCourseForm
-            course={itemData.available_course}
-            open={openToValidate}
-            setOpen={setOpenToValidate}
-            staticData={{
-              userRetakeId: staticData.userRetakeId,
-              userId: staticData.userId,
-              studentName: staticData.studentName,
-              facultyId: staticData.facultyId,
-              departmentId: staticData.departmentId,
-            }}
-          />
-          <InvalidateRetakeCourseForm
-            course={itemData.available_course}
-            open={openToInvalidate}
-            setOpen={setOpenToInvalidate}
-            staticData={{
-              userRetakeId: staticData.userRetakeId,
-              userId: staticData.userId,
-              studentName: staticData.studentName,
-              facultyId: staticData.facultyId,
-              departmentId: staticData.departmentId,
-            }}
+          {type === "not_done" && (
+            <ValidateRetakeCourseForm
+              course={itemData.available_course}
+              open={openToValidate}
+              setOpen={setOpenToValidate}
+              staticData={{
+                userRetakeId: staticData.userRetakeId,
+                userId: staticData.userId,
+                studentName: staticData.studentName,
+                facultyId: staticData.facultyId,
+                departmentId: staticData.departmentId,
+              }}
+            />
+          )}
+          {type === "done" && (
+            <InvalidateRetakeCourseForm
+              course={itemData.available_course}
+              open={openToInvalidate}
+              setOpen={setOpenToInvalidate}
+              staticData={{
+                userRetakeId: staticData.userRetakeId,
+                userId: staticData.userId,
+                studentName: staticData.studentName,
+                facultyId: staticData.facultyId,
+                departmentId: staticData.departmentId,
+              }}
+            />
+          )}
+          <DeleteRetakeReasonForm
+            retakeReason={itemData}
+            studentName={staticData.studentName}
+            open={openToDelete}
+            setOpen={setOpenToDelete}
+            type={type}
           />
         </>
       }

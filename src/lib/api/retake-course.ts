@@ -83,14 +83,42 @@ export async function addRetakeReason(data: {
     academic_year: number;
     class_year: number;
   })[];
-  //   retakeCourseAndReasonDone: number[];
 }) {
-  const res = await api.put(`/jury/retake-course/${data.userRetakeId}`, {
+  const res = await api.put(`/jury/retake-course/${data.userRetakeId}/`, {
     user: data.userId,
     retakeCourseAndReason: data.retakeCourseAndReason,
     faculty: data.facultyId,
     departement: data.departmentId,
   });
+  return res.data;
+}
+
+export async function addDoneRetakeReason(data: {
+  userRetakeId: number;
+  userId: number;
+  facultyId: number;
+  departmentId: number;
+  retakeCourseAndReasonDone: (Omit<
+    RetakeCourseReason,
+    "id" | "available_course" | "academic_year" | "class_year"
+  > & {
+    id?: number;
+    available_course: number;
+    academic_year: number;
+    class_year: number;
+  })[];
+}) {
+  const res = await api.put(`/jury/retake-course/${data.userRetakeId}/`, {
+    user: data.userId,
+    retakeCourseAndReasonDone: data.retakeCourseAndReasonDone,
+    faculty: data.facultyId,
+    departement: data.departmentId,
+  });
+  return res.data;
+}
+
+export async function deleteRetakeReason(retakeReasonId: number) {
+  const res = await api.delete(`/jury/retake-course-reason/${retakeReasonId}/`);
   return res.data;
 }
 

@@ -285,28 +285,46 @@ export default function Page() {
           </Flex>
           <Tabs
             tabBarStyle={{ padding: "0 16px 0 16px" }}
-            tabBarExtraContent={
-              <NewRetakeReasonForm
-                courses={courses}
-                staticData={{
-                  userRetakeId: selectedRetake.id,
-                  userId: selectedRetake.user.id,
-                  matricule: selectedRetake.user.matricule,
-                  studentName: `${selectedRetake.user.surname} ${selectedRetake.user.last_name} ${selectedRetake.user.first_name}`,
-                  facultyId: selectedRetake.faculty.id,
-                  departmentId: selectedRetake.departement.id,
-                }}
-                currentRetakeCourseReason={selectedRetake.retake_course_list}
-                classes={classes}
-              />
-            }
+            // tabBarExtraContent={
+
+            // }
             items={[
               {
                 key: "retake_course_list",
-                label: "À refaire",
+                label: "Cours à reprendre",
                 children: (
                   <div className="px-4">
                     <List
+                      header={
+                        <header className="flex justify-between ">
+                          <Typography.Title
+                            level={5}
+                            style={{ marginBottom: 0 }}
+                            type="secondary"
+                          >
+                            {selectedRetake.retake_course_list.length} cours
+                          </Typography.Title>
+                          <NewRetakeReasonForm
+                            type="not_done"
+                            courses={courses}
+                            staticData={{
+                              userRetakeId: selectedRetake.id,
+                              userId: selectedRetake.user.id,
+                              matricule: selectedRetake.user.matricule,
+                              studentName: `${selectedRetake.user.surname} ${selectedRetake.user.last_name} ${selectedRetake.user.first_name}`,
+                              facultyId: selectedRetake.faculty.id,
+                              departmentId: selectedRetake.departement.id,
+                            }}
+                            currentRetakeCourseReason={
+                              selectedRetake.retake_course_list
+                            }
+                            currentDoneRetakeCourseReason={
+                              selectedRetake.retake_course_done_list
+                            }
+                            classes={classes}
+                          />
+                        </header>
+                      }
                       dataSource={selectedRetake.retake_course_list}
                       renderItem={(item) => (
                         <RetakeReasonItem
@@ -321,7 +339,7 @@ export default function Page() {
                           }}
                         />
                       )}
-                      size="small"
+                      //   size="small"
                       locale={{
                         emptyText: (
                           <Empty
@@ -336,10 +354,41 @@ export default function Page() {
               },
               {
                 key: "retake_course_done_list",
-                label: "Repris et acquis",
+                label: "Cours repris et acquis",
                 children: (
                   <div className="px-4">
                     <List
+                      header={
+                        <header className="flex justify-between ">
+                          <Typography.Title
+                            level={5}
+                            style={{ marginBottom: 0 }}
+                            type="secondary"
+                          >
+                            {selectedRetake.retake_course_done_list.length}{" "}
+                            cours
+                          </Typography.Title>
+                          <NewRetakeReasonForm
+                            type="done"
+                            courses={courses}
+                            staticData={{
+                              userRetakeId: selectedRetake.id,
+                              userId: selectedRetake.user.id,
+                              matricule: selectedRetake.user.matricule,
+                              studentName: `${selectedRetake.user.surname} ${selectedRetake.user.last_name} ${selectedRetake.user.first_name}`,
+                              facultyId: selectedRetake.faculty.id,
+                              departmentId: selectedRetake.departement.id,
+                            }}
+                            currentRetakeCourseReason={
+                              selectedRetake.retake_course_list
+                            }
+                            currentDoneRetakeCourseReason={
+                              selectedRetake.retake_course_done_list
+                            }
+                            classes={classes}
+                          />
+                        </header>
+                      }
                       dataSource={selectedRetake.retake_course_done_list}
                       renderItem={(item) => (
                         <RetakeReasonItem

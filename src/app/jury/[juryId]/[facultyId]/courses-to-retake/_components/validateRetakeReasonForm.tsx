@@ -35,6 +35,11 @@ export const ValidateRetakeCourseForm: FC<ValidateRetakeCourseFormProps> = ({
     mutationFn: validateRetakeCourse,
   });
 
+   const onCancel=()=>{
+     setOpen(false)
+     form.resetFields();
+  }
+
   const onFinish = (values: FormDataType) => {
     if (values.validate === course.code) {
       mutateAsync(
@@ -87,7 +92,7 @@ export const ValidateRetakeCourseForm: FC<ValidateRetakeCourseFormProps> = ({
           style: { boxShadow: "none" },
           disabled: isPending,
         }}
-        onCancel={() => setOpen(false)}
+        onCancel={onCancel}
         destroyOnHidden
         closable={{ disabled: isPending }}
         maskClosable={!isPending}

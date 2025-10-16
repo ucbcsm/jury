@@ -4,11 +4,18 @@ import { FC, useState } from "react";
 import { Alert, Form, message, Modal, Select, Button } from "antd";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Class, Course, RetakeCourseReason, User } from "@/types";
-import { addRetakeReason, fomartedRetakeCourseReason } from "@/lib/api/retake-course";
+import {
+  addDoneRetakeReason,
+  addRetakeReason,
+  fomartedRetakeCourseReason,
+} from "@/lib/api/retake-course";
 import { BulbOutlined, PlusOutlined } from "@ant-design/icons";
 import { filterOption } from "@/lib/utils";
-import { getCurrentClassesAsOptions, getYearEnrollments, getYearsAsOptions } from "@/lib/api";
-import { useYid } from "@/hooks/use-yid";
+import {
+  getCurrentClassesAsOptions,
+  getYearEnrollments,
+  getYearsAsOptions,
+} from "@/lib/api";
 
 type FormDataType = {
   courseId: number;
@@ -29,6 +36,8 @@ type NewRetakeReasonFormProps = {
     departmentId: number;
   };
   currentRetakeCourseReason: RetakeCourseReason[];
+  currentDoneRetakeCourseReason: RetakeCourseReason[];
+  type: "not_done" | "done";
 };
 
 export const NewRetakeReasonForm: FC<NewRetakeReasonFormProps> = ({
@@ -36,17 +45,27 @@ export const NewRetakeReasonForm: FC<NewRetakeReasonFormProps> = ({
   classes,
   staticData,
   currentRetakeCourseReason,
+  currentDoneRetakeCourseReason,
+  type,
 }) => {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const [open, setOpen] = useState<boolean>(false);
   const queryClient = useQueryClient();
-  const { mutateAsync, isPending } = useMutation({
+  const {
+    mutateAsync: createNotDoneRetakenReason,
+    isPending: isPendingNotDone,
+  } = useMutation({
     mutationFn: addRetakeReason,
   });
 
+  const { mutateAsync: createDoneRetakenReason, isPending: isPendingDone } =
+    useMutation({
+      mutationFn: addDoneRetakeReason,
+    });
+
   const {
-    data:enrollments,
+    data: enrollments,
     isPending: isPendingEnrollememts,
     isError,
   } = useQuery({
@@ -72,37 +91,77 @@ export const NewRetakeReasonForm: FC<NewRetakeReasonFormProps> = ({
     return years;
   };
 
+  const onCancel = () => {
+    setOpen(false);
+    form.resetFields();
+  };
+
   const onFinish = (values: FormDataType) => {
-    mutateAsync(
-      {
-        userRetakeId: staticData.userRetakeId,
-        userId: staticData.userId,
-        facultyId: staticData.facultyId,
-        departmentId: staticData.departmentId,
-        retakeCourseAndReason: [
-          {
-            available_course: values.courseId,
-            reason: values.reason,
-            academic_year: values.yearId,
-            class_year: values.classId,
+    if (type === "not_done") {
+      createNotDoneRetakenReason(
+        {
+          userRetakeId: staticData.userRetakeId,
+          userId: staticData.userId,
+          facultyId: staticData.facultyId,
+          departmentId: staticData.departmentId,
+          retakeCourseAndReason: [
+            {
+              available_course: values.courseId,
+              reason: values.reason,
+              academic_year: values.yearId,
+              class_year: values.classId,
+            },
+            ...(fomartedRetakeCourseReason(currentRetakeCourseReason) || []),
+          ],
+        },
+        {
+          onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["retake-courses"] });
+            messageApi.success("Raison ajoutée avec succès !");
+            form.resetFields();
+            setOpen(false);
           },
-          ...(fomartedRetakeCourseReason(currentRetakeCourseReason) || []),
-        ],
-      },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["retake-reasons"] });
-          messageApi.success("Raison ajoutée avec succès !");
-          setOpen(false);
-        },
-        onError: (error) => {
-          messageApi.error(
-            (error as any)?.response?.data?.message ||
-              "Erreur lors de l'ajout de la raison."
-          );
-        },
-      }
-    );
+          onError: (error) => {
+            messageApi.error(
+              (error as any)?.response?.data?.message ||
+                "Erreur lors de l'ajout de la raison."
+            );
+          },
+        }
+      );
+    } else if (type === "done") {
+        createDoneRetakenReason(
+          {
+            userRetakeId: staticData.userRetakeId,
+            userId: staticData.userId,
+            facultyId: staticData.facultyId,
+            departmentId: staticData.departmentId,
+            retakeCourseAndReasonDone: [
+              {
+                available_course: values.courseId,
+                reason: values.reason,
+                academic_year: values.yearId,
+                class_year: values.classId,
+              },
+              ...(fomartedRetakeCourseReason(currentDoneRetakeCourseReason) || []),
+            ],
+          },
+          {
+            onSuccess: () => {
+              queryClient.invalidateQueries({ queryKey: ["retake-courses"] });
+              messageApi.success("Raison ajoutée avec succès !");
+              form.resetFields();
+              setOpen(false);
+            },
+            onError: (error) => {
+              messageApi.error(
+                (error as any)?.response?.data?.message ||
+                  "Erreur lors de l'ajout de la raison."
+              );
+            },
+          }
+        );
+    }
   };
 
   return (
@@ -111,14 +170,19 @@ export const NewRetakeReasonForm: FC<NewRetakeReasonFormProps> = ({
       <Button
         icon={<PlusOutlined />}
         size="small"
-        variant="dashed"
-        color="primary"
+        type="link"
         style={{ boxShadow: "none" }}
-        title="Ajouter un cours à reprendre"
+        title={
+          type === "not_done"
+            ? "Ajouter un cours à reprendre"
+            : "Ajouter un cours déjà repris et acquis"
+        }
         onClick={() => {
           setOpen(true);
         }}
-      />
+      >
+        Ajouter
+      </Button>
       <Modal
         open={open}
         title={staticData.studentName}
@@ -130,41 +194,49 @@ export const NewRetakeReasonForm: FC<NewRetakeReasonFormProps> = ({
           autoFocus: true,
           htmlType: "submit",
           style: { boxShadow: "none" },
-          disabled: isPending,
-          loading: isPending,
+          disabled: isPendingNotDone || isPendingDone,
+          loading: isPendingNotDone || isPendingDone,
         }}
         cancelButtonProps={{
           style: { boxShadow: "none" },
-          disabled: isPending,
+          disabled: isPendingNotDone || isPendingDone,
         }}
-        onCancel={() => setOpen(false)}
+        onCancel={onCancel}
         destroyOnHidden
-        closable={{ disabled: isPending }}
-        maskClosable={!isPending}
+        closable={{ disabled: isPendingNotDone || isPendingDone }}
+        maskClosable={!isPendingNotDone || !isPendingDone}
         modalRender={(dom) => (
           <Form
             form={form}
             layout="vertical"
             name="new_retake_reason_form"
             onFinish={onFinish}
-            disabled={isPending}
+            disabled={isPendingNotDone || isPendingDone}
           >
             {dom}
           </Form>
         )}
       >
         <Alert
-          message="Ajouter un cours à reprendre"
-          description="Sélectionnez le cours à reprendre et indiquez la raison pour
-                l'étudiant."
+          message={
+            type === "not_done"
+              ? "Ajouter un cours à reprendre"
+              : "Ajouter un cours un cours déjà repris et acquis"
+          }
+          description="Sélectionnez le cours à reprendre, indiquez la raison pour laquelle l'étudiant doit le reprendre, ainsi que l'année académique et la promotion durant laquelle il a manqué ou échoué ce cours."
           type="info"
           showIcon
           icon={<BulbOutlined />}
           style={{ border: 0 }}
+          closable
         />
         <Form.Item
           name="courseId"
-          label="Cours à reprendre"
+          label={
+            type === "not_done"
+              ? "Cours à reprendre"
+              : "Cours déjà repris et acquis"
+          }
           rules={[
             { required: true, message: "Veuillez sélectionner un cours." },
           ]}
@@ -175,9 +247,13 @@ export const NewRetakeReasonForm: FC<NewRetakeReasonFormProps> = ({
             options={courses?.map((c) => ({
               label: `${c.name} (${c.code})`,
               value: c.id,
-              disabled: currentRetakeCourseReason?.some(
-                (r) => r.available_course.id === c.id
-              ),
+              disabled:
+                currentRetakeCourseReason?.some(
+                  (r) => r.available_course.id === c.id
+                ) ||
+                currentDoneRetakeCourseReason?.some(
+                  (r) => r.available_course.id === c.id
+                ),
             }))}
             showSearch
             filterOption={filterOption}
@@ -199,8 +275,9 @@ export const NewRetakeReasonForm: FC<NewRetakeReasonFormProps> = ({
         </Form.Item>
         <Form.Item
           name="yearId"
-          label="Année académique ratée"
+          label="Année académique"
           rules={[{ required: true, message: "" }]}
+          tooltip="Sélectionnez l'année académique durant laquelle l'étudiant avait manqué ou échoué ce cours."
         >
           <Select
             loading={isPendingEnrollememts}
@@ -215,8 +292,9 @@ export const NewRetakeReasonForm: FC<NewRetakeReasonFormProps> = ({
         </Form.Item>
         <Form.Item
           name="classId"
-          label="Promotion ratée"
+          label="Promotion"
           rules={[{ required: true, message: "" }]}
+          tooltip="Sélectionnez la promotion durant laquelle l'étudiant avait manqué ou échoué ce cours."
         >
           <Select options={getCurrentClassesAsOptions(classes)} />
         </Form.Item>
