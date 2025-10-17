@@ -33,6 +33,7 @@ import { PrintableListGrades } from "./printable/print-list-grades";
 import { ButtonDeleteGradeFromGrid } from "./delete-grade-item";
 import { useYid } from "@/hooks/use-yid";
 import { CompensationForm } from "./compensation-form";
+import { ListPostponeReasons } from "./listPostponeReasons";
 
 type ListYearGradesProps = {
   department?: Department;
@@ -738,7 +739,15 @@ export const ListYearGrades: FC<ListYearGradesProps> = ({
                         record.decision === "passed" ? "#00a63e" : "#e7000b",
                     }}
                   >
-                    {getDecisionText(record.decision)}
+                    {getDecisionText(record.decision)}{" "}
+                    {record.decision === "postponed" &&
+                      (classYear?.acronym === "L3" ||
+                        classYear?.acronym === "M2") && (
+                        <ListPostponeReasons
+                          itemData={record}
+                          mode="YEAR-GRADE"
+                        />
+                      )}
                   </td>
                 </tr>
                 <tr className="bg-gray-50">

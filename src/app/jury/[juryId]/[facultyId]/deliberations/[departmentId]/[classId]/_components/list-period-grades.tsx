@@ -680,13 +680,14 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                   }}
                 >
                   {getDecisionText(record.decision)}{" "}
-                  {record.decision === "postponed" && (
-                    <ListPostponeReasons
-                      itemData={record}
-                      // periodGradeId={}
-                      mode="PERIOD-GRADE"
-                    />
-                  )}
+                  {record.decision === "postponed" &&
+                    (annoucement.class_year.acronym === "L3" ||
+                      annoucement.class_year.acronym === "M2") && (
+                      <ListPostponeReasons
+                        itemData={record}
+                        mode="PERIOD-GRADE"
+                      />
+                    )}
                 </td>
               </tr>
               <tr className="bg-gray-50">

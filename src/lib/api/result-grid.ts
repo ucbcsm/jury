@@ -1,4 +1,4 @@
-import { ResultGrid } from "@/types";
+import { ResultGrid, RetakeCourse } from "@/types";
 import api from "../fetcher";
 import ExcelJS from "exceljs";
 import { getShortGradeValidationText } from "./grade-class";
@@ -95,7 +95,11 @@ export async function getPostponeReasons(queryParams: {
   query.append("mode", mode);
   const res = await api.get(`/jury/postpone-reason/?${query.toString()}`);
 
-  return res.data; //.results as PostponeReason[];
+  return res.data as {
+    retake_course_obj?: RetakeCourse;
+    reason: string;
+    missing_course_list?: { id: number; name: string }[];
+  }[];
 }
 
 /**

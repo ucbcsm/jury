@@ -1,10 +1,21 @@
 "use client";
 
 import { getPostponeReasons } from "@/lib/api";
+import { getRetakeReasonText } from "@/lib/api/retake-course";
 import { ResultGrid } from "@/types";
 import { CloseOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Drawer, theme, Typography } from "antd";
+import {
+  Button,
+  Collapse,
+  Descriptions,
+  Drawer,
+  Flex,
+  List,
+  Space,
+  theme,
+  Typography,
+} from "antd";
 import { FC, useState } from "react";
 
 type ListPostponeReasonsProps = {
@@ -43,8 +54,6 @@ export const ListPostponeReasons: FC<ListPostponeReasonsProps> = ({
     enabled: !!open,
   });
 
-  console.log("Reasons", data);
-
   return (
     <>
       <Button
@@ -71,7 +80,82 @@ export const ListPostponeReasons: FC<ListPostponeReasonsProps> = ({
         extra={
           <Button type="text" icon={<CloseOutlined />} onClick={onClose} />
         }
-      ></Drawer>
+      >
+        <Descriptions
+          // title="Détails"
+          bordered
+          size="small"
+          column={1}
+          items={[
+            {
+              key: "name",
+              label: "Étudiant",
+              children: `${itemData?.surname || ""} ${
+                itemData?.last_name || ""
+              } ${itemData?.first_name || ""} `,
+            },
+            {
+              key: "matricule",
+              label: "Matricule",
+              children: itemData?.matricule || "",
+            },
+          ]}
+          style={{ marginBottom: 16 }}
+        />
+        <Collapse
+          defaultActiveKey={data?.map((_, i) => i)}
+          items={data?.map((item, index) => ({
+            key: `${index}`,
+            label: item.reason,
+            children: (
+              <div>
+                {item.retake_course_obj && (
+                  <List
+                    dataSource={item.retake_course_obj.retake_course_list}
+                    renderItem={(item, index) => (
+                      <List.Item key={index}>
+                        <List.Item.Meta
+                          title={item.available_course.name}
+                          description={
+                            <Flex justify="space-between">
+                              <Space>
+                                <Typography.Text type="secondary">
+                                  Raison:
+                                </Typography.Text>
+                                <Typography.Text type="danger">
+                                  {getRetakeReasonText(item.reason)}
+                                </Typography.Text>
+                              </Space>
+                              <Typography.Text type="secondary">
+                                {item.class_year.acronym}:{" "}
+                                {item.academic_year.name}
+                              </Typography.Text>
+                            </Flex>
+                          }
+                        />
+                      </List.Item>
+                    )}
+                  />
+                )}
+                {item.missing_course_list && (
+                  <List
+                    dataSource={item.missing_course_list}
+                    renderItem={(item) => (
+                      <List.Item key={item.id}>
+                        <List.Item.Meta title={item.name} />
+                      </List.Item>
+                    )}
+                  />
+                )}
+              </div>
+            ),
+          }))}
+          bordered={false}
+          //   style={{ borderRadius: 0 }}
+
+          //   ghost
+        />
+      </Drawer>
     </>
   );
 };

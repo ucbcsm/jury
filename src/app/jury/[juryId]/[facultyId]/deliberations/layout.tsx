@@ -102,7 +102,6 @@ export default function DeliberationsLayout({
             items={getDepartmentsAsCollapseItems()}
             bordered={false}
             style={{ borderRadius: 0 }}
-
             //   ghost
           />
         )}
