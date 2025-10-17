@@ -40,9 +40,22 @@ export async function getAppeal(id: number | string) {
   return res.data as Appeal;
 }
 
-export async function updateAppeal(id:number, data:Partial<Appeal>){ 
-    const res = await api.put(`/jury/appeals/${id}/`, data);
-    return res.data
+export async function updateAppeal(
+  data: Omit<Appeal, "student" | "jury"|"courses"> & { studentId: number; juryId: number, coursesIds: number[] }
+) {
+  const res = await api.put(`/jury/appeals/${data.id}/`, {
+    student: data.studentId,
+    jury: data.juryId,
+    subject: data.subject,
+    description: data.description,
+    submission_date: data.submission_date,
+    courses: data.coursesIds,
+    status: data.status,
+    response: data.response,
+    file: data.file,
+    session: data.session,
+  });
+  return res.data;
 }
 
 export function getAppealStatusText(
@@ -54,12 +67,32 @@ export function getAppealStatusText(
     case "in_progress":
       return "En cours de traitement";
     case "processed":
-      return "Traité";
+      return "Fondé";
     case "rejected":
-      return "Rejeté";
+      return "Non fondé";
     case "archived":
       return "Archivé";
     default:
       return status;
   }
 }
+
+export function getAppealStatusColor(
+  status: "submitted" | "in_progress" | "processed" | "rejected" | "archived"
+) {
+  switch (status) {
+    case "submitted":
+      return "warning";
+    case "in_progress":
+      return "processing";
+    case "processed":
+      return "success";
+    case "rejected":
+      return "error";
+    case "archived":
+      return "default";
+    default:
+      return undefined;
+  }
+}
+

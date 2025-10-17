@@ -13,13 +13,12 @@ import {
   getDepartmentsByFacultyId,
 } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
-import { set } from "zod";
 import { useParams } from "next/navigation";
 
 const appealsStatus = [
   "submitted",
   "in_progress",
-  "processes",
+  "processed",
   "rejected",
   "archived",
 ];

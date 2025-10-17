@@ -5,6 +5,7 @@ import { FC } from "react";
 import { NoAppealSelected } from "./no-appeal-selected";
 import { useQuery } from "@tanstack/react-query";
 import {
+  Avatar,
   Button,
   Card,
   Col,
@@ -12,19 +13,19 @@ import {
   Divider,
   Flex,
   Form,
-  Input,
   Layout,
-  List,
   Row,
-  Select,
   Skeleton,
   Space,
+  Tag,
   theme,
   Typography,
 } from "antd";
-import { CloseOutlined } from "@ant-design/icons";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { getAppeal, getAppealStatusText, getSessionText } from "@/lib/api";
+import { getAppeal, getAppealStatusColor, getAppealStatusText, getSessionText } from "@/lib/api";
+import { RespondeToAppealForm } from "./respondeToAppealForm";
+import { getHSLColor } from "@/lib/utils";
 
 type AppealDetailsProps = {
   appealId: number | null;
@@ -46,7 +47,7 @@ export const AppealDetails: FC<AppealDetailsProps> = ({
     isPending: isPendingAppeal,
     isError: isErrorAppeal,
   } = useQuery({
-    queryKey: ["appeal", appealId],
+    queryKey: ["appeals", appealId],
     queryFn: ({ queryKey }) => getAppeal(Number(queryKey[1])),
   });
 
@@ -73,34 +74,20 @@ export const AppealDetails: FC<AppealDetailsProps> = ({
           {!isPendingAppeal ? (
             <Flex justify="space-between" align="center" gap={8}>
               <Typography.Text type="secondary">Statut</Typography.Text>
-              <Select
-                value={appeal?.status || "submitted"}
-                variant="filled"
-                options={[
-                  {
-                    value: "submitted",
-                    label: "Soumis",
-                  },
-                  {
-                    value: "in_progress",
-                    label: "En cours de traitement",
-                  },
-                  {
-                    value: "processed",
-                    label: "Traité",
-                  },
-                  {
-                    value: "rejected",
-                    label: "Rejeté",
-                  },
-                  {
-                    value: "archived",
-                    label: "Archivé",
-                  },
-                ]}
-                style={{ width: 150 }}
-                onChange={(value) => {}}
-              />
+              <Tag
+                bordered={false}
+                color={getAppealStatusColor(appeal?.status!)}
+                style={{ marginRight: 0 }}
+                icon={
+                  appeal?.status === "processed" ? (
+                    <CheckOutlined />
+                  ) : appeal?.status === "rejected" ? (
+                    <CloseOutlined />
+                  ) : undefined
+                }
+              >
+                {getAppealStatusText(appeal?.status!)}
+              </Tag>
             </Flex>
           ) : (
             <Form>
@@ -111,6 +98,7 @@ export const AppealDetails: FC<AppealDetailsProps> = ({
             type="text"
             icon={<CloseOutlined />}
             onClick={() => setAppealId(null)}
+            title="Fermer ce recours"
           />
         </Space>
       </Layout.Header>
@@ -123,9 +111,33 @@ export const AppealDetails: FC<AppealDetailsProps> = ({
           loading={isPendingAppeal}
         >
           <Row gutter={24}>
-            <Col span={8}>
+            <Col xs={24} sm={24} md={8}>
+              <Space style={{ marginBottom: 16 }}>
+                <Avatar
+                  src={appeal?.student.user.avatar}
+                  size={64}
+                  style={{
+                    background: getHSLColor(
+                      `${appeal?.student.user.surname} ${appeal?.student.user.first_name} ${appeal?.student.user.last_name}`
+                    ),
+                  }}
+                >
+                  {appeal?.student.user &&
+                    appeal?.student.user.surname?.charAt(0).toUpperCase()}
+                </Avatar>
+                <Typography.Title level={4} style={{ margin: 0 }}>
+                  {appeal?.student.user.matricule}
+                </Typography.Title>
+              </Space>
+              {/* <Divider /> */}
+              <Space
+                direction="vertical"
+                size="middle"
+                style={{ width: "100%" }}
+              ></Space>
               <Descriptions
-                title="Etudiant"
+                bordered
+                size="small"
                 column={1}
                 items={[
                   {
@@ -173,33 +185,43 @@ export const AppealDetails: FC<AppealDetailsProps> = ({
                   {
                     key: "status",
                     label: "Statut",
-                    children: appeal?.status
-                      ? getAppealStatusText(appeal.status)
-                      : "",
+                    children: (
+                      <Tag
+                        bordered={false}
+                        color={getAppealStatusColor(appeal?.status!)}
+                        style={{ marginRight: 0 }}
+                        icon={
+                          appeal?.status === "processed" ? (
+                            <CheckOutlined />
+                          ) : appeal?.status === "rejected" ? (
+                            <CloseOutlined />
+                          ) : undefined
+                        }
+                      >
+                        {getAppealStatusText(appeal?.status!)}
+                      </Tag>
+                    ),
                   },
                 ]}
               />
-              <Divider />
-              {/* <Typography.Title level={5}>Cours</Typography.Title>
-              <List
-                dataSource={appeal?.courses}
-                renderItem={(course) => (
-                  <List.Item key={course.id}>
-                    <List.Item.Meta title={course.available_course.name} />
-                  </List.Item>
-                )}
-              />
-              <Divider /> */}
-              <Typography.Title level={5}>Pièce jointe</Typography.Title>
+              {/* <Divider /> */}
+              {/* <Typography.Title level={5}>Pièce jointe</Typography.Title> */}
             </Col>
-            <Col span={16}>
-              <Typography.Title level={5}>Objet</Typography.Title>
-              <Typography.Paragraph>
-                {appeal?.subject && appeal.subject.trim().length > 0
-                  ? appeal.subject
-                  : "Aucun objet renseigné"}
-              </Typography.Paragraph>
-              <Typography.Title level={5}>Message</Typography.Title>
+            <Col xs={24} sm={24} md={16}>
+              <Space>
+                <Typography.Title level={5} type="secondary">
+                  Objet :
+                </Typography.Title>
+                <Typography.Title level={5}>
+                  {appeal?.subject && appeal.subject.trim().length > 0
+                    ? appeal.subject
+                    : "Aucun objet renseigné"}
+                </Typography.Title>
+              </Space>
+              <Divider />
+              <Typography.Title level={5} type="secondary">
+                Message (réclamation)
+              </Typography.Title>
               <div className=" italic">
                 {/* <Typography.Paragraph > */}
                 {appeal?.description && appeal.description.trim().length > 0
@@ -208,31 +230,16 @@ export const AppealDetails: FC<AppealDetailsProps> = ({
                 {/* </Typography.Paragraph> */}
               </div>
               <Divider />
-              <Form layout="vertical">
-                <Form.Item
-                  label="Réponse"
-                  name="response"
-                  rules={[{ required: true }]}
-                  extra="La réponse sera envoyée à l'étudiant par email. Il pourra aussi la consulter dans son espace étudiant."
-                >
-                  <Input.TextArea
-                    rows={5}
-                    placeholder="Ecrire une réponse..."
-                    value={appeal?.response || ""}
-                    // disabled
-                  />
-                </Form.Item>
-                <Form.Item>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    // disabled={!appeal?.response}
-                    style={{ boxShadow: "none" }}
-                  >
-                    Envoyer
-                  </Button>
-                </Form.Item>
-              </Form>
+              {appeal?.response && appeal.response.trim().length > 0 ? (
+                <>
+                  <Typography.Title level={5} type="secondary">
+                    Reponse
+                  </Typography.Title>
+                  <div className=" italic">{appeal.response}</div>
+                </>
+              ) : (
+                <RespondeToAppealForm appeal={appeal} />
+              )}
             </Col>
           </Row>
         </Card>

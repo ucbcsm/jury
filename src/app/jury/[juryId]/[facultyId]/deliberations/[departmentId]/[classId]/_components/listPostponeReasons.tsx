@@ -3,7 +3,7 @@
 import { getPostponeReasons } from "@/lib/api";
 import { getRetakeReasonText } from "@/lib/api/retake-course";
 import { ResultGrid } from "@/types";
-import { CloseOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { BookOutlined, CloseOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
   Button,
@@ -115,7 +115,11 @@ export const ListPostponeReasons: FC<ListPostponeReasonsProps> = ({
                     renderItem={(item, index) => (
                       <List.Item key={index}>
                         <List.Item.Meta
-                          title={item.available_course.name}
+                          title={
+                            <Typography.Text>
+                              <BookOutlined /> {item.available_course.name}
+                            </Typography.Text>
+                          }
                           description={
                             <Flex justify="space-between">
                               <Space>

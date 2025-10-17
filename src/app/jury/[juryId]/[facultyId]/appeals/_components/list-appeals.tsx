@@ -3,7 +3,7 @@
 import { DataFetchPendingSkeleton } from "@/components/loadingSkeleton";
 import { getAppeals, } from "@/lib/api/appeal";
 import { useQuery } from "@tanstack/react-query";
-import { Flex,  List, Typography } from "antd";
+import { Flex,  List, Skeleton, Typography } from "antd";
 import { useParams } from "next/navigation";
 import dayjs from "dayjs";
 import { Options, parseAsString, useQueryState } from "nuqs";
@@ -50,7 +50,7 @@ export const ListAppeals: FC<ListAppealsProps> = ({
   if (isPendingAppeals)
     return (
       <div className="p-4">
-        <DataFetchPendingSkeleton />
+        <Skeleton active />
       </div>
     );
   return (
