@@ -5,20 +5,15 @@ import { ResultGrid } from "@/types";
 import { CloseOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Button, Drawer, theme, Typography } from "antd";
-import { get } from "lodash";
 import { FC, useState } from "react";
 
 type ListPostponeReasonsProps = {
   itemData: ResultGrid["BodyDataList"][number];
-  periodGradeId?: number;
-  yearGradeId?: number;
   mode: "PERIOD-GRADE" | "YEAR-GRADE";
 };
 
 export const ListPostponeReasons: FC<ListPostponeReasonsProps> = ({
   itemData,
-  periodGradeId,
-  yearGradeId,
   mode,
 }) => {
   const {
@@ -33,16 +28,16 @@ export const ListPostponeReasons: FC<ListPostponeReasonsProps> = ({
   const { data, isPending } = useQuery({
     queryKey: [
       "postpone-reasons",
-      periodGradeId,
-      yearGradeId,
+      itemData.id,
+      itemData.id,
       mode,
       itemData.user_id,
     ],
     queryFn: () =>
       getPostponeReasons({
         mode: mode,
-        periodGradeId,
-        yearGradeId,
+        periodGradeId: mode === "PERIOD-GRADE" ? itemData.id : undefined,
+        yearGradeId: mode === "YEAR-GRADE" ? itemData.id : undefined,
         userId: itemData.user_id,
       }),
     enabled: !!open,

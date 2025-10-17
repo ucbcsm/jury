@@ -683,7 +683,7 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                   {record.decision === "postponed" && (
                     <ListPostponeReasons
                       itemData={record}
-                      periodGradeId={annoucement.period.id}
+                      // periodGradeId={}
                       mode="PERIOD-GRADE"
                     />
                   )}

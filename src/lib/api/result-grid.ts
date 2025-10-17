@@ -94,6 +94,7 @@ export async function getPostponeReasons(queryParams: {
   query.append("user__id", userId.toString());
   query.append("mode", mode);
   const res = await api.get(`/jury/postpone-reason/?${query.toString()}`);
+
   return res.data; //.results as PostponeReason[];
 }
 
