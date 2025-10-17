@@ -204,15 +204,17 @@ export const AppealDetails: FC<AppealDetailsProps> = ({
                   },
                 ]}
               />
-              {/* <Divider /> */}
-              {/* <Typography.Title level={5}>Pièce jointe</Typography.Title> */}
             </Col>
             <Col xs={24} sm={24} md={16}>
               <Space>
-                <Typography.Title level={5} type="secondary">
+                <Typography.Title
+                  level={5}
+                  type="secondary"
+                  style={{ marginBottom: 0 }}
+                >
                   Objet :
                 </Typography.Title>
-                <Typography.Title level={5}>
+                <Typography.Title level={5} style={{ marginBottom: 0 }}>
                   {appeal?.subject && appeal.subject.trim().length > 0
                     ? appeal.subject
                     : "Aucun objet renseigné"}
