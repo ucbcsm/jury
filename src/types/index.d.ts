@@ -1305,7 +1305,7 @@ export const ResultGrid = z.object({
       last_name: z.string(),
       matricule: z.string(),
       year_enrollment_id: z.number(),
-      obj_userId: z.number(),
+      user_id: z.number(),
       percentage: z.number(),
       surname: z.string(),
       unvalidated_TU_count: z.number(),

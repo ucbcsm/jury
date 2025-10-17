@@ -131,9 +131,9 @@ export const AppealDetails: FC<AppealDetailsProps> = ({
                   {
                     key: "name",
                     label: "Noms",
-                    children: `${appeal?.student.user.first_name || ""} ${
+                    children: `${appeal?.student.user.surname || ""} ${
                       appeal?.student.user.last_name || ""
-                    } ${appeal?.student.user.surname || ""}`,
+                    } ${appeal?.student.user.first_name || ""}`,
                   },
                   {
                     key: "matricule",

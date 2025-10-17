@@ -19,6 +19,7 @@ import { useReactToPrint } from "react-to-print";
 import { PrintableListGrades } from "./printable/print-list-grades";
 import { ButtonDeleteGradeFromGrid } from "./delete-grade-item";
 import { CompensationForm } from "./compensation-form";
+import { ListPostponeReasons } from "./listPostponeReasons";
 
 type ListPeriodGradesProps = {
   annoucement: Announcement;
@@ -678,7 +679,14 @@ export const ListPeriodGrades: FC<ListPeriodGradesProps> = ({
                     color: record.decision === "passed" ? "#00a63e" : "#e7000b",
                   }}
                 >
-                  {getDecisionText(record.decision)}
+                  {getDecisionText(record.decision)}{" "}
+                  {record.decision === "postponed" && (
+                    <ListPostponeReasons
+                      itemData={record}
+                      periodGradeId={annoucement.period.id}
+                      mode="PERIOD-GRADE"
+                    />
+                  )}
                 </td>
               </tr>
               <tr className="bg-gray-50">

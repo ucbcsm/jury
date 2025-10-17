@@ -47,7 +47,6 @@ export const RetakeReasonItem: FC<RetakeReasonItemProps> = ({
   const [openToInvalidate, setOpenToInvalidate] = useState<boolean>(false);
   const [openToDelete, setOpenToDelete] = useState<boolean>(false);
   const [openToEdit, setOpenToEdit] = useState<boolean>(false);
-
   return (
     <List.Item
       extra={
@@ -171,7 +170,7 @@ export const RetakeReasonItem: FC<RetakeReasonItemProps> = ({
               </Typography.Text>
             </Space>
             <Typography.Text type="secondary">
-              {itemData.academic_year.name}
+              {itemData.academic_year.name} {itemData.class_year.acronym}
             </Typography.Text>
           </Flex>
         }

@@ -77,6 +77,26 @@ export async function deleteGradeFromGrid(periodEnrollmentId: number) {
   return res.data;
 }
 
+export async function getPostponeReasons(queryParams: {
+  yearGradeId?: number;
+  periodGradeId?: number;
+  userId: number;
+  mode: "PERIOD-GRADE" | "YEAR-GRADE";
+}) {
+  const { yearGradeId, periodGradeId, userId, mode } = queryParams;
+  const query = new URLSearchParams();
+  if (yearGradeId !== undefined) {
+    query.append("year_grade__id", yearGradeId.toString());
+  }
+  if (periodGradeId !== undefined) {
+    query.append("period_grade__id", periodGradeId.toString());
+  }
+  query.append("user__id", userId.toString());
+  query.append("mode", mode);
+  const res = await api.get(`/jury/postpone-reason/?${query.toString()}`);
+  return res.data; //.results as PostponeReason[];
+}
+
 /**
  * Exporte les données ResultGrid dans un fichier Excel (.xlsx)
  * @param data Les données du tableau de type ResultGrid

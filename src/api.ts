@@ -157,6 +157,11 @@
 // https://ciucbc.pythonanywhere.com/api/v01/jury/deliberation-minutes/
 // https://ciucbc.pythonanywhere.com/api/v01/jury/grade-report/
 // https://ciucbc.pythonanywhere.com/api/v01/jury/result-presentation/
+// https://ciucbc.pythonanywhere.com/api/v01/jury/postpone-reason/
+mode
+period_grade__id
+year_grade__id
+user__id
 
 //  https://ciucbc.pythonanywhere.com/api/v01/jury/student-results-grid
         // academic_year__id

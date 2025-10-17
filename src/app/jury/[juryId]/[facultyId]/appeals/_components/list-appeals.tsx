@@ -65,7 +65,7 @@ export const ListAppeals: FC<ListAppealsProps> = ({
             style={{ cursor: "pointer" }}
           >
             <List.Item.Meta
-              title={`${item.student.user.first_name} ${item.student.user.last_name} ${item.student.user.surname}`}
+              title={`${item.student.user.surname} ${item.student.user.last_name} ${item.student.user.first_name}`}
               description={
                 <Flex justify="space-between" gap={8}>
                   <Typography.Text type="secondary" ellipsis={{}}>
