@@ -52,7 +52,6 @@ export default function DeliberationsLayout({
       children: (
         <div className="pl-8">
           <TreeClassesAppeals classes={classes} department={dep} />
-          {/* <ListClasses classes={classes} department={dep}/> */}
         </div>
       ),
       extra: dep.id.toString() === departmentId ? <EyeOutlined /> : undefined,
@@ -96,7 +95,6 @@ export default function DeliberationsLayout({
             items={getDepartmentsAsCollapseItems()}
             bordered={false}
             style={{ borderRadius: 0 }}
-            //   ghost
           />
         )}
       </Splitter.Panel>

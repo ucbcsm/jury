@@ -58,6 +58,7 @@ export default function Page() {
     "dep",
     parseAsInteger.withDefault(0)
   );
+
   const [search, setSearch] = useQueryState("search");
 
   const [selectedRetake, setSelectedRetake] = useState<
@@ -161,14 +162,7 @@ export default function Page() {
                     loading={isPendingDepartments}
                     disabled={isPendingDepartments || isErrorDepartments}
                   />
-                  {/* <Button
-                    icon={<UserAddOutlined />}
-                    type="primary"
-                    style={{ boxShadow: "none" }}
-                    title="Ajouter un étudiant avec un cours à reprendre"
-                  >
-                    Ajouter un étudiant
-                  </Button> */}
+
                   <NewStudentWithRetakeForm
                     courses={courses}
                     classes={classes}

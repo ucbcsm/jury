@@ -12,10 +12,10 @@ import { SearchOutlined } from "@ant-design/icons";
 
 const appealsStatus = [
   "submitted",
-  "in_progress",
+  // "in_progress",
   "processed",
   "rejected",
-  "archived",
+  // "archived",
 ];
 
 type ListAppealsProps = {
@@ -29,7 +29,6 @@ type ListAppealsProps = {
 export const ListAppeals: FC<ListAppealsProps> = ({
   appealId,
   setAppealId,
-
 }) => {
  
   const { yid } = useYid();

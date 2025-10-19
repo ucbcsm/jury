@@ -40,6 +40,7 @@ export async function getRetakeCourses(queryParams?: {
   if (departmentId !== undefined) {
     query.append("departement__id", departmentId.toString());
   }
+
   if (page !== undefined) {
     query.append("page", page.toString());
   }
