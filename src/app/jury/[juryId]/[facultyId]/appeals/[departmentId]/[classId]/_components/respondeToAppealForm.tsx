@@ -73,8 +73,8 @@ export const RespondeToAppealForm: FC<RespondeToAppealFormProps> = ({ appeal }) 
   return (
     <>
       {contextHolder}
-      <Typography.Title level={5}>Réponse à la réclamation</Typography.Title>
-      <Card>
+      <Typography.Title level={5} type="secondary">Réponse à la réclamation</Typography.Title>
+      {/* <Card  > */}
         <Form
           layout="vertical"
           form={form}
@@ -149,7 +149,7 @@ export const RespondeToAppealForm: FC<RespondeToAppealFormProps> = ({ appeal }) 
             </Button>
           </Form.Item>
         </Form>
-      </Card>
+      {/* </Card> */}
     </>
   );
 };

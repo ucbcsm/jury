@@ -4,11 +4,12 @@ import {
   getDepartmentsByFacultyId,
 } from "@/lib/api";
 import {
-  EyeOutlined,
+    EyeOutlined,
   SubnodeOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import {
+    Badge,
   Collapse,
   type CollapseProps,
   Flex,
@@ -18,8 +19,8 @@ import {
   Typography,
 } from "antd";
 import { useParams } from "next/navigation";
-import { TreeClasses } from "./_components/tree-classes";
 import { useClasses } from "@/hooks/useClasses";
+import { TreeClassesAppeals } from "./_components/treeClasses";
 
 export default function DeliberationsLayout({
   children,
@@ -50,7 +51,7 @@ export default function DeliberationsLayout({
       icon: <SubnodeOutlined />,
       children: (
         <div className="pl-8">
-          <TreeClasses classes={classes} department={dep} />
+          <TreeClassesAppeals classes={classes} department={dep} />
           {/* <ListClasses classes={classes} department={dep}/> */}
         </div>
       ),

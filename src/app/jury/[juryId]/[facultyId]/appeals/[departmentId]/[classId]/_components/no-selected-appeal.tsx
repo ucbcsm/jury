@@ -3,7 +3,7 @@
 import { MailOutlined } from "@ant-design/icons";
 import { Layout, Result } from "antd";
 
-export const NoAppealSelected = () => {
+export const NoSelectedAppeal=()=> {
   return (
     <Layout>
       <Layout.Content
