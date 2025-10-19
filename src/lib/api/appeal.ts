@@ -8,23 +8,37 @@ export async function getAppeals(searchParams: {
   departmentId?: number;
   classId?: number;
   status?: string;
+  search?: string;
+  page?: number;
+  pageSize?: number;
 }) {
-  const {yearId, juryId, facultyId, departmentId, classId, status } = searchParams;
+  const { yearId, juryId, facultyId, departmentId, classId, status, search, page, pageSize } =
+    searchParams;
 
   const queryParams = new URLSearchParams();
   queryParams.append("academic_year__id", yearId.toString());
   queryParams.append("jury__id", juryId.toString());
   queryParams.append("faculty__id", facultyId.toString());
 
-  if (status !== undefined) {
-    queryParams.append("status", status.toString());
-  }
   if (departmentId !== undefined) {
     queryParams.append("departement__id", departmentId.toString());
   }
   if (classId !== undefined) {
     queryParams.append("class_year__id", classId.toString());
   }
+  if (status !== undefined) {
+    queryParams.append("status", status.toString());
+  }
+  if (search !== undefined) {
+    queryParams.append("search", search);
+  }
+  if (page !== undefined) {
+    queryParams.append("page", page.toString());
+  }
+  if (pageSize !== undefined) {
+    queryParams.append("page_size", pageSize.toString());
+  }
+
 
   const res = await api.get(`/jury/appeals?${queryParams.toString()}`);
   return res.data as {
