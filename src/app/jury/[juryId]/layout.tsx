@@ -17,6 +17,7 @@ import {
   LogoutOutlined,
   MailOutlined,
   MenuOutlined,
+  RedoOutlined,
   SolutionOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -282,7 +283,7 @@ export default function FacultyLayout({
                         Cours à reprendre
                       </Link>
                     ),
-                    icon: <SolutionOutlined />, //<RedoOutlined />,
+                    icon: <RedoOutlined />,
                     disabled: typeof facultyId === "undefined",
                   },
                   {

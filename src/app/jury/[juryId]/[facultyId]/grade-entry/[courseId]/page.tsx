@@ -524,7 +524,7 @@ export default function Page() {
                   dataIndex: "names",
                   title: "Noms",
                   render: (_, record) =>
-                    `${record.student?.year_enrollment.user.first_name} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.surname}`,
+                    `${record.student?.year_enrollment.user.surname} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.first_name}`,
                   ellipsis: true,
                   fixed: "left",
                 },
@@ -728,7 +728,11 @@ export default function Page() {
                     <Tag
                       color={getGradeValidationColor(record.validation)}
                       bordered={false}
-                      style={{ width: "100%", padding: "4px 8px", textAlign:"center" }}
+                      style={{
+                        width: "100%",
+                        padding: "4px 8px",
+                        textAlign: "center",
+                      }}
                       icon={
                         record.validation === "validated" ? (
                           <CheckCircleOutlined />

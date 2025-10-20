@@ -197,7 +197,7 @@ export const ImportFileGradeSubmissionForm: FC<
                 marginTop: 0,
                 textTransform: "uppercase",
               }}
-              type="warning"
+              type="success"
             >
               {course?.available_course.name}
             </Typography.Title>

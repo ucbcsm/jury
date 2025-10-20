@@ -176,7 +176,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                 marginTop: 0,
                 textTransform: "uppercase",
               }}
-              type="warning"
+              type="success"
             >
               {course?.available_course.name}
             </Typography.Title>
@@ -184,10 +184,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
               onClick={() => setOpenCancelForm(true)}
               type="text"
               icon={<CloseOutlined />}
-              disabled={
-                isPending ||
-                !newGradeClassItems
-              }
+              disabled={isPending || !newGradeClassItems}
             />
           </Flex>
         }
@@ -355,7 +352,7 @@ export const BulkGradeSubmissionForm: FC<BulkGradeSubmissionFormProps> = ({
                 dataIndex: "names",
                 title: "Noms",
                 render: (_, record) =>
-                  `${record.student?.year_enrollment.user.first_name} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.surname}`,
+                  `${record.student?.year_enrollment.user.surname} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.first_name}`,
                 ellipsis: true,
               },
               {

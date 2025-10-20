@@ -178,7 +178,9 @@ export const ExportSomeStudentsToExcelForm: FC<
               </Space>
               <div className="flex-1" />
               <Space>
-                <Typography.Text>{selectedRows.length} séléctions</Typography.Text>
+                <Typography.Text>
+                  {selectedRows.length} séléctions
+                </Typography.Text>
               </Space>
             </header>
           )}
@@ -201,7 +203,7 @@ export const ExportSomeStudentsToExcelForm: FC<
               dataIndex: "names",
               title: "Noms",
               render: (_, record) =>
-                `${record.student?.year_enrollment.user.first_name} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.surname}`,
+                `${record.student?.year_enrollment.user.surname} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.first_name}`,
             },
             {
               key: "promotion",

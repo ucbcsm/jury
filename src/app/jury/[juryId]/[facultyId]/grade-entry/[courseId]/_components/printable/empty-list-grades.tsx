@@ -20,50 +20,51 @@ export const EmptyListGradesToPrint: FC<EmptyListGradesToPrintProps> = ({
       <div ref={ref}>
         {/* <Watermark content="UCBC"> */}
         <div>
-          <DocHeader/>
-          <Typography.Title level={3} style={{}}>Fiche de notes</Typography.Title>
-          <Card>
-            <Descriptions
-              size="small"
-              column={2}
-              items={[
-                {
-                  key: "course_code",
-                  label: "Code du cours",
-                  children: course?.available_course.code || "",
-                },
-                {
-                  key: "course_title",
-                  label: "Intitulé du cours",
-                  children: course?.available_course.name || "",
-                },
-                {
-                  key: "teacher",
-                  label: "Enseignant",
-                  children: course?.teacher?.user
-                    ? `${course.teacher.user.first_name} ${course.teacher.user.last_name} ${course.teacher.user.surname}`
-                    : "",
-                },
-                {
-                  key: "semester",
-                  label: "Semestre",
-                  children: course?.period?.name || "",
-                },
-                {
-                  key: "year",
-                  label: "Année académique",
-                  children: course?.academic_year?.name || "",
-                },
-                {
-                  key: "departments",
-                  label: "Mention (s)",
-                  children: course?.departements
-                    .map((dep) => dep.name)
-                    .join(","),
-                },
-              ]}
-            />
-          </Card>
+          <DocHeader />
+          <Typography.Title level={3} style={{}}>
+            Fiche de notes
+          </Typography.Title>
+          {/* <Card> */}
+          <Descriptions
+            size="small"
+            column={2}
+            bordered
+            items={[
+              {
+                key: "course_code",
+                label: "Code du cours",
+                children: course?.available_course.code || "",
+              },
+              {
+                key: "course_title",
+                label: "Intitulé du cours",
+                children: course?.available_course.name || "",
+              },
+              {
+                key: "teacher",
+                label: "Enseignant",
+                children: course?.teacher?.user
+                  ? `${course.teacher.user.first_name} ${course.teacher.user.last_name} ${course.teacher.user.surname}`
+                  : "",
+              },
+              {
+                key: "semester",
+                label: "Semestre",
+                children: course?.period?.name || "",
+              },
+              {
+                key: "year",
+                label: "Année académique",
+                children: course?.academic_year?.name || "",
+              },
+              {
+                key: "departments",
+                label: "Mention (s)",
+                children: course?.departements.map((dep) => dep.name).join(","),
+              },
+            ]}
+          />
+          {/* </Card> */}
           <div className="pt-7">
             <Table
               dataSource={courseEnrollments || []}
@@ -97,7 +98,7 @@ export const EmptyListGradesToPrint: FC<EmptyListGradesToPrintProps> = ({
                   dataIndex: "student",
                   title: "Noms",
                   render: (_, record) =>
-                    `${record.student?.year_enrollment.user.first_name} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.surname}`,
+                    `${record.student?.year_enrollment.user.surname} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.first_name}`,
                 },
                 {
                   key: "continuous_assessment",

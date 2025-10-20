@@ -191,7 +191,7 @@ export const PrintSomeStudentsForm: FC<PrintSomeStudentsFormProps> = ({
               dataIndex: "names",
               title: "Noms",
               render: (_, record) =>
-                `${record.student?.year_enrollment.user.first_name} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.surname}`,
+                `${record.student?.year_enrollment.user.surname} ${record.student?.year_enrollment.user.last_name} ${record.student?.year_enrollment.user.first_name}`,
             },
             {
               key: "promotion",

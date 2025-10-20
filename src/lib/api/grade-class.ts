@@ -216,7 +216,7 @@ export async function exportEmptyGradesToExcel(
   worksheet.addRow(["Intitulé du cours:", `${course.available_course.name}`]); // row 4
   worksheet.addRow([
     "Enseignant:",
-    `${course.teacher?.user.first_name} ${course.teacher?.user.last_name} ${course.teacher?.user.surname}`,
+    `${course.teacher?.user.surname} ${course.teacher?.user.last_name} ${course.teacher?.user.first_name}`,
   ]); // row 5
   worksheet.addRow(["Année académique:", `${course.academic_year?.name}`]); // row 6
   worksheet.addRow(["Semestre:", `${course.period?.acronym}`]); // row 7
@@ -234,7 +234,7 @@ export async function exportEmptyGradesToExcel(
     worksheet.addRow([
       enrollment.student?.year_enrollment.user.matricule ?? "",
       `${enrollment.student.year_enrollment.class_year.acronym} - ${enrollment.student.year_enrollment.departement.acronym}`,
-      `${enrollment.student.year_enrollment.user.first_name} ${enrollment.student.year_enrollment.user.last_name} ${enrollment.student.year_enrollment.user.surname}`,
+      `${enrollment.student.year_enrollment.user.surname} ${enrollment.student.year_enrollment.user.last_name} ${enrollment.student.year_enrollment.user.first_name}`,
       "", // Contrôle Continu
       "", // Examen
       "", // Total
