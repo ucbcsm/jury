@@ -1,2 +1,2 @@
-## SMS-UCBC (Student Management System)
+## Student Management System
 
