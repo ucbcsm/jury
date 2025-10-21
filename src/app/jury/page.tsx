@@ -84,7 +84,7 @@ export default function Page() {
       typeof error === "object" &&
       error !== null &&
       "status" in error &&
-      (error as any).status === 404
+      ((error as any).status === 404 || (error as any).status === 503)
     ) {
       messageApi.error("Vous n'êtes associé(e) à aucun jury!");
     } else if (isErrorJury) {
@@ -108,36 +108,39 @@ export default function Page() {
         }}
       >
         <div style={{ width: 400, margin: "auto" }}>
-          {isErrorJury && (error as any).status === 404 && (
-            <Alert
-              type="error"
-              message="Accès non autorisé"
-              description="Vous n'êtes associé(e) à aucun jury dans le système. Merci de contacter l'administrateur afin qu'il vous associe à un jury."
-              style={{ marginBottom: 20 }}
-              action={
-                <Button
-                  type="primary"
-                  style={{ boxShadow: "none" }}
-                  onClick={() => {
-                    setIsLoadingLogout(true);
-                    logout()
-                      .then(() => {
-                        removeYid();
-                        window.location.href = "/auth/login";
-                      })
-                      .catch((error) => {
-                        messageApi.error(
-                          "Ouf, une erreur est survenue, Veuillez réessayer!"
-                        );
-                        setIsLoadingLogout(false);
-                      });
-                  }}
-                >
-                  OK
-                </Button>
-              }
-            />
-          )}
+          {isErrorJury &&
+            ((error as any).status === 404 ||
+              (error as any).status === 503) && (
+              <Alert
+                showIcon
+                type="info"
+                message="Accès non autorisé"
+                description="Vous n'êtes associé(e) à aucun jury dans le système. Merci de contacter l'administrateur afin qu'il vous associe à un jury."
+                style={{ marginBottom: 20, border: 0 }}
+                action={
+                  <Button
+                    type="primary"
+                    style={{ boxShadow: "none" }}
+                    onClick={() => {
+                      setIsLoadingLogout(true);
+                      logout()
+                        .then(() => {
+                          removeYid();
+                          window.location.href = "/auth/login";
+                        })
+                        .catch((error) => {
+                          messageApi.error(
+                            "Ouf, une erreur est survenue, Veuillez réessayer!"
+                          );
+                          setIsLoadingLogout(false);
+                        });
+                    }}
+                  >
+                    OK
+                  </Button>
+                }
+              />
+            )}
           <Card loading={isPending}>
             <Typography.Title level={4}>Année</Typography.Title>
             <List
